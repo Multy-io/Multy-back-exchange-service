@@ -1,4 +1,4 @@
-package Api
+package api
 
 import (
 	"log"
@@ -9,13 +9,13 @@ import (
 //main level, shoud go to main
 type TickerCollection struct {
 	TimpeStamp time.Time
-	Tickers []Ticker `json:"array"`
+	Tickers []Ticker
 }
 
 //main level, shoud go to main
 type Ticker struct {
-	Symbol 	string `json:"s"`
-	Rate	string `json:"c"`
+	Symbol 	string
+	Rate	string
 }
 
 
@@ -27,14 +27,17 @@ type BinanceTicker struct {
 }
 
 type BinanceManager struct {
-
+	binanceApi BinanceApi
 }
 
 
-var binanceApi = BinanceApi{}
+
 
 func (b BinanceManager)  StartListen(callback func(tickerCollection TickerCollection, error error)) {
-	binanceApi.StartListen( func(message []byte, error error) {
+
+	b.binanceApi = BinanceApi{}
+
+	b.binanceApi.StartListen( func(message []byte, error error) {
 		if error != nil {
 			log.Println("binance error:", error)
 			callback(TickerCollection{}, error)

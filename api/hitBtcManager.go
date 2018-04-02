@@ -1,4 +1,4 @@
-package Api
+package api
 
 import (
 
@@ -11,7 +11,8 @@ import (
 
 
 type HitBtcManager struct {
-
+	tickers map[string]Ticker
+	hitBtcApi HitBtcApi
 }
 
 type HitBtcTicker struct {
@@ -25,13 +26,14 @@ func (hitBtcTicker HitBtcTicker) IsFilled() bool {
 	return (len(hitBtcTicker.Params.Symbol) > 0 && len(hitBtcTicker.Params.Rate) > 0)
 }
 
-var tickers = make(map[string]Ticker)
 
-var hitBtcApi = HitBtcApi{}
 
 func (b HitBtcManager) StartListen(callback func(tickerCollection TickerCollection, error error)) {
 
-	go hitBtcApi.StartListen( func(message []byte, error error) {
+	b.tickers = make(map[string]Ticker)
+	b.hitBtcApi = HitBtcApi{}
+
+	go b.hitBtcApi.StartListen( func(message []byte, error error) {
 		if error != nil {
 			log.Println("error:", error)
 			//callback(nil, error)
@@ -40,7 +42,7 @@ func (b HitBtcManager) StartListen(callback func(tickerCollection TickerCollecti
 			var hitBtcTicker HitBtcTicker
 			error := json.Unmarshal(message, &hitBtcTicker)
 			if error == nil && hitBtcTicker.IsFilled()  {
-				add(hitBtcTicker)
+				b.add(hitBtcTicker)
 			} else {
 				fmt.Println( "error parsing hitBtc ticker:", error)
 			}
@@ -51,7 +53,7 @@ func (b HitBtcManager) StartListen(callback func(tickerCollection TickerCollecti
 		//TODO: add check if data is old and don't sent it ti callback
 		func() {
 			values := []Ticker{}
-			for _, value := range tickers {
+			for _, value := range b.tickers {
 				values = append(values, value)
 			}
 
@@ -63,9 +65,9 @@ func (b HitBtcManager) StartListen(callback func(tickerCollection TickerCollecti
 	}
 }
 
-func add(hitBtcTicker HitBtcTicker) {
+func (b HitBtcManager) add(hitBtcTicker HitBtcTicker) {
 	var ticker = Ticker{}
 	ticker.Rate = hitBtcTicker.Params.Rate
 	ticker.Symbol = hitBtcTicker.Params.Symbol
-	tickers[ticker.Symbol] = ticker
+	b.tickers[ticker.Symbol] = ticker
 }

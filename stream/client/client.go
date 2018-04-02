@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	serverAddr         = flag.String("server_addr", "127.0.0.1:10000", "The Server address in the format of host:port")
+	serverAddr         = flag.String("server_addr", "127.0.0.1:10000", "The server address in the format of host:port")
 )
 
 
@@ -37,7 +37,7 @@ func printAllTickers(client StreamDescription.TickerGRPCServerClient) {
 
 
 func main() {
-	log.Println("starting Client")
+	log.Println("starting client")
 	flag.Parse()
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())

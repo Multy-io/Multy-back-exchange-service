@@ -1,4 +1,4 @@
-package Api
+package api
 
 import (
 	"net/url"
@@ -8,9 +8,9 @@ import (
 	"time"
 	"fmt"
 )
-var binanceHost = "stream.binance.com:9443"
-var tickerPath = "/ws/!ticker@arr"
 
+const binanceHost = "stream.binance.com:9443"
+const tickerPath = "/ws/!ticker@arr"
 
 type BinanceApi struct {
 	connection *websocket.Conn

@@ -1,4 +1,4 @@
-package Server
+package server
 
 
 import (
@@ -8,20 +8,20 @@ import (
 	"net"
 	"google.golang.org/grpc"
 	"time"
-	"binanceParser/Api"
-	"binanceParser/Stream/StreamDescription"
+	"Multy-back-exchange-service/api"
+	"Multy-back-exchange-service/stream/streamDescription"
 )
 
 var (
-	port = flag.Int("port", 10000, "The Server port")
+	port = flag.Int("port", 10000, "The server port")
 )
 
 
 type Server struct {
-	ServerHandler func(*map[string]Api.TickerCollection)
+	ServerHandler func(*map[string]api.TickerCollection)
 }
 
-func (s *Server) Tickers(whoAreYouParams *StreamDescription.WhoAreYouParams, stream StreamDescription.TickerGRPCServer_TickersServer) error {
+func (s *Server) Tickers(whoAreYouParams *streamDescription.WhoAreYouParams, stream streamDescription.TickerGRPCServer_TickersServer) error {
 
 	for range time.Tick(1 * time.Second) {
 		if streemError := stream.Context().Err(); streemError != nil  {
@@ -29,21 +29,21 @@ func (s *Server) Tickers(whoAreYouParams *StreamDescription.WhoAreYouParams, str
 			break
 		}
 
-		var allTickers = make(map[string]Api.TickerCollection)
+		var allTickers = make(map[string]api.TickerCollection)
 
 		s.ServerHandler(&allTickers)
 
-		var streamTickers = StreamDescription.Tickers{}
-		streamTickers.ExchangeTickers = []*StreamDescription.ExchangeTickers{}
+		var streamTickers = streamDescription.Tickers{}
+		streamTickers.ExchangeTickers = []*streamDescription.ExchangeTickers{}
 
 		for exchange, tickers := range allTickers {
-			var exhangeTickers = StreamDescription.ExchangeTickers{}
+			var exhangeTickers = streamDescription.ExchangeTickers{}
 			exhangeTickers.Exchange = exchange
 			exhangeTickers.TimpeStamp = tickers.TimpeStamp.Unix()
 
-			var nodeTickers = []*StreamDescription.Ticker{}
+			var nodeTickers = []*streamDescription.Ticker{}
 			for _, ticker := range tickers.Tickers {
-				var nodeTicker = StreamDescription.Ticker{}
+				var nodeTicker = streamDescription.Ticker{}
 				nodeTicker.Rate = ticker.Rate
 				nodeTicker.Symbol = ticker.Symbol
 
@@ -75,6 +75,6 @@ func (s *Server) StartServer() {
 	var opts []grpc.ServerOption
 
 	grpcServer := grpc.NewServer(opts...)
-	StreamDescription.RegisterTickerGRPCServerServer(grpcServer, s)
+	streamDescription.RegisterTickerGRPCServerServer(grpcServer, s)
 	grpcServer.Serve(lis)
 }

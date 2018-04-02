@@ -1,4 +1,4 @@
-package Api
+package api
 
 import (
 	"net/url"
@@ -8,8 +8,9 @@ import (
 	"fmt"
 )
 
-var hitBtcHost = "api.hitbtc.com"
-var hitBtcPath = "/api/2/ws"
+
+const hitBtcHost = "api.hitbtc.com"
+const hitBtcPath = "/api/2/ws"
 
 type HitBtcApi struct {
 	connection *websocket.Conn
