@@ -17,6 +17,7 @@ var binanceManager = exchangeApi.BinanceManager{}
 var hitBtcManager = exchangeApi.HitBtcManager{}
 var poloniexManager = exchangeApi.PoloniexManager{}
 var bitfinexManager = exchangeApi.BitfinexManager{}
+var gdaxManager = exchangeApi.GdaxManager{}
 var server = stream.Server{}
 
 type Map struct {
@@ -67,6 +68,15 @@ func main() {
 		} else {
 			//fmt.Println(tickerCollection)
 			add(tickerCollection, "Bitfinex")
+		}
+	} )
+
+	go gdaxManager.StartListen( func(tickerCollection exchangeApi.TickerCollection, error error) {
+		if error != nil {
+			log.Println("error:", error)
+		} else {
+			//fmt.Println(tickerCollection)
+			add(tickerCollection, "Gdax")
 		}
 	} )
 
