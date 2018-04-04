@@ -19,7 +19,7 @@ type HitBtcApi struct {
 
 
 
-func (b HitBtcApi)  StartListen(callback func(message []byte, error error)) {
+func (b *HitBtcApi)  StartListen(callback func(message []byte, error error)) {
 	url := url.URL{Scheme: "wss", Host: hitBtcHost, Path: hitBtcPath}
 	log.Printf("connecting to %s", url.String())
 
@@ -72,7 +72,7 @@ func (b HitBtcApi)  StartListen(callback func(message []byte, error error)) {
 
 }
 
-func (b HitBtcApi)  StopListen() {
+func (b *HitBtcApi)  StopListen() {
 	//fmt.Println("before close")
 	//b.connection.Close()
 	//fmt.Println("closed")

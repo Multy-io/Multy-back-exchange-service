@@ -1,4 +1,4 @@
-package api
+package core
 
 import (
 	"log"
@@ -6,11 +6,12 @@ import (
 	"encoding/json"
 	"strconv"
 	"time"
+	"Multy-back-exchange-service/api"
 )
 
 type BitfinexManager struct {
 	bitfinexTickers map[int]BitfinexTicker
-	api BitfinexApi
+	api *api.BitfinexApi
 }
 
 type BitfinexTicker struct {
@@ -27,9 +28,9 @@ type BitfinexTicker struct {
 }
 
 
-func (b BitfinexManager) StartListen(callback func(tickerCollection TickerCollection, error error)) {
+func (b *BitfinexManager) StartListen(callback func(tickerCollection TickerCollection, error error)) {
 	b.bitfinexTickers = make(map[int]BitfinexTicker)
-	b.api = BitfinexApi{}
+	b.api = &api.BitfinexApi{}
 
 	go b.api.StartListen( func(message []byte, error error) {
 		//fmt.Println(0)
@@ -67,7 +68,7 @@ func (b BitfinexManager) StartListen(callback func(tickerCollection TickerCollec
 }
 
 
-func (b BitfinexManager) addMessage (message []byte) {
+func (b *BitfinexManager) addMessage (message []byte) {
 
 	var bitfinexTicker BitfinexTicker
 	json.Unmarshal(message, &bitfinexTicker)

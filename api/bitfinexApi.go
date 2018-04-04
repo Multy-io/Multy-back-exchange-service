@@ -23,7 +23,7 @@ type BitfinexApi struct {
 
 
 
-func (b BitfinexApi)  StartListen(callback func(message []byte, error error)) {
+func (b *BitfinexApi)  StartListen(callback func(message []byte, error error)) {
 	url := url.URL{Scheme: "wss", Host: bitfinexHost, Path: bitfinexPath}
 	log.Printf("connecting to %s", url.String())
 
@@ -69,7 +69,7 @@ func (b BitfinexApi)  StartListen(callback func(message []byte, error error)) {
 
 }
 
-func (b BitfinexApi)  StopListen() {
+func (b *BitfinexApi)  StopListen() {
 	//fmt.Println("before close")
 	//b.connection.Close()
 	//fmt.Println("closed")

@@ -1,22 +1,11 @@
-package api
+package core
 
 import (
 	"log"
 	"encoding/json"
 	"time"
+	"Multy-back-exchange-service/api"
 )
-
-//main level, shoud go to main
-type TickerCollection struct {
-	TimpeStamp time.Time
-	Tickers []Ticker
-}
-
-//main level, shoud go to main
-type Ticker struct {
-	Symbol 	string
-	Rate	string
-}
 
 
 type BinanceTicker struct {
@@ -27,15 +16,13 @@ type BinanceTicker struct {
 }
 
 type BinanceManager struct {
-	binanceApi BinanceApi
+	binanceApi *api.BinanceApi
 }
 
 
+func (b *BinanceManager)  StartListen(callback func(tickerCollection TickerCollection, error error)) {
 
-
-func (b BinanceManager)  StartListen(callback func(tickerCollection TickerCollection, error error)) {
-
-	b.binanceApi = BinanceApi{}
+	b.binanceApi = &api.BinanceApi{}
 
 	b.binanceApi.StartListen( func(message []byte, error error) {
 		if error != nil {

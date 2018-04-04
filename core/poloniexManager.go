@@ -1,4 +1,4 @@
-package api
+package core
 
 import (
 
@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"time"
 	"strconv"
+	"Multy-back-exchange-service/api"
 )
 
 type PoloniexTicker struct {
@@ -17,7 +18,7 @@ type PoloniexTicker struct {
 
 type PoloniexManager struct {
 	tickers map[string]Ticker
-	poloniexApi PoloniexApi
+	poloniexApi *api.PoloniexApi
 	channelsByID map[string]string
 }
 
@@ -27,10 +28,10 @@ func (poloniexTicker PoloniexTicker) IsFilled() bool {
 }
 
 
-func (b PoloniexManager) StartListen(callback func(tickerCollection TickerCollection, error error)) {
+func (b *PoloniexManager) StartListen(callback func(tickerCollection TickerCollection, error error)) {
 
 	b.tickers = make(map[string]Ticker)
-	b.poloniexApi = PoloniexApi{}
+	b.poloniexApi = &api.PoloniexApi{}
 	b.channelsByID = map[string]string{"121":"USDT_BTC", "149":"USDT_ETH", "168":"BTC_STEEM", "123":"USDT_LTC","191":"USDT_BCH","173":"USDT_ETC","122":"USDT_DASH"}
 
 	go b.poloniexApi.StartListen( func(message []byte, error error) {
@@ -81,7 +82,7 @@ func (b PoloniexManager) StartListen(callback func(tickerCollection TickerCollec
 }
 
 
-func (b PoloniexManager) convertArgsToTicker(args []interface{}) (wsticker PoloniexTicker, err error) {
+func (b *PoloniexManager) convertArgsToTicker(args []interface{}) (wsticker PoloniexTicker, err error) {
 	wsticker.CurrencyPair = b.channelsByID[strconv.FormatFloat(args[0].(float64), 'f', 0, 64)]
 	wsticker.Last = args[1].(string)
 	return

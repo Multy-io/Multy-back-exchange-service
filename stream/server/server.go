@@ -8,20 +8,28 @@ import (
 	"net"
 	"google.golang.org/grpc"
 	"time"
-	"Multy-back-exchange-service/api"
-	"Multy-back-exchange-service/stream/streamDescription"
 )
 
 var (
 	port = flag.Int("port", 10000, "The server port")
 )
 
-
-type Server struct {
-	ServerHandler func(*map[string]api.TickerCollection)
+type StreamTickerCollection struct {
+	TimpeStamp time.Time
+	Tickers []StreamTicker
 }
 
-func (s *Server) Tickers(whoAreYouParams *streamDescription.WhoAreYouParams, stream streamDescription.TickerGRPCServer_TickersServer) error {
+type StreamTicker struct {
+	Symbol 	string
+	Rate	string
+}
+
+
+type Server struct {
+	ServerHandler func(*map[string]StreamTickerCollection)
+}
+
+func (s *Server) Tickers(whoAreYouParams *WhoAreYouParams, stream TickerGRPCServer_TickersServer) error {
 
 	for range time.Tick(1 * time.Second) {
 		if streemError := stream.Context().Err(); streemError != nil  {
@@ -29,21 +37,21 @@ func (s *Server) Tickers(whoAreYouParams *streamDescription.WhoAreYouParams, str
 			break
 		}
 
-		var allTickers = make(map[string]api.TickerCollection)
+		var allTickers = make(map[string]StreamTickerCollection)
 
 		s.ServerHandler(&allTickers)
 
-		var streamTickers = streamDescription.Tickers{}
-		streamTickers.ExchangeTickers = []*streamDescription.ExchangeTickers{}
+		var streamTickers = Tickers{}
+		streamTickers.ExchangeTickers = []*ExchangeTickers{}
 
 		for exchange, tickers := range allTickers {
-			var exhangeTickers = streamDescription.ExchangeTickers{}
+			var exhangeTickers = ExchangeTickers{}
 			exhangeTickers.Exchange = exchange
 			exhangeTickers.TimpeStamp = tickers.TimpeStamp.Unix()
 
-			var nodeTickers = []*streamDescription.Ticker{}
+			var nodeTickers = []*Ticker{}
 			for _, ticker := range tickers.Tickers {
-				var nodeTicker = streamDescription.Ticker{}
+				var nodeTicker = Ticker{}
 				nodeTicker.Rate = ticker.Rate
 				nodeTicker.Symbol = ticker.Symbol
 
@@ -75,6 +83,6 @@ func (s *Server) StartServer() {
 	var opts []grpc.ServerOption
 
 	grpcServer := grpc.NewServer(opts...)
-	streamDescription.RegisterTickerGRPCServerServer(grpcServer, s)
+	RegisterTickerGRPCServerServer(grpcServer, s)
 	grpcServer.Serve(lis)
 }

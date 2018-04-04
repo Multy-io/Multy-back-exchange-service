@@ -13,7 +13,7 @@ It has these top-level messages:
 	Ticker
 	WhoAreYouParams
 */
-package streamDescription
+package server
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"

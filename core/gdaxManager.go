@@ -1,4 +1,4 @@
-package api
+package core
 
 import (
 
@@ -7,13 +7,14 @@ import (
 	"encoding/json"
 	//"github.com/Appscrunch/Multy-back/client"
 	"time"
+	"Multy-back-exchange-service/api"
 )
 
 
 
 type GdaxManager struct {
 	tickers map[string]Ticker
-	gdaxApi GdaxApi
+	gdaxApi *api.GdaxApi
 }
 
 type GdaxTicker struct {
@@ -36,10 +37,10 @@ func (ticker GdaxTicker) IsFilled() bool {
 
 
 
-func (b GdaxManager) StartListen(callback func(tickerCollection TickerCollection, error error)) {
+func (b *GdaxManager) StartListen(callback func(tickerCollection TickerCollection, error error)) {
 
 	b.tickers = make(map[string]Ticker)
-	b.gdaxApi = GdaxApi{}
+	b.gdaxApi = &api.GdaxApi{}
 
 	go b.gdaxApi.StartListen( func(message []byte, error error) {
 		if error != nil {
@@ -74,7 +75,7 @@ func (b GdaxManager) StartListen(callback func(tickerCollection TickerCollection
 	}
 }
 
-func (b GdaxManager) add(gdaxTicker GdaxTicker) {
+func (b *GdaxManager) add(gdaxTicker GdaxTicker) {
 	var ticker = Ticker{}
 	ticker.Rate = gdaxTicker.Rate
 	ticker.Symbol = gdaxTicker.Symbol

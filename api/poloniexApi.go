@@ -22,7 +22,7 @@ type PoloniexApi struct {
 
 
 
-func (b PoloniexApi)  StartListen(callback func(message []byte, error error)) {
+func (b *PoloniexApi)  StartListen(callback func(message []byte, error error)) {
 	url := url.URL{Scheme: "wss", Host: host, Path: path}
 	log.Printf("connecting to %s", url.String())
 
@@ -54,7 +54,7 @@ func (b PoloniexApi)  StartListen(callback func(message []byte, error error)) {
 
 }
 
-func (b PoloniexApi)  StopListen() {
+func (b *PoloniexApi)  StopListen() {
 	//fmt.Println("before close")
 	//b.connection.Close()
 	//fmt.Println("closed")

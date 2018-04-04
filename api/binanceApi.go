@@ -16,7 +16,7 @@ type BinanceApi struct {
 	connection *websocket.Conn
 }
 
-func (b BinanceApi)  StartListen(callback func(message []byte, error error)) {
+func (b *BinanceApi)  StartListen(callback func(message []byte, error error)) {
 	url := url.URL{Scheme: "wss", Host: binanceHost, Path: tickerPath}
 	log.Printf("connecting to %s", url.String())
 
@@ -41,7 +41,7 @@ func (b BinanceApi)  StartListen(callback func(message []byte, error error)) {
 
 }
 
-func (b BinanceApi)  StopListen() {
+func (b *BinanceApi)  StopListen() {
 	//fmt.Println("before close")
 	//b.connection.Close()
 	//fmt.Println("closed")

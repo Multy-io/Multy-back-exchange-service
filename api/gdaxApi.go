@@ -19,7 +19,7 @@ type GdaxApi struct {
 
 
 
-func (b GdaxApi)  StartListen(callback func(message []byte, error error)) {
+func (b *GdaxApi)  StartListen(callback func(message []byte, error error)) {
 	url := url.URL{Scheme: "wss", Host: gdaxHost, Path: ""}
 	log.Printf("connecting to %s", url.String())
 
@@ -52,7 +52,7 @@ func (b GdaxApi)  StartListen(callback func(message []byte, error error)) {
 
 }
 
-func (b GdaxApi)  StopListen() {
+func (b *GdaxApi)  StopListen() {
 	//fmt.Println("before close")
 	//b.connection.Close()
 	//fmt.Println("closed")

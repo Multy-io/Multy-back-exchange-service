@@ -1,4 +1,4 @@
-package api
+package core
 
 import (
 
@@ -6,13 +6,14 @@ import (
 	"fmt"
 	"encoding/json"
 	"time"
+	"Multy-back-exchange-service/api"
 )
 
 
 
 type HitBtcManager struct {
 	tickers map[string]Ticker
-	hitBtcApi HitBtcApi
+	hitBtcApi *api.HitBtcApi
 }
 
 type HitBtcTicker struct {
@@ -28,10 +29,10 @@ func (hitBtcTicker HitBtcTicker) IsFilled() bool {
 
 
 
-func (b HitBtcManager) StartListen(callback func(tickerCollection TickerCollection, error error)) {
+func (b *HitBtcManager) StartListen(callback func(tickerCollection TickerCollection, error error)) {
 
 	b.tickers = make(map[string]Ticker)
-	b.hitBtcApi = HitBtcApi{}
+	b.hitBtcApi = &api.HitBtcApi{}
 
 	go b.hitBtcApi.StartListen( func(message []byte, error error) {
 		if error != nil {
@@ -65,7 +66,7 @@ func (b HitBtcManager) StartListen(callback func(tickerCollection TickerCollecti
 	}
 }
 
-func (b HitBtcManager) add(hitBtcTicker HitBtcTicker) {
+func (b *HitBtcManager) add(hitBtcTicker HitBtcTicker) {
 	var ticker = Ticker{}
 	ticker.Rate = hitBtcTicker.Params.Rate
 	ticker.Symbol = hitBtcTicker.Params.Symbol
