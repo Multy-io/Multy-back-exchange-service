@@ -34,7 +34,11 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 	b.tickers = make(map[string]Ticker)
 	b.hitBtcApi = &api.HitBtcApi{}
 
-	go b.hitBtcApi.StartListen( func(message []byte, error error) {
+	var apiCurrenciesConfiguration = api.ApiCurrenciesConfiguration{}
+	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
+	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
+
+	go b.hitBtcApi.StartListen(apiCurrenciesConfiguration, func(message []byte, error error) {
 		if error != nil {
 			log.Println("error:", error)
 			//callback(nil, error)

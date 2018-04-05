@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c5b380ad-a446-4ec8-9b01-d260a726246b" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/api/gdaxApi.go" afterPath="$PROJECT_DIR$/api/gdaxApi.go" />
-      <change beforePath="$PROJECT_DIR$/core/gdaxManager.go" afterPath="$PROJECT_DIR$/core/gdaxManager.go" />
+      <change beforePath="$PROJECT_DIR$/api/hitBtcApi.go" afterPath="$PROJECT_DIR$/api/hitBtcApi.go" />
+      <change beforePath="$PROJECT_DIR$/core/hitBtcManager.go" afterPath="$PROJECT_DIR$/core/hitBtcManager.go" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -15,18 +14,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="bitfinexApi.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/api/bitfinexApi.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="283">
-              <caret line="37" column="90" lean-forward="false" selection-start-line="37" selection-start-column="35" selection-end-line="37" selection-end-column="90" />
-              <folding>
-                <element signature="e#13#99#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="binanceApi.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/api/binanceApi.go">
           <provider selected="true" editor-type-id="text-editor">
@@ -52,8 +39,8 @@
       <file leaf-file-name="gdaxManager.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/gdaxManager.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="249">
-              <caret line="48" column="56" lean-forward="false" selection-start-line="48" selection-start-column="56" selection-end-line="48" selection-end-column="56" />
+            <state relative-caret-position="219">
+              <caret line="46" column="94" lean-forward="false" selection-start-line="44" selection-start-column="4" selection-end-line="46" selection-end-column="94" />
               <folding>
                 <element signature="e#14#144#0" expanded="true" />
               </folding>
@@ -61,11 +48,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="gdaxApi.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="gdaxApi.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/api/gdaxApi.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="106">
-              <caret line="65" column="30" lean-forward="true" selection-start-line="65" selection-start-column="30" selection-end-line="65" selection-end-column="30" />
+            <state relative-caret-position="540">
+              <caret line="59" column="9" lean-forward="true" selection-start-line="45" selection-start-column="8" selection-end-line="59" selection-end-column="9" />
               <folding>
                 <element signature="e#13#121#0" expanded="true" />
               </folding>
@@ -105,11 +92,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="hitBtcApi.go" pinned="false" current-in-tab="false">
+      <file leaf-file-name="hitBtcApi.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/api/hitBtcApi.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="696">
-              <caret line="74" column="9" lean-forward="false" selection-start-line="74" selection-start-column="9" selection-end-line="74" selection-end-column="9" />
+            <state relative-caret-position="449">
+              <caret line="59" column="0" lean-forward="true" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -169,11 +156,9 @@
         <option value="$PROJECT_DIR$/api/poloniexManager.go" />
         <option value="$PROJECT_DIR$/stream/server/server.go" />
         <option value="$PROJECT_DIR$/api/binanceApi.go" />
-        <option value="$PROJECT_DIR$/api/hitBtcApi.go" />
         <option value="$PROJECT_DIR$/api/okexApi.go" />
         <option value="$PROJECT_DIR$/api/poloniexApi.go" />
         <option value="$PROJECT_DIR$/main/main.go" />
-        <option value="$PROJECT_DIR$/core/hitBtcManager.go" />
         <option value="$PROJECT_DIR$/core/okexManager.go" />
         <option value="$PROJECT_DIR$/core/poloniexManager.go" />
         <option value="$PROJECT_DIR$/core/manager.go" />
@@ -183,6 +168,8 @@
         <option value="$PROJECT_DIR$/core/gdaxManager.go" />
         <option value="$PROJECT_DIR$/api/gdaxApi.go" />
         <option value="$PROJECT_DIR$/core/agregator.go" />
+        <option value="$PROJECT_DIR$/core/hitBtcManager.go" />
+        <option value="$PROJECT_DIR$/api/hitBtcApi.go" />
       </list>
     </option>
   </component>
@@ -649,16 +636,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/hitBtcManager.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="146">
-          <caret line="31" column="81" lean-forward="false" selection-start-line="31" selection-start-column="81" selection-end-line="31" selection-end-column="81" />
-          <folding>
-            <element signature="e#14#99#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/api/okexApi.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="621">
@@ -681,14 +658,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="540">
           <caret line="43" column="9" lean-forward="false" selection-start-line="43" selection-start-column="9" selection-end-line="43" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/api/hitBtcApi.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="696">
-          <caret line="74" column="9" lean-forward="false" selection-start-line="74" selection-start-column="9" selection-end-line="74" selection-end-column="9" />
           <folding />
         </state>
       </provider>
@@ -747,21 +716,37 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/core/gdaxManager.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="249">
-          <caret line="48" column="56" lean-forward="false" selection-start-line="48" selection-start-column="56" selection-end-line="48" selection-end-column="56" />
+        <state relative-caret-position="219">
+          <caret line="46" column="94" lean-forward="false" selection-start-line="44" selection-start-column="4" selection-end-line="46" selection-end-column="94" />
           <folding>
             <element signature="e#14#144#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/core/hitBtcManager.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="286">
+          <caret line="40" column="58" lean-forward="false" selection-start-line="40" selection-start-column="58" selection-end-line="40" selection-end-column="58" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/api/gdaxApi.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="106">
-          <caret line="65" column="30" lean-forward="true" selection-start-line="65" selection-start-column="30" selection-end-line="65" selection-end-column="30" />
+        <state relative-caret-position="540">
+          <caret line="59" column="9" lean-forward="true" selection-start-line="45" selection-start-column="8" selection-end-line="59" selection-end-column="9" />
           <folding>
             <element signature="e#13#121#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/hitBtcApi.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="449">
+          <caret line="59" column="0" lean-forward="true" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 	//"fmt"
 	"fmt"
+	"encoding/json"
 )
 
 
@@ -16,10 +17,19 @@ type HitBtcApi struct {
 	connection *websocket.Conn
 }
 
+type HitBtcSubscription struct {
+	Method string `json:"method"`
+	Params HitBtcSubscriptionParams `json:"params"`
+	ID int `json:"id"`
+}
+
+type HitBtcSubscriptionParams struct {
+	Symbol string `json:"symbol"`
+}
 
 
 
-func (b *HitBtcApi)  StartListen(callback func(message []byte, error error)) {
+func (b *HitBtcApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback func(message []byte, error error)) {
 	url := url.URL{Scheme: "wss", Host: hitBtcHost, Path: hitBtcPath}
 	log.Printf("connecting to %s", url.String())
 
@@ -31,32 +41,22 @@ func (b *HitBtcApi)  StartListen(callback func(message []byte, error error)) {
 	} else if connection != nil {
 		fmt.Println("HitBtc ws connected")
 
-		//TODO: get symbols from exhange
-		subscribtionBTCUSD := `{"method":"subscribeTicker","params":{"symbol": "BTCUSD"},"id": 10000}`
-		subscribtionETHBTC := `{"method":"subscribeTicker","params":{"symbol":"ETHBTC"},"id": 10000}`
-		subscribtionETHUSD := `{"method":"subscribeTicker","params":{"symbol":"ETHUSD"},"id": 10000}`
 
-		subscribtionBCHUSD := `{"method":"subscribeTicker","params":{"symbol":"BCHUSD"},"id": 10000}`
-		subscribtionLTCUSD := `{"method":"subscribeTicker","params":{"symbol":"LTCUSD"},"id": 10000}`
-		subscribtionXMRUSD := `{"method":"subscribeTicker","params":{"symbol":"XMRUSD"},"id": 10000}`
-		subscribtionDASHUSD := `{"method":"subscribeTicker","params":{"symbol":"DASHUSD"},"id": 10000}`
-		subscribtionEOSUSD := `{"method":"subscribeTicker","params":{"symbol":"EOSUSD"},"id": 10000}`
-		subscribtionXRPUSD := `{"method":"subscribeTicker","params":{"symbol":"XRPUSD"},"id": 10000}`
-		subscribtionZECUSD := `{"method":"subscribeTicker","params":{"symbol":"ZECUSD"},"id": 10000}`
+		productsIds :=  b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
 
+		for _, productId := range  productsIds {
 
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtionBTCUSD))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtionETHBTC))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtionETHUSD))
+			hitBtcSubscriptionParams := HitBtcSubscriptionParams{}
+			hitBtcSubscriptionParams.Symbol = productId
 
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtionBCHUSD))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtionLTCUSD))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtionXMRUSD))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtionDASHUSD))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtionEOSUSD))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtionXRPUSD))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtionZECUSD))
+			subscribtion := HitBtcSubscription{}
+			subscribtion.Method = "subscribeTicker"
+			subscribtion.ID = 10000
+			subscribtion.Params = hitBtcSubscriptionParams
 
+			msg, _ := json.Marshal(subscribtion)
+			connection.WriteMessage(websocket.TextMessage, msg)
+		}
 
 		for {
 			func() {
@@ -76,4 +76,21 @@ func (b *HitBtcApi)  StopListen() {
 	//fmt.Println("before close")
 	//b.connection.Close()
 	//fmt.Println("closed")
+}
+
+func (b *HitBtcApi)  composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCurrenciesConfiguration) []string {
+	var smybolsForSubscirbe = []string{}
+	for _, targetCurrency := range apiCurrenciesConfiguration.TargetCurrencies {
+		for _, referenceCurrency := range apiCurrenciesConfiguration.ReferenceCurrencies {
+
+			if targetCurrency == referenceCurrency {
+				continue
+			}
+
+			symbol := targetCurrency + referenceCurrency
+			smybolsForSubscirbe = append(smybolsForSubscirbe, symbol)
+		}
+	}
+	return smybolsForSubscirbe
+
 }
