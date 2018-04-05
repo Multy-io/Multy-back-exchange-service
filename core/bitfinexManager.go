@@ -28,9 +28,9 @@ type BitfinexTicker struct {
 }
 
 
-func (b *BitfinexManager) StartListen(callback func(tickerCollection TickerCollection, error error)) {
+func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
 	b.bitfinexTickers = make(map[int]BitfinexTicker)
-	b.api = &api.BitfinexApi{}
+	b.api = api.NewBitfinexApi()
 
 	go b.api.StartListen( func(message []byte, error error) {
 		//fmt.Println(0)

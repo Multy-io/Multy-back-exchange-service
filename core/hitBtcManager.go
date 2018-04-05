@@ -29,7 +29,7 @@ func (hitBtcTicker HitBtcTicker) IsFilled() bool {
 
 
 
-func (b *HitBtcManager) StartListen(callback func(tickerCollection TickerCollection, error error)) {
+func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
 
 	b.tickers = make(map[string]Ticker)
 	b.hitBtcApi = &api.HitBtcApi{}

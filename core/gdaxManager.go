@@ -37,7 +37,7 @@ func (ticker GdaxTicker) IsFilled() bool {
 
 
 
-func (b *GdaxManager) StartListen(callback func(tickerCollection TickerCollection, error error)) {
+func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
 
 	b.tickers = make(map[string]Ticker)
 	b.gdaxApi = &api.GdaxApi{}

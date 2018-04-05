@@ -19,11 +19,19 @@ type biftfinexSubscription struct {
 
 type BitfinexApi struct {
 	//connection *websocket.Conn
+	symbolesForSubscirbe []string
+}
+
+func NewBitfinexApi() *BitfinexApi {
+	var api = BitfinexApi{}
+	api.symbolesForSubscirbe = []string{"tBTCUSD", "tETHUSD","tBTSUSD", "tSTEEMUSD", "tWAVESUSD", "tLTCUSD", "tBCHUSD", "tETCUSD", "tDASHUSD", "tEOSUSD",  "tETHBTC","tBTSBTC", "tSTEEMBTC", "tWAVESBTC", "tLTCBTC", "tBCHBTC", "tETCBTC", "tDASHBTC", "tEOSBTC"}
+	return &api
 }
 
 
 
 func (b *BitfinexApi)  StartListen(callback func(message []byte, error error)) {
+
 	url := url.URL{Scheme: "wss", Host: bitfinexHost, Path: bitfinexPath}
 	log.Printf("connecting to %s", url.String())
 
@@ -35,23 +43,10 @@ func (b *BitfinexApi)  StartListen(callback func(message []byte, error error)) {
 	} else if connection != nil {
 		fmt.Println("Bitfinex ws connected")
 
-
-		subscribtion0 := `{"event":"subscribe","channel":"ticker","symbol": "tBTCUSD"}`
-		subscribtion1 := `{"event":"subscribe","channel":"ticker","symbol": "tETHUSD"}`
-
-		subscribtion2 := `{"event":"subscribe","channel":"ticker","symbol": "tLTCUSD"}`
-		subscribtion3 := `{"event":"subscribe","channel":"ticker","symbol": "tBCHUSD"}`
-
-		subscribtion4 := `{"event":"subscribe","channel":"ticker","symbol": "tETCUSD"}`
-		subscribtion5 := `{"event":"subscribe","channel":"ticker","symbol": "tEOSUSD"}`
-
-
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtion0))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtion1))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtion2))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtion3))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtion4))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtion5))
+		for _, symbol := range b.symbolesForSubscirbe {
+			subscribtion := `{"event":"subscribe","channel":"ticker","symbol": "` + symbol + `"}`
+			connection.WriteMessage(websocket.TextMessage, []byte(subscribtion))
+		}
 
 		for {
 			func() {

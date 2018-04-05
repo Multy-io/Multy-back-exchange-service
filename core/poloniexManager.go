@@ -28,7 +28,7 @@ func (poloniexTicker PoloniexTicker) IsFilled() bool {
 }
 
 
-func (b *PoloniexManager) StartListen(callback func(tickerCollection TickerCollection, error error)) {
+func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
 
 	b.tickers = make(map[string]Ticker)
 	b.poloniexApi = &api.PoloniexApi{}

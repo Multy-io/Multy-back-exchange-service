@@ -44,7 +44,7 @@ func (ticker OkexTicker) IsFilled() bool {
 
 
 
-func (b *OkexManager) StartListen(callback func(tickerCollection TickerCollection, error error)) {
+func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
 
 	b.tickers = make(map[string]Ticker)
 	b.okexApi = &api.OkexApi{}
