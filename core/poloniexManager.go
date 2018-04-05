@@ -8,6 +8,12 @@ import (
 	"time"
 	"strconv"
 	"Multy-back-exchange-service/api"
+	//"sync"
+)
+
+const (
+	TICKER     = "1002" /* Ticker Channel Id */
+	SUBSBUFFER = 24     /* Subscriptions Buffer */
 )
 
 type PoloniexTicker struct {
@@ -20,6 +26,9 @@ type PoloniexManager struct {
 	tickers map[string]Ticker
 	poloniexApi *api.PoloniexApi
 	channelsByID map[string]string
+	channelsByName map[string]string
+	marketChannels []string
+	symbolsToParse map[string]bool
 }
 
 
@@ -31,8 +40,16 @@ func (poloniexTicker PoloniexTicker) IsFilled() bool {
 func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
 
 	b.tickers = make(map[string]Ticker)
-	b.poloniexApi = &api.PoloniexApi{}
-	b.channelsByID = map[string]string{"121":"USDT_BTC", "149":"USDT_ETH", "168":"BTC_STEEM", "123":"USDT_LTC","191":"USDT_BCH","173":"USDT_ETC","122":"USDT_DASH"}
+	b.poloniexApi = api.NewPoloniexApi()
+	b.channelsByID = make(map[string]string)
+	b.channelsByName = make(map[string]string)
+	b.marketChannels = []string{}
+	b.symbolsToParse = b.composeSybolsToParse(exchangeConfiguration)
+
+
+	//TODO: work around
+	if err := b.setchannelids(); err != nil {
+	}
 
 	go b.poloniexApi.StartListen( func(message []byte, error error) {
 		if error != nil {
@@ -49,9 +66,9 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 				var poloniexTicker PoloniexTicker
 				args := unmarshaledMessage[2].([]interface{})
 				poloniexTicker, err = b.convertArgsToTicker(args)
-				//fmt.Println(poloniexTicker)
+				//fmt.Println(poloniexTicker.CurrencyPair)
 
-				if error == nil && poloniexTicker.IsFilled()  {
+				if error == nil && poloniexTicker.IsFilled() && b.symbolsToParse[poloniexTicker.CurrencyPair]  {
 
 					var ticker Ticker
 					ticker.Rate = poloniexTicker.Last
@@ -86,4 +103,42 @@ func (b *PoloniexManager) convertArgsToTicker(args []interface{}) (wsticker Polo
 	wsticker.CurrencyPair = b.channelsByID[strconv.FormatFloat(args[0].(float64), 'f', 0, 64)]
 	wsticker.Last = args[1].(string)
 	return
+}
+
+
+
+func (b *PoloniexManager) setchannelids() (err error) {
+
+	resp, err := b.poloniexApi.PubReturnTickers()
+	if err != nil {
+		return err
+	}
+
+	for k, v := range resp {
+		chid := strconv.Itoa(v.ID)
+		b.channelsByName[k] = chid
+		b.channelsByID[chid] = k
+		b.marketChannels = append(b.marketChannels, chid)
+	}
+
+	b.channelsByName["TICKER"] = TICKER
+	b.channelsByID[TICKER] = "TICKER"
+	return
+}
+
+func (b *PoloniexManager)  composeSybolsToParse(exchangeConfiguration ExchangeConfiguration) map[string]bool {
+	var symbolsToParse = map[string]bool{}
+	for _, targetCurrency := range exchangeConfiguration.TargetCurrencies {
+		for _, referenceCurrency := range exchangeConfiguration.ReferenceCurrencies {
+
+			if referenceCurrency == "USD" {
+				referenceCurrency = "USDT"
+			}
+
+			symbol := referenceCurrency  + "_" + targetCurrency
+			symbolsToParse[symbol] = true
+		}
+	}
+	return symbolsToParse
+
 }

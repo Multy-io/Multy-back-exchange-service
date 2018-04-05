@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 	//"fmt"
 	"fmt"
+	"encoding/json"
 )
 
 
@@ -16,10 +17,13 @@ type OkexApi struct {
 	connection *websocket.Conn
 }
 
+type OkexSubscription struct {
+	Event   string `json:"event"`
+	Channel string `json:"channel"`
+}
 
 
-
-func (b *OkexApi)  StartListen(callback func(message []byte, error error)) {
+func (b *OkexApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback func(message []byte, error error)) {
 	url := url.URL{Scheme: "wss", Host: okexHost, Path: ""}
 	log.Printf("connecting to %s", url.String())
 
@@ -31,19 +35,16 @@ func (b *OkexApi)  StartListen(callback func(message []byte, error error)) {
 	} else if connection != nil {
 		fmt.Println("Okex ws connected")
 
-		//TODO: get symbols from exhange
-		subscribtion0 := `{"event":"addChannel","channel":"ok_sub_futureusd_btc_ticker_this_week"}`
-		subscribtion1 := `{"event":"addChannel","channel":"ok_sub_futureusd_ltc_ticker_this_week"}`
-		subscribtion2 := `{"event":"addChannel","channel":"ok_sub_futureusd_eth_ticker_this_week"}`
-		subscribtion3 := `{"event":"addChannel","channel":"ok_sub_futureusd_etc_ticker_this_week"}`
-		subscribtion4 := `{"event":"addChannel","channel":"ok_sub_futureusd_bch_ticker_this_week"}`
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtion0))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtion1))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtion2))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtion3))
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtion4))
+		productsIds :=  b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
 
+		for _, productId := range  productsIds {
+			subscribtion := OkexSubscription{}
+			subscribtion.Event = "addChannel"
+			subscribtion.Channel = productId
 
+			msg, _ := json.Marshal(subscribtion)
+			connection.WriteMessage(websocket.TextMessage, msg)
+		}
 
 		for {
 			func() {
@@ -64,4 +65,16 @@ func (b *OkexApi)  StopListen() {
 	//fmt.Println("before close")
 	//b.connection.Close()
 	//fmt.Println("closed")
+}
+
+func (b *OkexApi)  composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCurrenciesConfiguration) []string {
+	var smybolsForSubscirbe = []string{}
+	for _, targetCurrency := range apiCurrenciesConfiguration.TargetCurrencies {
+
+		symbol := "ok_sub_futureusd_" +  targetCurrency + "_ticker_this_week"
+		smybolsForSubscirbe = append(smybolsForSubscirbe, symbol)
+
+	}
+	return smybolsForSubscirbe
+
 }

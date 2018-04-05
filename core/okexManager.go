@@ -49,7 +49,11 @@ func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, c
 	b.tickers = make(map[string]Ticker)
 	b.okexApi = &api.OkexApi{}
 
-	go b.okexApi.StartListen( func(message []byte, error error) {
+	var apiCurrenciesConfiguration = api.ApiCurrenciesConfiguration{}
+	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
+	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
+
+	go b.okexApi.StartListen(apiCurrenciesConfiguration, func(message []byte, error error) {
 		if error != nil {
 			log.Println("error:", error)
 			//callback(nil, error)
