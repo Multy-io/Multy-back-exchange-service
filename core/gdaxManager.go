@@ -42,7 +42,11 @@ func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, c
 	b.tickers = make(map[string]Ticker)
 	b.gdaxApi = &api.GdaxApi{}
 
-	go b.gdaxApi.StartListen( func(message []byte, error error) {
+	var apiCurrenciesConfiguration = api.ApiCurrenciesConfiguration{}
+	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
+	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
+
+	go b.gdaxApi.StartListen(apiCurrenciesConfiguration, func(message []byte, error error) {
 		if error != nil {
 			log.Println("error:", error)
 			//callback(nil, error)

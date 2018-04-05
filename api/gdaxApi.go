@@ -6,6 +6,9 @@ import (
 "github.com/gorilla/websocket"
 //"fmt"
 "fmt"
+	"encoding/json"
+	//"net"
+	//"bytes"
 )
 
 
@@ -16,10 +19,19 @@ type GdaxApi struct {
 	connection *websocket.Conn
 }
 
+type GdaxSubscription struct {
+	Type     string `json:"type"`
+	Channels []Channel `json:"channels"`
+}
+
+type Channel struct {
+Name       string   `json:"name"`
+ProductIds []string `json:"product_ids"`
+}
 
 
 
-func (b *GdaxApi)  StartListen(callback func(message []byte, error error)) {
+func (b *GdaxApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback func(message []byte, error error)) {
 	url := url.URL{Scheme: "wss", Host: gdaxHost, Path: ""}
 	log.Printf("connecting to %s", url.String())
 
@@ -31,11 +43,21 @@ func (b *GdaxApi)  StartListen(callback func(message []byte, error error)) {
 	} else if connection != nil {
 		fmt.Println("Gdax ws connected")
 
-		//TODO: get symbols from exhange
-		subscribtion := `{"type":"subscribe","channels":[{"name": "ticker", "product_ids":["BTC-USD", "ETH-USD", "LTC-USD", "BCH-USD"]}]}`
-		connection.WriteMessage(websocket.TextMessage, []byte(subscribtion))
+		productsIds :=  b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
 
+		for _, productId := range  productsIds {
 
+			channel := Channel{}
+			channel.Name = "ticker"
+			channel.ProductIds = []string{productId}
+
+			subscribtion := GdaxSubscription{}
+			subscribtion.Type = "subscribe"
+			subscribtion.Channels = []Channel{channel}
+
+			msg, _ := json.Marshal(subscribtion)
+			connection.WriteMessage(websocket.TextMessage, msg)
+		}
 
 		for {
 			func() {
@@ -56,4 +78,21 @@ func (b *GdaxApi)  StopListen() {
 	//fmt.Println("before close")
 	//b.connection.Close()
 	//fmt.Println("closed")
+}
+
+func (b *GdaxApi)  composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCurrenciesConfiguration) []string {
+	var smybolsForSubscirbe = []string{}
+	for _, targetCurrency := range apiCurrenciesConfiguration.TargetCurrencies {
+		for _, referenceCurrency := range apiCurrenciesConfiguration.ReferenceCurrencies {
+
+			if targetCurrency == referenceCurrency {
+				continue
+			}
+
+			symbol := targetCurrency + "-" + referenceCurrency
+			smybolsForSubscirbe = append(smybolsForSubscirbe, symbol)
+		}
+	}
+	return smybolsForSubscirbe
+
 }
