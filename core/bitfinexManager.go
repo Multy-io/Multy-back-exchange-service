@@ -32,13 +32,17 @@ func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 	b.bitfinexTickers = make(map[int]BitfinexTicker)
 	b.api = api.NewBitfinexApi()
 
-	go b.api.StartListen( func(message []byte, error error) {
+	var apiCurrenciesConfiguration = api.ApiCurrenciesConfiguration{}
+	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
+	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
+
+	go b.api.StartListen(apiCurrenciesConfiguration, func(message []byte, error error) {
 		//fmt.Println(0)
 		if error != nil {
 			log.Println("error:", error)
 			callback(TickerCollection{}, error)
 		} else if message != nil {
-			//fmt.Printf("%s", message)
+			//fmt.Printf("%s \n", message)
 			//fmt.Println(1)
 			b.addMessage(message)
 			//fmt.
@@ -87,7 +91,7 @@ func (b *BitfinexManager) addMessage (message []byte) {
 			//var unmarshaledTicker []interface{}
 			if v, ok := unmarshaledTickerMessage[1].([]interface{}); ok {
 				var sub = b.bitfinexTickers[chanId]
-				sub.Rate = strconv.FormatFloat(v[0].(float64), 'f', 0, 64)
+				sub.Rate = strconv.FormatFloat(v[0].(float64), 'f', 8, 64)
 				b.bitfinexTickers[chanId] = sub
 				//fmt.Println(b.bitfinexTickers)
 			}

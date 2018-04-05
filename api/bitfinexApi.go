@@ -22,15 +22,20 @@ type BitfinexApi struct {
 	symbolesForSubscirbe []string
 }
 
+type ApiCurrenciesConfiguration struct {
+	TargetCurrencies    []string
+	ReferenceCurrencies []string
+}
+
 func NewBitfinexApi() *BitfinexApi {
 	var api = BitfinexApi{}
-	api.symbolesForSubscirbe = []string{"tBTCUSD", "tETHUSD","tBTSUSD", "tSTEEMUSD", "tWAVESUSD", "tLTCUSD", "tBCHUSD", "tETCUSD", "tDASHUSD", "tEOSUSD",  "tETHBTC","tBTSBTC", "tSTEEMBTC", "tWAVESBTC", "tLTCBTC", "tBCHBTC", "tETCBTC", "tDASHBTC", "tEOSBTC"}
+	//api.symbolesForSubscirbe = []string{"tBTCUSD", "tETHUSD","tBTSUSD", "tSTEEMUSD", "tWAVESUSD", "tLTCUSD", "tBCHUSD", "tETCUSD", "tDASHUSD", "tEOSUSD",  "tETHBTC","tBTSBTC", "tSTEEMBTC", "tWAVESBTC", "tLTCBTC", "tBCHBTC", "tETCBTC", "tDASHBTC", "tEOSBTC"}
 	return &api
 }
 
 
 
-func (b *BitfinexApi)  StartListen(callback func(message []byte, error error)) {
+func (b *BitfinexApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback  func(message []byte, error error)) {
 
 	url := url.URL{Scheme: "wss", Host: bitfinexHost, Path: bitfinexPath}
 	log.Printf("connecting to %s", url.String())
@@ -43,6 +48,7 @@ func (b *BitfinexApi)  StartListen(callback func(message []byte, error error)) {
 	} else if connection != nil {
 		fmt.Println("Bitfinex ws connected")
 
+		b.symbolesForSubscirbe = b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
 		for _, symbol := range b.symbolesForSubscirbe {
 			subscribtion := `{"event":"subscribe","channel":"ticker","symbol": "` + symbol + `"}`
 			connection.WriteMessage(websocket.TextMessage, []byte(subscribtion))
@@ -63,6 +69,19 @@ func (b *BitfinexApi)  StartListen(callback func(message []byte, error error)) {
 
 
 }
+
+func (b *BitfinexApi)  composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCurrenciesConfiguration) []string {
+	var smybolsForSubscirbe = []string{}
+	for _, targetCurrency := range apiCurrenciesConfiguration.TargetCurrencies {
+		for _, referenceCurrency := range apiCurrenciesConfiguration.ReferenceCurrencies {
+			symbol := "t" + targetCurrency + referenceCurrency
+			smybolsForSubscirbe = append(smybolsForSubscirbe, symbol)
+		}
+	}
+	return smybolsForSubscirbe
+
+}
+
 
 func (b *BitfinexApi)  StopListen() {
 	//fmt.Println("before close")
