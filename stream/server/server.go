@@ -51,6 +51,8 @@ func (s *Server) Tickers(whoAreYouParams *WhoAreYouParams, stream TickerGRPCServ
 
 		s.ServerHandler(&allTickers)
 
+		fmt.Println(allTickers)
+
 		var streamTickers = Tickers{}
 		streamTickers.ExchangeTickers = []*ExchangeTickers{}
 
@@ -74,6 +76,7 @@ func (s *Server) Tickers(whoAreYouParams *WhoAreYouParams, stream TickerGRPCServ
 		}
 
 		func() {
+			fmt.Println(streamTickers)
 			if error := stream.Send(&streamTickers); error != nil {
 				fmt.Println("error sending to stream: ", error)
 			}

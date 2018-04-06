@@ -1,8 +1,8 @@
-//    protoc -I Streamer/ Streamer/StreamerDescription/StreamerDescription.proto --go_out=plugins=grpc:Streamer
+//    protoc -I stream/ stream/server/streamDescription.proto --go_out=plugins=grpc:stream
 
 syntax = "proto3";
 
-package StreamDescription;
+package server;
 
 service TickerGRPCServer {
     rpc tickers(WhoAreYouParams) returns (stream Tickers) {}
@@ -21,6 +21,8 @@ message ExchangeTickers {
 message Ticker {
  	string symbol = 1;
 	string rate = 2;
+    int64 targetCurrencyId = 3;
+    int64 referrenceCurrencyId = 4;
 }
 
 message WhoAreYouParams {}

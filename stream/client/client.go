@@ -7,7 +7,7 @@ import (
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"binanceParser/Stream/StreamDescription"
+	"Multy-back-exchange-service/stream/server"
 )
 
 var (
@@ -15,11 +15,11 @@ var (
 )
 
 
-func printAllTickers(client StreamDescription.TickerGRPCServerClient) {
+func printAllTickers(client server.TickerGRPCServerClient) {
 	log.Printf("Looking for features within %v")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	stream, err := client.Tickers(ctx, &StreamDescription.WhoAreYouParams{})
+	stream, err := client.Tickers(ctx, &server.WhoAreYouParams{})
 	if err != nil {
 		log.Fatalf("%v.ListFeatures(_) = _, %v", client, err)
 	}
@@ -46,7 +46,7 @@ func main() {
 		log.Fatalf("fail to dial: %v", err)
 	}
 	defer conn.Close()
-	client := StreamDescription.NewTickerGRPCServerClient(conn)
+	client := server.NewTickerGRPCServerClient(conn)
 
 	printAllTickers(client)
 }

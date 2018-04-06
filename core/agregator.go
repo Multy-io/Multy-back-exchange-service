@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 	//"fmt"
-	"fmt"
+	//"fmt"
 	"Multy-back-exchange-service/currencies"
 )
 
@@ -50,7 +50,7 @@ func NewAgregator() *Agregator {
 func (b *Agregator) add(tickerCollection TickerCollection, forExchange string) {
 	b.Lock()
 	b.allTickers[forExchange] = tickerCollection
-	fmt.Println(b.allTickers)
+	//fmt.Println(b.allTickers)
 	b.Unlock()
 }
 

@@ -8,6 +8,7 @@ import (
 
 	"time"
 	"strings"
+	"fmt"
 )
 
 type Manager struct {
@@ -164,13 +165,14 @@ func (b *Manager) StartListen(configuration ManagerConfiguration) {
 	b.server.ServerHandler =  func(allTickers *map[string]stream.StreamTickerCollection) {
 
 		var tickerCollections = b.agregator.getTickers(time.Now().Add(-3 * time.Second))
-
+		//fmt.Println(tickerCollections)
 		var streamTickerCollections = make(map[string]stream.StreamTickerCollection)
 
 		for key, tickerColection := range tickerCollections {
 			var streamTickerColection = b.convertToTickerCollection(tickerColection)
 			streamTickerCollections[key] = streamTickerColection
 		}
+		аьеюЗкштедт(ыекуфьЕшслукСщддусешщты)
 		allTickers = &streamTickerCollections
 	}
 
