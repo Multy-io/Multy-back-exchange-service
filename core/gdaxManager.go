@@ -8,6 +8,8 @@ import (
 	//"github.com/Appscrunch/Multy-back/client"
 	"time"
 	"Multy-back-exchange-service/api"
+	"strings"
+	"Multy-back-exchange-service/currencies"
 )
 
 
@@ -33,6 +35,18 @@ type GdaxTicker struct {
 
 func (ticker GdaxTicker) IsFilled() bool {
 	return (len(ticker.Symbol) > 0 && len(ticker.Rate) > 0)
+}
+
+func (b *GdaxTicker) getCurriences() (currencies.Currency, currencies.Currency) {
+
+	if len(b.Symbol) > 0 {
+		var symbol = b.Symbol
+		var currencyCodes = strings.Split(symbol, "-")
+		if len(currencyCodes) > 1 {
+			return currencies.NewCurrencyWithCode(currencyCodes[0]), currencies.NewCurrencyWithCode(currencyCodes[1])
+		}
+	}
+	return currencies.NotAplicable, currencies.NotAplicable
 }
 
 
@@ -83,5 +97,10 @@ func (b *GdaxManager) add(gdaxTicker GdaxTicker) {
 	var ticker = Ticker{}
 	ticker.Rate = gdaxTicker.Rate
 	ticker.Symbol = gdaxTicker.Symbol
+
+	targetCurrency, referenceCurrency  := gdaxTicker.getCurriences()
+	ticker.TargetCurrency = targetCurrency
+	ticker.ReferenceCurrency = referenceCurrency
+
 	b.tickers[ticker.Symbol] = ticker
 }

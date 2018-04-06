@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"Multy-back-exchange-service/api"
 	//"sync"
+	"strings"
+	"Multy-back-exchange-service/currencies"
 )
 
 const (
@@ -17,8 +19,20 @@ const (
 )
 
 type PoloniexTicker struct {
-	CurrencyPair  string  `json:"currencyPair"`
+	Symbol  string  `json:"currencyPair"`
 	Last          string `json:"last"`
+}
+
+func (b *PoloniexTicker) getCurriences() (currencies.Currency, currencies.Currency) {
+
+	if len(b.Symbol) > 0 {
+		var symbol = b.Symbol
+		var currencyCodes = strings.Split(symbol, "_")
+		if len(currencyCodes) > 1 {
+			return currencies.NewCurrencyWithCode(currencyCodes[0]), currencies.NewCurrencyWithCode(currencyCodes[1])
+		}
+	}
+	return currencies.NotAplicable, currencies.NotAplicable
 }
 
 
@@ -33,7 +47,7 @@ type PoloniexManager struct {
 
 
 func (poloniexTicker PoloniexTicker) IsFilled() bool {
-	return (len(poloniexTicker.CurrencyPair) > 0 && len(poloniexTicker.Last) > 0)
+	return (len(poloniexTicker.Symbol) > 0 && len(poloniexTicker.Last) > 0)
 }
 
 
@@ -68,11 +82,16 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 				poloniexTicker, err = b.convertArgsToTicker(args)
 				//fmt.Println(poloniexTicker.CurrencyPair)
 
-				if error == nil && poloniexTicker.IsFilled() && b.symbolsToParse[poloniexTicker.CurrencyPair]  {
+				if error == nil && poloniexTicker.IsFilled() && b.symbolsToParse[poloniexTicker.Symbol]  {
 
 					var ticker Ticker
 					ticker.Rate = poloniexTicker.Last
-					ticker.Symbol = poloniexTicker.CurrencyPair
+					ticker.Symbol = poloniexTicker.Symbol
+
+					targetCurrency, referenceCurrency  := poloniexTicker.getCurriences()
+					ticker.TargetCurrency = targetCurrency
+					ticker.ReferenceCurrency = referenceCurrency
+
 					b.tickers[ticker.Symbol] = ticker
 				}
 			} else {
@@ -100,7 +119,7 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 
 
 func (b *PoloniexManager) convertArgsToTicker(args []interface{}) (wsticker PoloniexTicker, err error) {
-	wsticker.CurrencyPair = b.channelsByID[strconv.FormatFloat(args[0].(float64), 'f', 0, 64)]
+	wsticker.Symbol = b.channelsByID[strconv.FormatFloat(args[0].(float64), 'f', 0, 64)]
 	wsticker.Last = args[1].(string)
 	return
 }

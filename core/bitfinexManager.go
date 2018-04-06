@@ -7,6 +7,10 @@ import (
 	"strconv"
 	"time"
 	"Multy-back-exchange-service/api"
+	"Multy-back-exchange-service/utiles"
+	"strings"
+
+	"Multy-back-exchange-service/currencies"
 )
 
 type BitfinexManager struct {
@@ -25,6 +29,29 @@ type BitfinexTicker struct {
 
 	func (bitfinexTicker BitfinexTicker) IsFilled() bool {
 	return (len(bitfinexTicker.Symbol) > 0 && len(bitfinexTicker.Rate) > 0)
+}
+
+func (b *BitfinexTicker) getCurriences() (currencies.Currency, currencies.Currency) {
+
+	if len(b.Symbol) > 0 {
+		var symbol = b.Symbol
+		var damagedSymbol = utiles.TrimLeftChars(symbol, 2)
+		for _, referenceCurrency := range currencies.DefaultReferenceCurrencies {
+			//fmt.Println(damagedSymbol, referenceCurrency.CurrencyCode())
+
+			if strings.Contains(damagedSymbol, referenceCurrency.CurrencyCode()) {
+
+				//fmt.Println("2",symbol, referenceCurrency.CurrencyCode())
+				targetCurrencyStringWithT := strings.TrimSuffix(symbol, referenceCurrency.CurrencyCode())
+				targetCurrencyString := utiles.TrimLeftChars(targetCurrencyStringWithT, 1)
+				//fmt.Println(targetCurrencyString)
+				var targetCurrency = currencies.NewCurrencyWithCode(targetCurrencyString)
+				return targetCurrency, referenceCurrency
+			}
+		}
+
+	}
+	return currencies.NotAplicable, currencies.NotAplicable
 }
 
 
@@ -59,6 +86,10 @@ func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 				var ticker = Ticker{}
 				ticker.Rate = value.Rate
 				ticker.Symbol = value.Symbol
+
+				targetCurrency, referenceCurrency  := value.getCurriences()
+				ticker.TargetCurrency = targetCurrency
+				ticker.ReferenceCurrency = referenceCurrency
 				tickers = append(tickers, ticker)
 			}
 

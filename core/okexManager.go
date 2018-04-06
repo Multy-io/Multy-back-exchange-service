@@ -9,7 +9,9 @@ import (
 	"time"
 	//"strconv"
 	"Multy-back-exchange-service/api"
-	)
+	"strings"
+	"Multy-back-exchange-service/currencies"
+)
 
 
 
@@ -36,7 +38,17 @@ type OkexTicker struct {
 	} `json:"data"`
 }
 
+func (b *OkexTicker) getCurriences() (currencies.Currency, currencies.Currency) {
 
+	if len(b.Symbol) > 0 {
+		var symbol = b.Symbol
+		var currencyCode = strings.TrimPrefix(strings.TrimSuffix(symbol, "_ticker_this_week"),"ok_sub_futureusd_")
+		if len(currencyCode) > 2 {
+			return currencies.NewCurrencyWithCode(currencyCode), currencies.Tether
+		}
+	}
+	return currencies.NotAplicable, currencies.NotAplicable
+}
 
 func (ticker OkexTicker) IsFilled() bool {
 	return (len(ticker.Symbol) > 0 && len(ticker.Data.Last) > 0)
@@ -79,15 +91,6 @@ func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, c
 	}
 }
 
-func (b *OkexManager) add(okexTicker OkexTicker) {
-	var ticker = Ticker{}
-	ticker.Rate = okexTicker.Data.Last
-	ticker.Symbol = okexTicker.Symbol
-	b.tickers[ticker.Symbol] = ticker
-}
-
-
-
 func (b *OkexManager) addMessage (message []byte) {
 
 	var okexTickers =[]OkexTicker{}
@@ -98,11 +101,16 @@ func (b *OkexManager) addMessage (message []byte) {
 			var ticker = Ticker{}
 			ticker.Symbol = okexTicker.Symbol
 			ticker.Rate = okexTicker.Data.Last
+
+			targetCurrency, referenceCurrency  := okexTicker.getCurriences()
+			ticker.TargetCurrency = targetCurrency
+			ticker.ReferenceCurrency = referenceCurrency
+
 			b.tickers[ticker.Symbol] = ticker
 		}
 	}
 
 
-		//fmt.Println(b.tickers)
+	//fmt.Println(b.tickers)
 
 }

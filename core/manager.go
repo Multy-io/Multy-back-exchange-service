@@ -197,5 +197,7 @@ func (b *Manager) convertToStreamTicker (ticker Ticker) stream.StreamTicker {
 	var streamTicker = stream.StreamTicker{}
 	streamTicker.Symbol = ticker.Symbol
 	streamTicker.Rate = ticker.Rate
+	streamTicker.ReferenceCurrency = ticker.ReferenceCurrency
+	streamTicker.TargetCurrency = ticker.TargetCurrency
 	return streamTicker
 }

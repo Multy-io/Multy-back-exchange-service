@@ -7,6 +7,9 @@ import (
 	"encoding/json"
 	"time"
 	"Multy-back-exchange-service/api"
+	"Multy-back-exchange-service/utiles"
+	"strings"
+	"Multy-back-exchange-service/currencies"
 )
 
 
@@ -21,6 +24,28 @@ type HitBtcTicker struct {
 		Rate        string    `json:"last"`
 		Symbol      string    `json:"symbol"`
 	} `json:"params"`
+}
+
+func (b *HitBtcTicker) getCurriences() (currencies.Currency, currencies.Currency) {
+
+	if len(b.Params.Symbol) > 0 {
+		var symbol = b.Params.Symbol
+		var damagedSymbol = utiles.TrimLeftChars(symbol, 1)
+		for _, referenceCurrency := range currencies.DefaultReferenceCurrencies {
+			//fmt.Println(damagedSymbol, referenceCurrency.CurrencyCode())
+
+			if strings.Contains(damagedSymbol, referenceCurrency.CurrencyCode()) {
+
+				//fmt.Println("2",symbol, referenceCurrency.CurrencyCode())
+				targetCurrencyString := strings.TrimSuffix(symbol, referenceCurrency.CurrencyCode())
+				//fmt.Println(targetCurrencyString)
+				var targetCurrency = currencies.NewCurrencyWithCode(targetCurrencyString)
+				return targetCurrency, referenceCurrency
+			}
+		}
+
+	}
+	return currencies.NotAplicable, currencies.NotAplicable
 }
 
 func (hitBtcTicker HitBtcTicker) IsFilled() bool {
@@ -74,5 +99,10 @@ func (b *HitBtcManager) add(hitBtcTicker HitBtcTicker) {
 	var ticker = Ticker{}
 	ticker.Rate = hitBtcTicker.Params.Rate
 	ticker.Symbol = hitBtcTicker.Params.Symbol
+
+	targetCurrency, referenceCurrency  := hitBtcTicker.getCurriences()
+	ticker.TargetCurrency = targetCurrency
+	ticker.ReferenceCurrency = referenceCurrency
+
 	b.tickers[ticker.Symbol] = ticker
 }

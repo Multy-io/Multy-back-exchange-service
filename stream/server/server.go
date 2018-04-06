@@ -1,6 +1,13 @@
 package server
 
 
+//var configString = `{
+//		"targetCurrencies" : ["BTC", "ETH", "GOLOS", "BTS", "STEEM", "WAVES", "LTC", "BCH", "ETC", "DASH", "EOS"],
+//		"referenceCurrencies" : ["USD", "BTC"],
+//		"exchanges": ["Binance","Bitfinex","Gdax","HitBtc","Okex","Poloniex"],
+//		"refreshInterval" : "3"
+//		}`
+
 import (
 	"flag"
 	"fmt"
@@ -8,6 +15,7 @@ import (
 	"net"
 	"google.golang.org/grpc"
 	"time"
+	"Multy-back-exchange-service/currencies"
 )
 
 var (
@@ -20,6 +28,8 @@ type StreamTickerCollection struct {
 }
 
 type StreamTicker struct {
+	TargetCurrency currencies.Currency
+	ReferenceCurrency currencies.Currency
 	Symbol 	string
 	Rate	string
 }

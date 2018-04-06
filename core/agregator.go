@@ -5,6 +5,7 @@ import (
 	"time"
 	//"fmt"
 	"fmt"
+	"Multy-back-exchange-service/currencies"
 )
 
 type NewTickerCollection struct {
@@ -25,6 +26,8 @@ type TickerCollection struct {
 }
 
 type Ticker struct {
+	TargetCurrency currencies.Currency
+	ReferenceCurrency currencies.Currency
 	Symbol 	string
 	Rate	string
 }
