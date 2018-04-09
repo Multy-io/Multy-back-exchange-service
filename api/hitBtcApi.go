@@ -27,20 +27,17 @@ type HitBtcSubscriptionParams struct {
 	Symbol string `json:"symbol"`
 }
 
-
-
-func (b *HitBtcApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback func(message []byte, error error)) {
+func (b *HitBtcApi)  connectWs(apiCurrenciesConfiguration ApiCurrenciesConfiguration) *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: hitBtcHost, Path: hitBtcPath}
 	log.Printf("connecting to %s", url.String())
 
 	connection, _, error := websocket.DefaultDialer.Dial(url.String(), nil)
 
-	if error != nil {
-		fmt.Println("HitBtc ws error: ",error)
-		callback(nil, error)
-	} else if connection != nil {
+	if error != nil || connection == nil {
+		fmt.Println("HitBtc ws connection error: ",error)
+		return nil
+	} else  {
 		fmt.Println("HitBtc ws connected")
-
 
 		productsIds :=  b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
 
@@ -58,15 +55,31 @@ func (b *HitBtcApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigu
 			connection.WriteMessage(websocket.TextMessage, msg)
 		}
 
-		for {
+		return connection
+	}
+}
+
+
+
+func (b *HitBtcApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback func(message []byte, error error)) {
+
+	for {
+		if b.connection == nil {
+			b.connection = b.connectWs(apiCurrenciesConfiguration)
+		} else if b.connection != nil {
+
 			func() {
-				_, message, error := connection.ReadMessage()
-				callback(message, error)
+				_, message, error := b.connection.ReadMessage()
+				if error != nil {
+					fmt.Println("HitBtc read message error:", error)
+					b.connection.Close()
+					b.connection = nil
+				} else {
+					//fmt.Printf("%s \n", message)
+					callback(message, error)
+				}
 			}()
 		}
-	} else {
-		fmt.Println("connection is nil")
-		callback(nil, nil)
 	}
 
 
@@ -74,8 +87,11 @@ func (b *HitBtcApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigu
 
 func (b *HitBtcApi)  StopListen() {
 	//fmt.Println("before close")
-	//b.connection.Close()
-	//fmt.Println("closed")
+	if b.connection != nil {
+		b.connection.Close()
+		b.connection = nil
+	}
+	fmt.Println("HitBtc ws closed")
 }
 
 func (b *HitBtcApi)  composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCurrenciesConfiguration) []string {

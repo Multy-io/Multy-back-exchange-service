@@ -84,13 +84,17 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 		func() {
 			values := []Ticker{}
 			for _, value := range b.tickers {
-				values = append(values, value)
+				if value.TimpeStamp.After(time.Now().Add(-3 * time.Second)) {
+					values = append(values, value)
+				}
 			}
 
 			var tickerCollection = TickerCollection{}
 			tickerCollection.TimpeStamp = time.Now()
 			tickerCollection.Tickers = values
-			callback(tickerCollection, nil)
+			if len(tickerCollection.Tickers) > 0 {
+				callback(tickerCollection, nil)
+			}
 		}()
 	}
 }
@@ -103,6 +107,7 @@ func (b *HitBtcManager) add(hitBtcTicker HitBtcTicker) {
 	targetCurrency, referenceCurrency  := hitBtcTicker.getCurriences()
 	ticker.TargetCurrency = targetCurrency
 	ticker.ReferenceCurrency = referenceCurrency
+	ticker.TimpeStamp = time.Now()
 
 	b.tickers[ticker.Symbol] = ticker
 }
