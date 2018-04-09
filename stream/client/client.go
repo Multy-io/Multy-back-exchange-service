@@ -33,7 +33,7 @@ func printAllTickers(client server.TickerGRPCServerClient) {
 			log.Fatalf("%v.ListFeatures(_) = _, %v", client, err)
 		}
 		for _, exchangeTicker := range feature.ExchangeTickers {
-			fmt.Println(exchangeTicker.Exchange, exchangeTicker.TimpeStamp)
+			fmt.Println(exchangeTicker.Exchange, exchangeTicker.TimpeStamp, exchangeTicker.Tickers)
 		}
 	}
 }
