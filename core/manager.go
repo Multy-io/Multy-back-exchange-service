@@ -11,6 +11,8 @@ import (
 	//"fmt"
 )
 
+const maxTickerAge  = 5
+
 type Manager struct {
 	binanceManager *BinanceManager
 	hitBtcManager *HitBtcManager
@@ -44,7 +46,7 @@ type ManagerConfiguration struct {
 	TargetCurrencies    []string `json:"targetCurrencies"`
 	ReferenceCurrencies []string `json:"referenceCurrencies"`
 	Exchanges           []string `json:"exchanges"`
-	RefreshInterval     string   `json:"refreshInterval"`
+	RefreshInterval     time.Duration   `json:"refreshInterval"`
 }
 
 
@@ -161,11 +163,11 @@ func (b *Manager) StartListen(configuration ManagerConfiguration) {
 		b.lunchExchange(exchangeConfiguration)
 	}
 
-
+	b.server.RefreshInterval = configuration.RefreshInterval
 	go b.server.StartServer()
 	b.server.ServerHandler =  func(allTickers *map[string]stream.StreamTickerCollection) {
 
-		var tickerCollections = b.agregator.getTickers(time.Now().Add(-3 * time.Second))
+		var tickerCollections = b.agregator.getTickers(time.Now().Add(-maxTickerAge * time.Second))
 		//fmt.Println(tickerCollections)
 		var streamTickerCollections = make(map[string]stream.StreamTickerCollection)
 

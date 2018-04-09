@@ -37,11 +37,12 @@ type StreamTicker struct {
 
 type Server struct {
 	ServerHandler func(*map[string]StreamTickerCollection)
+	RefreshInterval time.Duration
 }
 
 func (s *Server) Tickers(whoAreYouParams *WhoAreYouParams, stream TickerGRPCServer_TickersServer) error {
 
-	for range time.Tick(1 * time.Second) {
+	for range time.Tick(s.RefreshInterval * time.Second) {
 		if streemError := stream.Context().Err(); streemError != nil  {
 			println("error getting contex from client: ", streemError)
 			break

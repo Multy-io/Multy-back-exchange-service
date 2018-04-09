@@ -103,7 +103,7 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 		func() {
 			values := []Ticker{}
 			for _, value := range b.tickers {
-				if value.TimpeStamp.After(time.Now().Add(-3 * time.Second)) {
+				if value.TimpeStamp.After(time.Now().Add(-maxTickerAge * time.Second)) {
 					values = append(values, value)
 				}
 			}

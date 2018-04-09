@@ -84,7 +84,7 @@ func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 		func() {
 			tickers := []Ticker{}
 			for _, value := range b.bitfinexTickers {
-				if value.TimpeStamp.After(time.Now().Add(-3 * time.Second)) {
+				if value.TimpeStamp.After(time.Now().Add(-maxTickerAge * time.Second)) {
 					var ticker= Ticker{}
 					ticker.Rate = value.Rate
 					ticker.Symbol = value.Symbol

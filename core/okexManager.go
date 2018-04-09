@@ -79,7 +79,7 @@ func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, c
 		func() {
 			tickers := []Ticker{}
 			for _, ticker := range b.tickers {
-				if ticker.TimpeStamp.After(time.Now().Add(-3 * time.Second)) {
+				if ticker.TimpeStamp.After(time.Now().Add(-maxTickerAge * time.Second)) {
 					tickers = append(tickers, ticker)
 				}
 			}
