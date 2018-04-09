@@ -78,17 +78,20 @@ func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, c
 	})
 
 	for range time.Tick(1 * time.Second) {
-		//TODO: add check if data is old and don't sent it ti callback
 		func() {
 			values := []Ticker{}
 			for _, value := range b.tickers {
-				values = append(values, value)
+				if value.TimpeStamp.After(time.Now().Add(-3 * time.Second)) {
+					values = append(values, value)
+				}
 			}
 
 			var tickerCollection = TickerCollection{}
 			tickerCollection.TimpeStamp = time.Now()
 			tickerCollection.Tickers = values
-			callback(tickerCollection, nil)
+			if len(tickerCollection.Tickers) > 0 {
+				callback(tickerCollection, nil)
+			}
 		}()
 	}
 }
@@ -101,6 +104,7 @@ func (b *GdaxManager) add(gdaxTicker GdaxTicker) {
 	targetCurrency, referenceCurrency  := gdaxTicker.getCurriences()
 	ticker.TargetCurrency = targetCurrency
 	ticker.ReferenceCurrency = referenceCurrency
+	ticker.TimpeStamp = time.Now()
 
 	b.tickers[ticker.Symbol] = ticker
 }
