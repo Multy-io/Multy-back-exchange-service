@@ -51,6 +51,9 @@ func (poloniexTicker PoloniexTicker) IsFilled() bool {
 }
 
 
+
+
+
 func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
 
 	b.tickers = make(map[string]Ticker)
@@ -59,11 +62,7 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 	b.channelsByName = make(map[string]string)
 	b.marketChannels = []string{}
 	b.symbolsToParse = b.composeSybolsToParse(exchangeConfiguration)
-
-
-	//TODO: work around
-	if err := b.setchannelids(); err != nil {
-	}
+	b.setchannelids()
 
 	go b.poloniexApi.StartListen( func(message []byte, error error) {
 		if error != nil {
@@ -87,7 +86,7 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 					var ticker Ticker
 					ticker.Rate = poloniexTicker.Last
 					ticker.Symbol = poloniexTicker.Symbol
-
+					ticker.TimpeStamp = time.Now()
 					targetCurrency, referenceCurrency  := poloniexTicker.getCurriences()
 					ticker.TargetCurrency = targetCurrency
 					ticker.ReferenceCurrency = referenceCurrency
@@ -101,24 +100,32 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 	})
 
 	for range time.Tick(1 * time.Second) {
-		//TODO: add check if data is old and don't sent it ti callback
 		func() {
 			values := []Ticker{}
 			for _, value := range b.tickers {
-				values = append(values, value)
+				if value.TimpeStamp.After(time.Now().Add(-3 * time.Second)) {
+					values = append(values, value)
+				}
 			}
 
 			var tickerCollection = TickerCollection{}
 			tickerCollection.TimpeStamp = time.Now()
 			tickerCollection.Tickers = values
 			//fmt.Println(tickerCollection)
-			callback(tickerCollection, nil)
+			if len(tickerCollection.Tickers) > 0 {
+				callback(tickerCollection, nil)
+			}
 		}()
 	}
 }
 
 
 func (b *PoloniexManager) convertArgsToTicker(args []interface{}) (wsticker PoloniexTicker, err error) {
+
+	if len(b.channelsByID) < 1 {
+		b.setchannelids()
+	}
+
 	wsticker.Symbol = b.channelsByID[strconv.FormatFloat(args[0].(float64), 'f', 0, 64)]
 	wsticker.Last = args[1].(string)
 	return

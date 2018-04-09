@@ -19,7 +19,7 @@ func main() {
 	var configuration = core.ManagerConfiguration{}
 	configuration.TargetCurrencies = []string{"BTC", "ETH", "GOLOS", "BTS", "STEEM", "WAVES", "LTC", "BCH", "ETC", "DASH", "EOS"}
 	configuration.ReferenceCurrencies = []string{"USD", "BTC"}
-	configuration.Exchanges = []string{"Okex","Binance"}
+	configuration.Exchanges = []string{"Poloniex"}
 	//configuration.Exchanges = []string{"Binance","Bitfinex","Gdax","HitBtc","Okex","Poloniex"}
 	configuration.RefreshInterval = "3"
 

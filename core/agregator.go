@@ -6,7 +6,7 @@ import (
 	//"fmt"
 	//"fmt"
 	"Multy-back-exchange-service/currencies"
-	"fmt"
+	//"fmt"
 )
 
 type NewTickerCollection struct {
@@ -52,7 +52,7 @@ func NewAgregator() *Agregator {
 func (b *Agregator) add(tickerCollection TickerCollection, forExchange string) {
 	b.Lock()
 	b.allTickers[forExchange] = tickerCollection
-	fmt.Println("added:", b.allTickers)
+	//fmt.Println("added:", tickerCollection)
 	b.Unlock()
 }
 

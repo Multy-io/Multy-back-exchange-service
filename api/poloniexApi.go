@@ -30,7 +30,7 @@ type subscription struct {
 }
 
 type PoloniexApi struct {
-	//connection *websocket.Conn
+	connection *websocket.Conn
 	logger     Logger
 	LogBus     chan<- string
 	httpClient *http.Client
@@ -42,38 +42,45 @@ func NewPoloniexApi() *PoloniexApi {
 	return &api
 }
 
-
-
-func (b *PoloniexApi)  StartListen(callback func(message []byte, error error)) {
+func (b *PoloniexApi)  connectWs() *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: host, Path: path}
 	log.Printf("connecting to %s", url.String())
 
 	connection, _, error := websocket.DefaultDialer.Dial(url.String(), nil)
 
-	if error != nil {
-		fmt.Println("Poloniex ws error: ",error)
-		callback(nil, error)
-	} else if connection != nil {
+	if error != nil || connection == nil  {
+		fmt.Println("Poloniex ws connection error: ",error)
+		return nil
+	} else {
 		fmt.Println("Poloniex ws connected")
-
 		subs := subscription{Command: "subscribe", Channel: "1002"}
 		msg, _ := json.Marshal(subs)
 		connection.WriteMessage(websocket.BinaryMessage, msg)
-
-		for {
-			func() {
-				_, messageJSON, _ := connection.ReadMessage()
-					//fmt.Printf("%s \n", messageJSON)
-					callback(messageJSON, error)
-
-			}()
-		}
-	} else {
-		fmt.Println("connection is nil")
-		callback(nil, nil)
+		return connection
 	}
 
+}
 
+
+func (b *PoloniexApi)  StartListen(callback func(message []byte, error error)) {
+
+	for {
+		if b.connection == nil {
+			b.connection = b.connectWs()
+		} else if b.connection != nil {
+			func() {
+				_, message, error := b.connection.ReadMessage()
+				if error != nil {
+					fmt.Println("Poloniex read message error:", error)
+					b.connection.Close()
+					b.connection = nil
+				} else {
+					//fmt.Printf("%s \n", message)
+					callback(message, error)
+				}
+			}()
+		}
+	}
 }
 
 type Ticker struct {

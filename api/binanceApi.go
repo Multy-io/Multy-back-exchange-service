@@ -16,33 +16,45 @@ type BinanceApi struct {
 	connection *websocket.Conn
 }
 
-func (b *BinanceApi)  StartListen(callback func(message []byte, error error)) {
+func (b *BinanceApi)  connectWs() *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: binanceHost, Path: tickerPath}
 	log.Printf("connecting to %s", url.String())
 
 	connection, _, error := websocket.DefaultDialer.Dial(url.String(), nil)
-	b.connection = connection
-	if error != nil {
-		callback(nil, error)
-	} else if connection != nil {
-		fmt.Println("Binance ws connected")
-		func() {
-			for range time.Tick(1 * time.Second) {
-				_, message, error := b.connection.ReadMessage()
-				callback(message, error)
-			}
-		}()
+	if error != nil || connection == nil  {
+		fmt.Println("Binance ws connection error: ",error)
+		return nil
 	} else {
-			fmt.Println("connection is nil")
-			callback(nil, nil)
+		fmt.Println("Binance ws connected")
+		return connection
 	}
+}
 
+func (b *BinanceApi)  StartListen(callback func(message []byte, error error)) {
 
-
+	for range time.Tick(1 * time.Second) {
+		if b.connection == nil {
+			b.connection = b.connectWs()
+		} else if b.connection != nil {
+			func() {
+				_, message, error := b.connection.ReadMessage()
+				if error != nil {
+					fmt.Println("Binance read message error:", error)
+					b.connection.Close()
+					b.connection = nil
+				} else {
+					//fmt.Printf("%s \n", message)
+					callback(message, error)
+				}
+			}()
+		}
+	}
 }
 
 func (b *BinanceApi)  StopListen() {
-	//fmt.Println("before close")
-	//b.connection.Close()
-	//fmt.Println("closed")
+	if b.connection != nil {
+		b.connection.Close()
+		b.connection = nil
+	}
+	fmt.Println("Binance ws closed")
 }
