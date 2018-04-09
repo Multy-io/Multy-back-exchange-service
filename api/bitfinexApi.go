@@ -18,7 +18,7 @@ type biftfinexSubscription struct {
 }
 
 type BitfinexApi struct {
-	//connection *websocket.Conn
+	connection *websocket.Conn
 	symbolesForSubscirbe []string
 }
 
@@ -34,18 +34,16 @@ func NewBitfinexApi() *BitfinexApi {
 }
 
 
-
-func (b *BitfinexApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback  func(message []byte, error error)) {
-
+func (b *BitfinexApi)  connectWs(apiCurrenciesConfiguration ApiCurrenciesConfiguration) *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: bitfinexHost, Path: bitfinexPath}
 	log.Printf("connecting to %s", url.String())
 
 	connection, _, error := websocket.DefaultDialer.Dial(url.String(), nil)
 
-	if error != nil {
-		fmt.Println("Bitfinex ws error: ",error)
-		callback(nil, error)
-	} else if connection != nil {
+	if error != nil || connection == nil {
+		fmt.Println("Bitfinex ws connection error: ",error)
+		return nil
+	} else  {
 		fmt.Println("Bitfinex ws connected")
 
 		b.symbolesForSubscirbe = b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
@@ -54,17 +52,30 @@ func (b *BitfinexApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfi
 			connection.WriteMessage(websocket.TextMessage, []byte(subscribtion))
 		}
 
-		for {
-			func() {
-				_, messageJSON, _ := connection.ReadMessage()
-				//fmt.Println("read", messageJSON)
-				callback(messageJSON, error)
+		return connection
+	}
+}
 
+
+func (b *BitfinexApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback  func(message []byte, error error)) {
+
+	for {
+		if b.connection == nil {
+			b.connection = b.connectWs(apiCurrenciesConfiguration)
+		} else if b.connection != nil {
+
+			func() {
+				_, message, error := b.connection.ReadMessage()
+				if error != nil {
+					fmt.Println("Bitfinex read message error:", error)
+					b.connection.Close()
+					b.connection = nil
+				} else {
+					//fmt.Printf("%s \n", message)
+					callback(message, error)
+				}
 			}()
 		}
-	} else {
-		fmt.Println("connection is nil")
-		callback(nil, nil)
 	}
 
 
@@ -85,7 +96,10 @@ func (b *BitfinexApi)  composeSymbolsForSubscirbe(apiCurrenciesConfiguration Api
 
 func (b *BitfinexApi)  StopListen() {
 	//fmt.Println("before close")
-	//b.connection.Close()
-	//fmt.Println("closed")
+	if b.connection != nil {
+		b.connection.Close()
+		b.connection = nil
+	}
+	fmt.Println("Bitfinex ws closed")
 }
 

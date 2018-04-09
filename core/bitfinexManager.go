@@ -25,6 +25,7 @@ type BitfinexTicker struct {
 	Pair    string `json:"pair"`
 	Symbol  string `json:"symbol"`
 	Rate	string
+	TimpeStamp time.Time
 }
 
 	func (bitfinexTicker BitfinexTicker) IsFilled() bool {
@@ -83,21 +84,25 @@ func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 		func() {
 			tickers := []Ticker{}
 			for _, value := range b.bitfinexTickers {
-				var ticker = Ticker{}
-				ticker.Rate = value.Rate
-				ticker.Symbol = value.Symbol
+				if value.TimpeStamp.After(time.Now().Add(-3 * time.Second)) {
+					var ticker= Ticker{}
+					ticker.Rate = value.Rate
+					ticker.Symbol = value.Symbol
 
-				targetCurrency, referenceCurrency  := value.getCurriences()
-				ticker.TargetCurrency = targetCurrency
-				ticker.ReferenceCurrency = referenceCurrency
-				tickers = append(tickers, ticker)
+					targetCurrency, referenceCurrency := value.getCurriences()
+					ticker.TargetCurrency = targetCurrency
+					ticker.ReferenceCurrency = referenceCurrency
+					tickers = append(tickers, ticker)
+				}
 			}
 
 			var tickerCollection = TickerCollection{}
 			tickerCollection.TimpeStamp = time.Now()
 			tickerCollection.Tickers = tickers
 			//fmt.Println(tickerCollection)
-			callback(tickerCollection, nil)
+			if len(tickerCollection.Tickers) > 0 {
+				callback(tickerCollection, nil)
+			}
 		}()
 	}
 }
@@ -123,6 +128,7 @@ func (b *BitfinexManager) addMessage (message []byte) {
 			if v, ok := unmarshaledTickerMessage[1].([]interface{}); ok {
 				var sub = b.bitfinexTickers[chanId]
 				sub.Rate = strconv.FormatFloat(v[0].(float64), 'f', 8, 64)
+				sub.TimpeStamp = time.Now()
 				b.bitfinexTickers[chanId] = sub
 				//fmt.Println(b.bitfinexTickers)
 			}
