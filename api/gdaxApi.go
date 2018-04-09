@@ -29,18 +29,16 @@ Name       string   `json:"name"`
 ProductIds []string `json:"product_ids"`
 }
 
-
-
-func (b *GdaxApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback func(message []byte, error error)) {
+func (b *GdaxApi)  connectWs(apiCurrenciesConfiguration ApiCurrenciesConfiguration) *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: gdaxHost, Path: ""}
 	log.Printf("connecting to %s", url.String())
 
 	connection, _, error := websocket.DefaultDialer.Dial(url.String(), nil)
 
-	if error != nil {
-		fmt.Println("Gdax ws error: ",error)
-		callback(nil, error)
-	} else if connection != nil {
+	if error != nil || connection == nil {
+		fmt.Println("Gdax ws connection error: ",error)
+		return nil
+	} else  {
 		fmt.Println("Gdax ws connected")
 
 		productsIds :=  b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
@@ -59,25 +57,38 @@ func (b *GdaxApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigura
 			connection.WriteMessage(websocket.TextMessage, msg)
 		}
 
-		for {
+		return connection
+	}
+}
+
+func (b *GdaxApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback func(message []byte, error error)) {
+	for {
+		if b.connection == nil {
+			b.connection = b.connectWs(apiCurrenciesConfiguration)
+		} else if b.connection != nil {
+
 			func() {
-				_, message, _ := connection.ReadMessage()
-				//fmt.Printf("%s \n", message)
-				callback(message, error)
+				_, message, error := b.connection.ReadMessage()
+				if error != nil {
+					fmt.Println("Gdax read message error:", error)
+					b.connection.Close()
+					b.connection = nil
+				} else {
+					//fmt.Printf("%s \n", message)
+					callback(message, error)
+				}
 			}()
 		}
-	} else {
-		fmt.Println("connection is nil")
-		callback(nil, nil)
 	}
-
-
 }
 
 func (b *GdaxApi)  StopListen() {
 	//fmt.Println("before close")
-	//b.connection.Close()
-	//fmt.Println("closed")
+	if b.connection != nil {
+		b.connection.Close()
+		b.connection = nil
+	}
+	fmt.Println("Gdax ws closed")
 }
 
 func (b *GdaxApi)  composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCurrenciesConfiguration) []string {
