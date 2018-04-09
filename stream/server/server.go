@@ -48,10 +48,10 @@ func (s *Server) Tickers(whoAreYouParams *WhoAreYouParams, stream TickerGRPCServ
 		}
 
 		var allTickers = make(map[string]StreamTickerCollection)
-
 		s.ServerHandler(&allTickers)
-
 		fmt.Println(allTickers)
+
+
 
 		var streamTickers = Tickers{}
 		streamTickers.ExchangeTickers = []*ExchangeTickers{}
@@ -65,7 +65,11 @@ func (s *Server) Tickers(whoAreYouParams *WhoAreYouParams, stream TickerGRPCServ
 			for _, ticker := range tickers.Tickers {
 				var nodeTicker = Ticker{}
 				nodeTicker.Rate = ticker.Rate
-				nodeTicker.Symbol = ticker.Symbol
+				//nodeTicker.Symbol = ticker.Symbol
+
+				nodeTicker.Referrence = ticker.ReferenceCurrency.CurrencyCode()
+				nodeTicker.Target = ticker.TargetCurrency.CurrencyCode()
+
 
 				nodeTickers = append(nodeTickers, &nodeTicker)
 			}
@@ -76,7 +80,7 @@ func (s *Server) Tickers(whoAreYouParams *WhoAreYouParams, stream TickerGRPCServ
 		}
 
 		func() {
-			fmt.Println(streamTickers)
+			//fmt.Println(streamTickers)
 			if error := stream.Send(&streamTickers); error != nil {
 				fmt.Println("error sending to stream: ", error)
 			}

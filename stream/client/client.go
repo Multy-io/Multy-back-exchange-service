@@ -8,6 +8,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"Multy-back-exchange-service/stream/server"
+	"fmt"
 )
 
 var (
@@ -16,7 +17,7 @@ var (
 
 
 func printAllTickers(client server.TickerGRPCServerClient) {
-	log.Printf("Looking for features within %v")
+	//log.Printf("Looking for features within %v")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	stream, err := client.Tickers(ctx, &server.WhoAreYouParams{})
@@ -31,7 +32,7 @@ func printAllTickers(client server.TickerGRPCServerClient) {
 		if err != nil {
 			log.Fatalf("%v.ListFeatures(_) = _, %v", client, err)
 		}
-		log.Println(feature)
+		fmt.Println(feature)
 	}
 }
 

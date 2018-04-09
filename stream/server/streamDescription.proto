@@ -21,8 +21,8 @@ message ExchangeTickers {
 message Ticker {
  	string symbol = 1;
 	string rate = 2;
-    int64 targetCurrencyId = 3;
-    int64 referrenceCurrencyId = 4;
+    string target = 3;
+    string referrence = 4;
 }
 
 message WhoAreYouParams {}

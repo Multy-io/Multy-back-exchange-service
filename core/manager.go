@@ -8,7 +8,7 @@ import (
 
 	"time"
 	"strings"
-	"fmt"
+	//"fmt"
 )
 
 type Manager struct {
@@ -172,8 +172,7 @@ func (b *Manager) StartListen(configuration ManagerConfiguration) {
 			var streamTickerColection = b.convertToTickerCollection(tickerColection)
 			streamTickerCollections[key] = streamTickerColection
 		}
-		аьеюЗкштедт(ыекуфьЕшслукСщддусешщты)
-		allTickers = &streamTickerCollections
+		*allTickers = streamTickerCollections
 	}
 
 	b.waitGroup.Wait()
