@@ -32,7 +32,9 @@ func printAllTickers(client server.TickerGRPCServerClient) {
 		if err != nil {
 			log.Fatalf("%v.ListFeatures(_) = _, %v", client, err)
 		}
-		fmt.Println(feature)
+		for _, exchangeTicker := range feature.ExchangeTickers {
+			fmt.Println(exchangeTicker.Exchange, exchangeTicker.TimpeStamp)
+		}
 	}
 }
 
