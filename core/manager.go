@@ -79,6 +79,7 @@ type ExchangeConfiguration struct {
 	Exchange            Exchange
 	TargetCurrencies    []string
 	ReferenceCurrencies []string
+	RefreshInterval int
 }
 
 

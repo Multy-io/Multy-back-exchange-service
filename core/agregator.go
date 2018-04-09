@@ -6,6 +6,7 @@ import (
 	//"fmt"
 	//"fmt"
 	"Multy-back-exchange-service/currencies"
+	"fmt"
 )
 
 type NewTickerCollection struct {
@@ -30,6 +31,7 @@ type Ticker struct {
 	ReferenceCurrency currencies.Currency
 	Symbol 	string
 	Rate	string
+	TimpeStamp time.Time
 }
 
 
@@ -50,7 +52,7 @@ func NewAgregator() *Agregator {
 func (b *Agregator) add(tickerCollection TickerCollection, forExchange string) {
 	b.Lock()
 	b.allTickers[forExchange] = tickerCollection
-	//fmt.Println(b.allTickers)
+	fmt.Println("added:", b.allTickers)
 	b.Unlock()
 }
 
