@@ -9,18 +9,6 @@ import (
 	//"fmt"
 )
 
-type NewTickerCollection struct {
-	TimpeStamp time.Time
-	Tickers []Ticker
-}
-
-type NewTicker struct {
-	primaryCurrency string
-	secondarycurrency string
-	Rate	string
-}
-
-
 type TickerCollection struct {
 	TimpeStamp time.Time
 	Tickers []Ticker

@@ -2,7 +2,6 @@ package core
 
 import (
 	stream "Multy-back-exchange-service/stream/server"
-	"sync"
 	//"time"
 	"log"
 
@@ -24,8 +23,6 @@ type Manager struct {
 	server *stream.Server
 
 	agregator *Agregator
-
-	waitGroup sync.WaitGroup
 }
 
 func NewManager() *Manager {
@@ -152,8 +149,6 @@ func (b *Manager)lunchExchange(exchangeConfiguration ExchangeConfiguration) {
 
 func (b *Manager) StartListen(configuration ManagerConfiguration) {
 
-	exchangesAmount := len(configuration.Exchanges)
-	b.waitGroup.Add(exchangesAmount + 1)
 
 	for _, exchangeString := range configuration.Exchanges {
 		exchangeConfiguration := ExchangeConfiguration{}
@@ -177,8 +172,6 @@ func (b *Manager) StartListen(configuration ManagerConfiguration) {
 		}
 		*allTickers = streamTickerCollections
 	}
-
-	b.waitGroup.Wait()
 
 }
 

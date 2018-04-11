@@ -5,7 +5,7 @@ import (
 	"fmt"
 	//"encoding/json"
 	"github.com/gorilla/websocket"
-	"log"
+	//"log"
 )
 
 const bitfinexHost = "api.bitfinex.com"
@@ -36,12 +36,12 @@ func NewBitfinexApi() *BitfinexApi {
 
 func (b *BitfinexApi)  connectWs(apiCurrenciesConfiguration ApiCurrenciesConfiguration) *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: bitfinexHost, Path: bitfinexPath}
-	log.Printf("connecting to %s", url.String())
+	//log.Printf("connecting to %s", url.String())
 
 	connection, _, error := websocket.DefaultDialer.Dial(url.String(), nil)
 
 	if error != nil || connection == nil {
-		fmt.Println("Bitfinex ws connection error: ",error)
+		//fmt.Println("Bitfinex ws connection error: ",error)
 		return nil
 	} else  {
 		fmt.Println("Bitfinex ws connected")

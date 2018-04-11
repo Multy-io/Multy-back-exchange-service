@@ -50,7 +50,7 @@ func (s *Server) Tickers(whoAreYouParams *WhoAreYouParams, stream TickerGRPCServ
 
 		var allTickers = make(map[string]StreamTickerCollection)
 		s.ServerHandler(&allTickers)
-		fmt.Println(allTickers)
+		//fmt.Println(allTickers)
 
 
 
