@@ -2,16 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c5b380ad-a446-4ec8-9b01-d260a726246b" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/exchangeRates/dbManager.go" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/exchangeRates/exchangeManager.go" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/api/bitfinexApi.go" afterPath="$PROJECT_DIR$/api/bitfinexApi.go" />
-      <change beforePath="$PROJECT_DIR$/core/agregator.go" afterPath="$PROJECT_DIR$/core/agregator.go" />
-      <change beforePath="$PROJECT_DIR$/core/manager.go" afterPath="$PROJECT_DIR$/core/manager.go" />
-      <change beforePath="$PROJECT_DIR$/main/main.go" afterPath="$PROJECT_DIR$/main/main.go" />
-      <change beforePath="$PROJECT_DIR$/stream/client/client.go" afterPath="$PROJECT_DIR$/exchangeRates/grcpClient.go" />
-      <change beforePath="$PROJECT_DIR$/stream/server/server.go" afterPath="$PROJECT_DIR$/stream/server/server.go" />
-      <change beforePath="$PROJECT_DIR$/stream/server/streamDescription.proto" afterPath="$PROJECT_DIR$/stream/server/streamDescription.proto" />
+      <change beforePath="$PROJECT_DIR$/exchangeRates/dbManager.go" afterPath="$PROJECT_DIR$/exchangeRates/dbManager.go" />
+      <change beforePath="$PROJECT_DIR$/exchangeRates/exchangeManager.go" afterPath="$PROJECT_DIR$/exchangeRates/exchangeManager.go" />
+      <change beforePath="$PROJECT_DIR$/sql/rdb.sql" afterPath="$PROJECT_DIR$/sql/rdb.sql" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -22,29 +16,40 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="exchangeManager.go" pinned="false" current-in-tab="false">
+      <file leaf-file-name="exchangeManager.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/exchangeRates/exchangeManager.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="186">
-              <caret line="136" column="41" lean-forward="false" selection-start-line="136" selection-start-column="41" selection-end-line="136" selection-end-column="41" />
+            <state relative-caret-position="478">
+              <caret line="146" column="5" lean-forward="true" selection-start-line="146" selection-start-column="5" selection-end-line="146" selection-end-column="5" />
               <folding>
-                <element signature="e#23#192#0" expanded="true" />
+                <element signature="e#23#221#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="dbManager.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="bitfinexApi.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/api/bitfinexApi.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="30">
+              <caret line="8" column="1" lean-forward="true" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="dbManager.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/exchangeRates/dbManager.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="638">
-              <caret line="61" column="49" lean-forward="false" selection-start-line="61" selection-start-column="49" selection-end-line="61" selection-end-column="49" />
+            <state relative-caret-position="1785">
+              <caret line="119" column="0" lean-forward="true" selection-start-line="119" selection-start-column="0" selection-end-line="119" selection-end-column="0" />
               <folding>
-                <element signature="e#23#172#0" expanded="true" />
-                <marker date="1523457551310" expanded="true" signature="1324:1401" ph="INSERT INTO exchanges... " />
-                <marker date="1523457551310" expanded="true" signature="1661:1763" ph="INSERT INTO currencies... " />
-                <marker date="1523457551310" expanded="true" signature="2193:2381" ph="INSERT INTO sa_rates... " />
-                <marker date="1523457551310" expanded="true" signature="2770:2789" ph="SELECT fill_... " />
+                <element signature="e#23#206#0" expanded="true" />
+                <marker date="1523545439560" expanded="true" signature="1481:1558" ph="INSERT INTO exchanges... " />
+                <marker date="1523545439560" expanded="true" signature="1818:1920" ph="INSERT INTO currencies... " />
+                <marker date="1523545439560" expanded="true" signature="2313:2501" ph="INSERT INTO sa_rates... " />
+                <marker date="1523545439560" expanded="true" signature="2798:2817" ph="SELECT fill_... " />
+                <marker date="1523545439560" expanded="true" signature="3037:3075" ph="SELECT getRa... " />
               </folding>
             </state>
           </provider>
@@ -53,7 +58,7 @@
       <file leaf-file-name="atof.go" pinned="false" current-in-tab="false">
         <entry file="file:///usr/local/go/src/strconv/atof.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="433">
+            <state relative-caret-position="7980">
               <caret line="532" column="5" lean-forward="false" selection-start-line="532" selection-start-column="5" selection-end-line="532" selection-end-column="5" />
               <folding />
             </state>
@@ -63,8 +68,8 @@
       <file leaf-file-name="bitfinexManager.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/bitfinexManager.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-606">
-              <caret line="26" column="4" lean-forward="false" selection-start-line="26" selection-start-column="4" selection-end-line="26" selection-end-column="4" />
+            <state relative-caret-position="629">
+              <caret line="139" column="93" lean-forward="false" selection-start-line="139" selection-start-column="43" selection-end-line="139" selection-end-column="93" />
               <folding />
             </state>
           </provider>
@@ -73,8 +78,8 @@
       <file leaf-file-name="sql.go" pinned="false" current-in-tab="false">
         <entry file="file:///usr/local/go/src/database/sql/sql.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="202">
-              <caret line="2548" column="5" lean-forward="false" selection-start-line="2548" selection-start-column="5" selection-end-line="2548" selection-end-column="5" />
+            <state relative-caret-position="907">
+              <caret line="1431" column="14" lean-forward="false" selection-start-line="1431" selection-start-column="14" selection-end-line="1431" selection-end-column="14" />
               <folding />
             </state>
           </provider>
@@ -83,7 +88,7 @@
       <file leaf-file-name="grcpClient.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/exchangeRates/grcpClient.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="321">
+            <state relative-caret-position="660">
               <caret line="55" column="42" lean-forward="false" selection-start-line="55" selection-start-column="4" selection-end-line="55" selection-end-column="42" />
               <folding />
             </state>
@@ -103,8 +108,8 @@
       <file leaf-file-name="manager.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/manager.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2160">
-              <caret line="152" column="42" lean-forward="false" selection-start-line="152" selection-start-column="42" selection-end-line="152" selection-end-column="42" />
+            <state relative-caret-position="191">
+              <caret line="164" column="97" lean-forward="false" selection-start-line="164" selection-start-column="84" selection-end-line="164" selection-end-column="97" />
               <folding />
             </state>
           </provider>
@@ -113,7 +118,7 @@
       <file leaf-file-name="agregator.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/agregator.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
+            <state relative-caret-position="60">
               <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="22" selection-end-column="1" />
               <folding>
                 <element signature="e#14#109#0" expanded="true" />
@@ -150,6 +155,7 @@
       <find>-3</find>
       <find>NewTickerCollection</find>
       <find>NewTickerNewTicker</find>
+      <find>getRates</find>
     </findStrings>
     <replaceStrings>
       <replace>Currency	=</replace>
@@ -197,8 +203,8 @@
         <option value="$PROJECT_DIR$/exchangeRates/grcpClient.go" />
         <option value="$PROJECT_DIR$/stream/server/streamDescription.proto" />
         <option value="$PROJECT_DIR$/api/bitfinexApi.go" />
-        <option value="$PROJECT_DIR$/exchangeRates/exchangeManager.go" />
         <option value="$PROJECT_DIR$/exchangeRates/dbManager.go" />
+        <option value="$PROJECT_DIR$/exchangeRates/exchangeManager.go" />
       </list>
     </option>
   </component>
@@ -208,10 +214,10 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="74" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="77" />
     <option name="y" value="23" />
-    <option name="width" value="1846" />
+    <option name="width" value="1843" />
     <option name="height" value="1177" />
   </component>
   <component name="ProjectLevelVcsManager">
@@ -232,6 +238,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -289,7 +296,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -339,17 +345,17 @@
     <option name="remove_strategy" value="false" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="74" y="23" width="1846" height="1177" extended-state="6" />
+    <frame x="77" y="23" width="1843" height="1177" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30709535" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20433092" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23135033" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.37488195" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.598678" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295562" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39943343" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -657,15 +663,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1065">
           <caret line="81" column="42" lean-forward="false" selection-start-line="81" selection-start-column="4" selection-end-line="81" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/manager.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2160">
-          <caret line="152" column="42" lean-forward="false" selection-start-line="152" selection-start-column="42" selection-end-line="152" selection-end-column="42" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -696,20 +693,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/core/agregator.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
+        <state relative-caret-position="60">
           <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="22" selection-end-column="1" />
           <folding>
             <element signature="e#14#109#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/api/bitfinexApi.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="1" lean-forward="true" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
-          <folding>
-            <element signature="e#13#101#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -718,62 +705,78 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="202">
           <caret line="53" column="5" lean-forward="false" selection-start-line="53" selection-start-column="5" selection-end-line="53" selection-end-column="5" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/exchangeRates/grcpClient.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="321">
+        <state relative-caret-position="660">
           <caret line="55" column="42" lean-forward="false" selection-start-line="55" selection-start-column="4" selection-end-line="55" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/local/go/src/database/sql/sql.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="202">
-          <caret line="2548" column="5" lean-forward="false" selection-start-line="2548" selection-start-column="5" selection-end-line="2548" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/bitfinexManager.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-606">
-          <caret line="26" column="4" lean-forward="false" selection-start-line="26" selection-start-column="4" selection-end-line="26" selection-end-column="4" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file:///usr/local/go/src/strconv/atof.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="433">
+        <state relative-caret-position="7980">
           <caret line="532" column="5" lean-forward="false" selection-start-line="532" selection-start-column="5" selection-end-line="532" selection-end-column="5" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/exchangeRates/exchangeManager.go">
+    <entry file="file:///usr/local/go/src/database/sql/sql.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="136" column="41" lean-forward="false" selection-start-line="136" selection-start-column="41" selection-end-line="136" selection-end-column="41" />
-          <folding>
-            <element signature="e#23#192#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="907">
+          <caret line="1431" column="14" lean-forward="false" selection-start-line="1431" selection-start-column="14" selection-end-line="1431" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/bitfinexApi.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="8" column="1" lean-forward="true" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/bitfinexManager.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="629">
+          <caret line="139" column="93" lean-forward="false" selection-start-line="139" selection-start-column="43" selection-end-line="139" selection-end-column="93" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/manager.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="191">
+          <caret line="164" column="97" lean-forward="false" selection-start-line="164" selection-start-column="84" selection-end-line="164" selection-end-column="97" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/exchangeRates/dbManager.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="638">
-          <caret line="61" column="49" lean-forward="false" selection-start-line="61" selection-start-column="49" selection-end-line="61" selection-end-column="49" />
+        <state relative-caret-position="1785">
+          <caret line="119" column="0" lean-forward="true" selection-start-line="119" selection-start-column="0" selection-end-line="119" selection-end-column="0" />
           <folding>
-            <element signature="e#23#172#0" expanded="true" />
-            <marker date="1523457551310" expanded="true" signature="1324:1401" ph="INSERT INTO exchanges... " />
-            <marker date="1523457551310" expanded="true" signature="1661:1763" ph="INSERT INTO currencies... " />
-            <marker date="1523457551310" expanded="true" signature="2193:2381" ph="INSERT INTO sa_rates... " />
-            <marker date="1523457551310" expanded="true" signature="2770:2789" ph="SELECT fill_... " />
+            <element signature="e#23#206#0" expanded="true" />
+            <marker date="1523545439560" expanded="true" signature="1481:1558" ph="INSERT INTO exchanges... " />
+            <marker date="1523545439560" expanded="true" signature="1818:1920" ph="INSERT INTO currencies... " />
+            <marker date="1523545439560" expanded="true" signature="2313:2501" ph="INSERT INTO sa_rates... " />
+            <marker date="1523545439560" expanded="true" signature="2798:2817" ph="SELECT fill_... " />
+            <marker date="1523545439560" expanded="true" signature="3037:3075" ph="SELECT getRa... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/exchangeRates/exchangeManager.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="478">
+          <caret line="146" column="5" lean-forward="true" selection-start-line="146" selection-start-column="5" selection-end-line="146" selection-end-column="5" />
+          <folding>
+            <element signature="e#23#221#0" expanded="true" />
           </folding>
         </state>
       </provider>

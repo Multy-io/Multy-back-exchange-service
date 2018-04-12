@@ -9,8 +9,11 @@ import (
 	"time"
 	"Multy-back-exchange-service/currencies"
 	//"fmt"
-	"strings"
+	//"strings"
 	//"fmt"
+	//"fmt"
+	"strconv"
+	"fmt"
 )
 
 type Exchange struct {
@@ -44,19 +47,10 @@ type ExchangeManager struct {
 func NewExchangeManager() *ExchangeManager {
 	var manger = ExchangeManager{}
 	manger.exchanges = map[string]*Exchange{}
-	//manger.allTickers
 	manger.grpcClient = NewGrpcClient()
 	manger.fiatureCh = make(chan *server.Tickers)
 	manger.dbManger = NewDbManager()
 
-	//manger.binanceManager = NewBinanceManager()
-	//manger.hitBtcManager = &HitBtcManager{}
-	//manger.poloniexManager = &PoloniexManager{}
-	//manger.bitfinexManager = &BitfinexManager{}
-	//manger.gdaxManager = &GdaxManager{}
-	//manger.okexManager = &OkexManager{}
-	//manger.server = &stream.Server{}
-	//manger.agregator = NewAgregator()
 	return &manger
 }
 
@@ -99,35 +93,24 @@ func (b *ExchangeManager) add(tikers *server.Tickers) {
 			b.exchanges[exchangeTicker.Exchange].Tickers[ticker.symbol()] = &ticker
 		}
 	}
-	//fmt.Println(b.exchanges["BINANCE"])
-	b.getRates(time.Now(), "Binance", "ETH",[]string{"USDT", "BTC"})
 	b.Unlock()
 }
 
-func (b *ExchangeManager) getRates(timeStamp time.Time, exchangeName string, targetCode string, refereceCodes []string)  []*Ticker {
-	exchange := b.exchanges[strings.ToUpper(exchangeName)]
+func (b *ExchangeManager) getRates(timeStamp time.Time, exchangeName string, targetCode string, referecies []string)  []*Ticker {
 
-	if exchange == nil {
-		return nil
-	}
+	var dbRates = b.dbManger.getRates(timeStamp, exchangeName, targetCode, referecies)
 
-	//fmt.Println(exchange.name)
 	var tickers = []*Ticker{}
-	for _, refereceCode := range refereceCodes {
 
-		var symbol = targetCode + "-" + refereceCode
+	for _, dbRate := range dbRates {
 
-		//fmt.Println(symbol)
-
-		var ticker = exchange.Tickers[symbol]
-		//fmt.Println(ticker)
-		if ticker != nil {
-			tickers = append(tickers, ticker)
-		}
+		var ticker= Ticker{}
+		ticker.TargetCurrency = currencies.NewCurrencyWithCode(dbRate.targetCode)
+		ticker.ReferenceCurrency = currencies.NewCurrencyWithCode(dbRate.referenceCode)
+		ticker.TimpeStamp = dbRate.timeStamp
+		ticker.Rate = strconv.FormatFloat(dbRate.rate, 'f', 8, 64)
+		tickers = append(tickers, &ticker)
 	}
-
-
-	//fmt.Println(tickers)
 	return tickers
 }
 
@@ -155,5 +138,11 @@ func (b *ExchangeManager) fillDb() {
 		}
 
 		b.dbManger.FillDb(dbExchanges)
+
+		v := b.getRates(time.Now().Add(-4 * time.Minute), "BINANCE", "ETH", []string{"BTC", "USDT"})
+
+		for _,value := range v {
+			fmt.Println("rasult:", value)
+		}
 	}
 }
