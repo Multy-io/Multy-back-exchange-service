@@ -29,7 +29,7 @@ func (b *PoloniexTicker) getCurriences() (currencies.Currency, currencies.Curren
 		var symbol = b.Symbol
 		var currencyCodes = strings.Split(symbol, "_")
 		if len(currencyCodes) > 1 {
-			return currencies.NewCurrencyWithCode(currencyCodes[0]), currencies.NewCurrencyWithCode(currencyCodes[1])
+			return currencies.NewCurrencyWithCode(currencyCodes[1]), currencies.NewCurrencyWithCode(currencyCodes[0])
 		}
 	}
 	return currencies.NotAplicable, currencies.NotAplicable
@@ -90,7 +90,7 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 					targetCurrency, referenceCurrency  := poloniexTicker.getCurriences()
 					ticker.TargetCurrency = targetCurrency
 					ticker.ReferenceCurrency = referenceCurrency
-
+					//fmt.Println(targetCurrency.CurrencyCode(), referenceCurrency.CurrencyCode())
 					b.tickers[ticker.Symbol] = ticker
 				}
 			} else {
