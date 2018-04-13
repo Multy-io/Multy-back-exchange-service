@@ -175,3 +175,35 @@ SELECT * from getRates(CURRENT_TIMESTAMP, 'BINANCE', 'ETH', '{USDT, BTC}');
 SELECT DISTINCT on (ex.id, tcr.id, rcr.id ) ex.id exchange_id, tcr.id target_id, rcr.id reference_id, time_stamp
 FROM sa_rates sr, exchanges ex, currencies tcr,  currencies rcr
 WHERE sr.exchange_title = ex.title and sr.target_code = tcr.code and sr.reference_code = rcr.code;
+
+
+SELECT exchange_id, target_id, *
+FROM exchanges_pairs ex, currencies rcr
+WHERE ex.reference_id = rcr.id and code in ('USDT','USD')
+
+
+SELECT ex.title, tc.code, rc.code from (
+SELECT a.id as exchange_id, a.target_id, a.reference_id, exp.exchange_id as exist
+FROM exchanges_pairs exp
+RIGHT OUTER JOIN
+(
+SELECT * from (
+SELECT DISTINCT target_id
+FROM exchanges_pairs) t,
+(SELECT DISTINCT reference_id
+FROM exchanges_pairs) r,
+(SELECT DISTINCT exchanges.id
+FROM exchanges) ex
+WHERE t.target_id != r.reference_id
+) a
+on exp.reference_id = a.reference_id and exp.target_id = a.target_id and exp.exchange_id = a.id) result, exchanges ex, currencies tc, currencies rc
+WHERE result.exist is NULL and result.exchange_id = ex.id and result.target_id = tc.id and result.reference_id = rc.id
+
+
+SELECT * from (
+SELECT DISTINCT target_id
+FROM exchanges_pairs) t,
+(SELECT DISTINCT reference_id
+FROM exchanges_pairs) r,
+(SELECT DISTINCT exchanges.id
+FROM exchanges) ex

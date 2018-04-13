@@ -33,19 +33,30 @@ type BitfinexTicker struct {
 }
 
 func (b *BitfinexTicker) getCurriences() (currencies.Currency, currencies.Currency) {
-
+	//fmt.Println(b.Symbol)
 	if len(b.Symbol) > 0 {
 		var symbol = b.Symbol
 		var damagedSymbol = utiles.TrimLeftChars(symbol, 2)
 		for _, referenceCurrency := range currencies.DefaultReferenceCurrencies {
 			//fmt.Println(damagedSymbol, referenceCurrency.CurrencyCode())
 
-			if strings.Contains(damagedSymbol, referenceCurrency.CurrencyCode()) {
+			referenceCurrencyCode := referenceCurrency.CurrencyCode()
+
+			if referenceCurrencyCode == "USDT" {
+				referenceCurrencyCode = "USD"
+			}
+
+			//fmt.Println(damagedSymbol)
+			//fmt.Println(referenceCurrencyCode)
+			//fmt.Println(strings.Contains(damagedSymbol, referenceCurrencyCode))
+
+			if strings.Contains(damagedSymbol, referenceCurrencyCode) {
+				//fmt.Println(damagedSymbol)
 
 				//fmt.Println("2",symbol, referenceCurrency.CurrencyCode())
-				targetCurrencyStringWithT := strings.TrimSuffix(symbol, referenceCurrency.CurrencyCode())
+				targetCurrencyStringWithT := strings.TrimSuffix(symbol, referenceCurrencyCode)
 				targetCurrencyString := utiles.TrimLeftChars(targetCurrencyStringWithT, 1)
-				//fmt.Println(targetCurrencyString)
+				//fmt.Println("targetCurrencyString", targetCurrencyString)
 				var targetCurrency = currencies.NewCurrencyWithCode(targetCurrencyString)
 				return targetCurrency, referenceCurrency
 			}
@@ -130,7 +141,6 @@ func (b *BitfinexManager) addMessage (message []byte) {
 				sub.Rate = strconv.FormatFloat(v[0].(float64), 'f', 8, 64)
 				sub.TimpeStamp = time.Now()
 				b.bitfinexTickers[chanId] = sub
-				//fmt.Println(b.bitfinexTickers)
 			}
 		}
 	}

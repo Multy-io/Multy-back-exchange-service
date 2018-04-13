@@ -100,6 +100,10 @@ func (b *GdaxApi)  composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCurr
 				continue
 			}
 
+			if referenceCurrency == "USDT" {
+				referenceCurrency = "USD"
+			}
+
 			symbol := targetCurrency + "-" + referenceCurrency
 			smybolsForSubscirbe = append(smybolsForSubscirbe, symbol)
 		}

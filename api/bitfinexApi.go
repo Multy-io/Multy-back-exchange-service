@@ -85,6 +85,14 @@ func (b *BitfinexApi)  composeSymbolsForSubscirbe(apiCurrenciesConfiguration Api
 	var smybolsForSubscirbe = []string{}
 	for _, targetCurrency := range apiCurrenciesConfiguration.TargetCurrencies {
 		for _, referenceCurrency := range apiCurrenciesConfiguration.ReferenceCurrencies {
+
+			if targetCurrency == referenceCurrency {
+				continue
+			}
+
+			if referenceCurrency == "USDT" {
+				referenceCurrency = "USD"
+			}
 			symbol := "t" + targetCurrency + referenceCurrency
 			smybolsForSubscirbe = append(smybolsForSubscirbe, symbol)
 		}

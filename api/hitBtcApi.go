@@ -103,6 +103,10 @@ func (b *HitBtcApi)  composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCu
 				continue
 			}
 
+			if referenceCurrency == "USDT" {
+				referenceCurrency = "USD"
+			}
+
 			symbol := targetCurrency + referenceCurrency
 			smybolsForSubscirbe = append(smybolsForSubscirbe, symbol)
 		}

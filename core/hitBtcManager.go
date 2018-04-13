@@ -34,10 +34,16 @@ func (b *HitBtcTicker) getCurriences() (currencies.Currency, currencies.Currency
 		for _, referenceCurrency := range currencies.DefaultReferenceCurrencies {
 			//fmt.Println(damagedSymbol, referenceCurrency.CurrencyCode())
 
-			if strings.Contains(damagedSymbol, referenceCurrency.CurrencyCode()) {
+			referenceCurrencyCode := referenceCurrency.CurrencyCode()
+
+			if referenceCurrencyCode == "USDT" {
+				referenceCurrencyCode = "USD"
+			}
+
+			if strings.Contains(damagedSymbol, referenceCurrencyCode) {
 
 				//fmt.Println("2",symbol, referenceCurrency.CurrencyCode())
-				targetCurrencyString := strings.TrimSuffix(symbol, referenceCurrency.CurrencyCode())
+				targetCurrencyString := strings.TrimSuffix(symbol, referenceCurrencyCode)
 				//fmt.Println(targetCurrencyString)
 				var targetCurrency = currencies.NewCurrencyWithCode(targetCurrencyString)
 				return targetCurrency, referenceCurrency
@@ -93,6 +99,7 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 			tickerCollection.TimpeStamp = time.Now()
 			tickerCollection.Tickers = values
 			if len(tickerCollection.Tickers) > 0 {
+				//fmt.Println(tickerCollection)
 				callback(tickerCollection, nil)
 			}
 		}()
@@ -103,7 +110,7 @@ func (b *HitBtcManager) add(hitBtcTicker HitBtcTicker) {
 	var ticker = Ticker{}
 	ticker.Rate = hitBtcTicker.Params.Rate
 	ticker.Symbol = hitBtcTicker.Params.Symbol
-
+	//fmt.Println(hitBtcTicker)
 	targetCurrency, referenceCurrency  := hitBtcTicker.getCurriences()
 	ticker.TargetCurrency = targetCurrency
 	ticker.ReferenceCurrency = referenceCurrency

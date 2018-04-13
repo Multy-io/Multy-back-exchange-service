@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-var DefaultReferenceCurrencies = []Currency{Tether, USD, Bitcoin}
+var DefaultReferenceCurrencies = []Currency{Tether, Bitcoin}
 
 type Currency int
 
@@ -197,7 +197,6 @@ const (
 	Waves 				   Currency= 37313
 	EOS 				   Currency= 37314
 	Tether 					Currency= 37315
-	USD 					Currency= 37316
 	NotAplicable 			Currency= -99
 )
 
@@ -389,7 +388,6 @@ var CurrencyNames= map[Currency]string{
 	Waves: 					"Waves",
 	EOS: 					"EOS",
 	Tether: 				"Tether",
-	USD: 					"USD",
 	NotAplicable: 			"NotAplicable",
 }
 
@@ -406,7 +404,6 @@ var CurrencyCodes= map[Currency]string{
 	EtherClassic: 			"ETC",
 	EOS: 					"EOS",
 	Tether:					"USDT",
-	USD:					"USD",
 	NotAplicable: 			"N.A.",
 }
 
@@ -432,6 +429,11 @@ func NewCurrencyWithCode(currencyCodeString string ) Currency {
 	for key, val := range CurrencyCodes {
 		currencies[strings.ToUpper(val)] = key
 	}
+
+	if currencyCodeString == "USD" {
+		currencyCodeString = "USDT"
+	}
+
 	currency := currencies[strings.ToUpper(currencyCodeString)]
 
 	return currency
