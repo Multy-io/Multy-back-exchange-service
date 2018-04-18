@@ -23,7 +23,7 @@ UNION
 ON CONFLICT DO NOTHING;
 
 INSERT INTO exchanges_pairs
-SELECT DISTINCT on (ex.id, tcr.id, rcr.id ) ex.id exchange_id, tcr.id target_id, rcr.id reference_id, time_stamp
+SELECT DISTINCT on (ex.id, tcr.id, rcr.id ) ex.id exchange_id, tcr.id target_id, rcr.id reference_id, time_stamp, FALSE as is_calculated
 FROM sa_rates sr, exchanges ex, currencies tcr,  currencies rcr
 WHERE sr.exchange_title = ex.title and sr.target_code = tcr.code and sr.reference_code = rcr.code
  ON CONFLICT DO NOTHING;
@@ -179,25 +179,37 @@ WHERE sr.exchange_title = ex.title and sr.target_code = tcr.code and sr.referenc
 
 SELECT exchange_id, target_id, *
 FROM exchanges_pairs ex, currencies rcr
-WHERE ex.reference_id = rcr.id and code in ('USDT','USD')
+WHERE ex.reference_id = rcr.id and code in ('USDT','USD');
 
-
-SELECT ex.title, tc.code, rc.code from (
+CREATE or replace view sa_calculates as
+SELECT ex.id ex_id, tc.id tc_id, rc.id rc_id, ex.title, tc.code as tc_code, rc.code as rc_code from (
 SELECT a.id as exchange_id, a.target_id, a.reference_id, exp.exchange_id as exist
 FROM exchanges_pairs exp
 RIGHT OUTER JOIN
 (
 SELECT * from (
 SELECT DISTINCT target_id
-FROM exchanges_pairs) t,
+FROM exchanges_pairs
+WHERE is_calculated = FALSE) t,
 (SELECT DISTINCT reference_id
-FROM exchanges_pairs) r,
+FROM exchanges_pairs
+WHERE is_calculated = FALSE) r,
 (SELECT DISTINCT exchanges.id
 FROM exchanges) ex
 WHERE t.target_id != r.reference_id
 ) a
-on exp.reference_id = a.reference_id and exp.target_id = a.target_id and exp.exchange_id = a.id) result, exchanges ex, currencies tc, currencies rc
-WHERE result.exist is NULL and result.exchange_id = ex.id and result.target_id = tc.id and result.reference_id = rc.id
+on exp.reference_id = a.reference_id and exp.target_id = a.target_id and exp.exchange_id = a.id) result, exchanges ex, currencies tc, currencies rc, exchanges_pairs ep
+WHERE result.exist is NULL and result.exchange_id = ex.id and result.target_id = tc.id and result.reference_id = rc.id and result.exchange_id = ep.exchange_id and result.target_id = ep.target_id and ep.is_calculated = FALSE
+ORDER  by ex.title, 2;
+
+
+SELECT e.title, tc.code, rc.code
+FROM exchanges_pairs ep, exchanges e, currencies tc, currencies rc
+WHERE ep.exchange_id = e.id and ep.target_id = tc.id and ep.reference_id = rc.id
+and e.title = 'HITBTC'
+ORDER  by  1
+
+
 
 
 SELECT * from (
@@ -206,4 +218,43 @@ FROM exchanges_pairs) t,
 (SELECT DISTINCT reference_id
 FROM exchanges_pairs) r,
 (SELECT DISTINCT exchanges.id
-FROM exchanges) ex
+FROM exchanges) ex;
+
+
+TRUNCATE TABLE public.currencies
+    CONTINUE IDENTITY
+    RESTRICT;
+
+TRUNCATE TABLE exchanges
+    CONTINUE IDENTITY
+    RESTRICT;
+
+TRUNCATE TABLE exchanges_pairs
+    CONTINUE IDENTITY
+    RESTRICT;
+
+
+TRUNCATE TABLE rates
+    CONTINUE IDENTITY
+    RESTRICT;
+
+
+TRUNCATE TABLE sa_rates
+    CONTINUE IDENTITY
+    RESTRICT;
+
+
+SELECT *
+from sa_calculates
+
+
+SELECT *
+FROM
+(
+SELECT *
+from sa_calculates) c ,
+(
+SELECT DISTINCT exchange_id, reference_id, is_calculated, ex.title, c.code
+from exchanges_pairs ep, exchanges ex, currencies c
+WHERE ep.exchange_id = ex.id and reference_id = c.id) r
+WHERE c.ex_id = r.exchange_id and c.rc_id != r.reference_id
