@@ -1,17 +1,18 @@
 package api
 
 import (
-	"net/url"
-	"fmt"
 	"encoding/json"
-	"github.com/gorilla/websocket"
-	"log"
-	"github.com/shopspring/decimal"
-	"io/ioutil"
-	"net/http"
-	"time"
 	"errors"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"net/url"
 	"sync"
+	"time"
+
+	"github.com/gorilla/websocket"
+	"github.com/shopspring/decimal"
 )
 
 const host = "api2.poloniex.com"
@@ -42,14 +43,14 @@ func NewPoloniexApi() *PoloniexApi {
 	return &api
 }
 
-func (b *PoloniexApi)  connectWs() *websocket.Conn {
+func (b *PoloniexApi) connectWs() *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: host, Path: path}
 	log.Printf("connecting to %s", url.String())
 
 	connection, _, error := websocket.DefaultDialer.Dial(url.String(), nil)
 
-	if error != nil || connection == nil  {
-		fmt.Println("Poloniex ws connection error: ",error)
+	if error != nil || connection == nil {
+		fmt.Println("Poloniex ws connection error: ", error)
 		return nil
 	} else {
 		fmt.Println("Poloniex ws connected")
@@ -61,8 +62,7 @@ func (b *PoloniexApi)  connectWs() *websocket.Conn {
 
 }
 
-
-func (b *PoloniexApi)  StartListen(callback func(message []byte, error error)) {
+func (b *PoloniexApi) StartListen(callback func(message []byte, error error)) {
 
 	for {
 		if b.connection == nil {
@@ -158,13 +158,11 @@ func (p *PoloniexApi) publicRequest(action string, respch chan<- []byte, errch c
 	errch <- nil
 }
 
-func (b *PoloniexApi)  StopListen() {
+func (b *PoloniexApi) StopListen() {
 	//fmt.Println("before close")
 	//b.connection.Close()
 	//fmt.Println("closed")
 }
-
-
 
 var (
 	ConnectError    = "[ERROR] Connection could not be established!"
@@ -192,7 +190,6 @@ func Error(msg string, args ...interface{}) error {
 	}
 }
 
-
 type Logger struct {
 	isOpen bool
 	Lock   *sync.Mutex
@@ -208,4 +205,3 @@ func (l *Logger) LogRoutine(bus <-chan string) {
 		}
 	}
 }
-

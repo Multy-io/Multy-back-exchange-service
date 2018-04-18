@@ -1,15 +1,15 @@
 package exchangeRates
 
 import (
-	"time"
-	"Multy-back-exchange-service/currencies"
-	"fmt"
 	"database/sql"
-	_ "github.com/lib/pq"
-	//"golang.org/x/text/currency"
-	"strconv"
 	"database/sql/driver"
+	"fmt"
+	"strconv"
 	"strings"
+	"time"
+
+	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
+	_ "github.com/lib/pq"
 )
 
 const (
@@ -19,16 +19,15 @@ const (
 )
 
 type DbExchange struct {
-	name string
+	name    string
 	Tickers []*DbTicker
 }
 
-
 type DbTicker struct {
-	TargetCurrency currencies.Currency
+	TargetCurrency    currencies.Currency
 	ReferenceCurrency currencies.Currency
-	Rate	string
-	TimpeStamp time.Time
+	Rate              string
+	TimpeStamp        time.Time
 }
 
 type DbManager struct {
@@ -37,14 +36,13 @@ type DbManager struct {
 
 type DbRate struct {
 	exchangeTitle string
-	targetCode string
+	targetCode    string
 	referenceCode string
-	timeStamp time.Time
-	rate float64
+	timeStamp     time.Time
+	rate          float64
 }
 
-
-func NewDbManager() *DbManager  {
+func NewDbManager() *DbManager {
 	manager := DbManager{}
 	manager.db = manager.connectDb()
 	return &manager
@@ -68,7 +66,6 @@ func checkErr(err error) {
 
 func (b *DbManager) FillDb(withExchanges []*DbExchange) {
 
-
 	for _, exchange := range withExchanges {
 		for _, ticker := range exchange.Tickers {
 			b.insertSaRate(exchange.name, ticker.TargetCurrency, ticker.ReferenceCurrency, ticker.Rate)
@@ -76,6 +73,7 @@ func (b *DbManager) FillDb(withExchanges []*DbExchange) {
 	}
 	b.fillRateFromSA()
 }
+
 //
 //func (b *DbManager) insert(exchange *DbExchange) {
 //	//fmt.Println("# Inserting values")
@@ -109,7 +107,6 @@ func (b *DbManager) fillRateFromSA() {
 	checkErr(err)
 }
 
-
 func (b *DbManager) getRates(timeStamp time.Time, exchangeTitle string, targetCode string, refereciesCodes []string) []DbRate {
 	var s = StringSlice{}
 	s = refereciesCodes
@@ -140,7 +137,6 @@ func (b *DbManager) getRates(timeStamp time.Time, exchangeTitle string, targetCo
 	rows.Close()
 	return dbRates
 }
-
 
 type StringSlice []string
 

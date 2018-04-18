@@ -3,39 +3,33 @@ package core
 import (
 	"sync"
 	"time"
-	//"fmt"
-	//"fmt"
-	"Multy-back-exchange-service/currencies"
-	//"fmt"
+
+	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 )
 
 type TickerCollection struct {
 	TimpeStamp time.Time
-	Tickers []Ticker
+	Tickers    []Ticker
 }
 
 type Ticker struct {
-	TargetCurrency currencies.Currency
+	TargetCurrency    currencies.Currency
 	ReferenceCurrency currencies.Currency
-	Symbol 	string
-	Rate	string
-	TimpeStamp time.Time
+	Symbol            string
+	Rate              string
+	TimpeStamp        time.Time
 }
-
-
 
 type Agregator struct {
 	sync.Mutex
 	allTickers map[string]TickerCollection
 }
 
-
 func NewAgregator() *Agregator {
 	var agregator = Agregator{}
 	agregator.allTickers = make(map[string]TickerCollection)
 	return &agregator
 }
-
 
 func (b *Agregator) add(tickerCollection TickerCollection, forExchange string) {
 	b.Lock()

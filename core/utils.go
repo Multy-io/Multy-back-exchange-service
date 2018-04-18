@@ -1,4 +1,4 @@
-package utiles
+package core
 
 func TrimLeftChars(s string, n int) string {
 	m := 0

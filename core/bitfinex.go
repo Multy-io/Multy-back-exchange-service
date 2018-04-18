@@ -1,34 +1,33 @@
 package core
 
 import (
-	"log"
-	"fmt"
 	"encoding/json"
+	"fmt"
+	"log"
 	"strconv"
-	"time"
-	"Multy-back-exchange-service/api"
-	"Multy-back-exchange-service/utiles"
 	"strings"
+	"time"
 
-	"Multy-back-exchange-service/currencies"
+	"github.com/Appscrunch/Multy-back-exchange-service/api"
+	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 )
 
 type BitfinexManager struct {
 	bitfinexTickers map[int]BitfinexTicker
-	api *api.BitfinexApi
+	api             *api.BitfinexApi
 }
 
 type BitfinexTicker struct {
-	ChanID  int    `json:"chanId"`
-	Channel string `json:"channel"`
-	Event   string `json:"event"`
-	Pair    string `json:"pair"`
-	Symbol  string `json:"symbol"`
-	Rate	string
+	ChanID     int    `json:"chanId"`
+	Channel    string `json:"channel"`
+	Event      string `json:"event"`
+	Pair       string `json:"pair"`
+	Symbol     string `json:"symbol"`
+	Rate       string
 	TimpeStamp time.Time
 }
 
-	func (bitfinexTicker BitfinexTicker) IsFilled() bool {
+func (bitfinexTicker BitfinexTicker) IsFilled() bool {
 	return (len(bitfinexTicker.Symbol) > 0 && len(bitfinexTicker.Rate) > 0)
 }
 
@@ -36,7 +35,7 @@ func (b *BitfinexTicker) getCurriences() (currencies.Currency, currencies.Curren
 	//fmt.Println(b.Symbol)
 	if len(b.Symbol) > 0 {
 		var symbol = b.Symbol
-		var damagedSymbol = utiles.TrimLeftChars(symbol, 2)
+		var damagedSymbol = TrimLeftChars(symbol, 2)
 		for _, referenceCurrency := range currencies.DefaultReferenceCurrencies {
 			//fmt.Println(damagedSymbol, referenceCurrency.CurrencyCode())
 
@@ -55,7 +54,7 @@ func (b *BitfinexTicker) getCurriences() (currencies.Currency, currencies.Curren
 
 				//fmt.Println("2",symbol, referenceCurrency.CurrencyCode())
 				targetCurrencyStringWithT := strings.TrimSuffix(symbol, referenceCurrencyCode)
-				targetCurrencyString := utiles.TrimLeftChars(targetCurrencyStringWithT, 1)
+				targetCurrencyString := TrimLeftChars(targetCurrencyStringWithT, 1)
 				//fmt.Println("targetCurrencyString", targetCurrencyString)
 				var targetCurrency = currencies.NewCurrencyWithCode(targetCurrencyString)
 				return targetCurrency, referenceCurrency
@@ -65,7 +64,6 @@ func (b *BitfinexTicker) getCurriences() (currencies.Currency, currencies.Curren
 	}
 	return currencies.NotAplicable, currencies.NotAplicable
 }
-
 
 func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
 	b.bitfinexTickers = make(map[int]BitfinexTicker)
@@ -85,10 +83,10 @@ func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 			//fmt.Println(1)
 			b.addMessage(message)
 			//fmt.
-			} else {
-				fmt.Println( "error parsing Bitfinex ticker:", error)
-			}
-		})
+		} else {
+			fmt.Println("error parsing Bitfinex ticker:", error)
+		}
+	})
 
 	for range time.Tick(1 * time.Second) {
 		//TODO: add check if data is old and don't sent it to callback
@@ -96,7 +94,7 @@ func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 			tickers := []Ticker{}
 			for _, value := range b.bitfinexTickers {
 				if value.TimpeStamp.After(time.Now().Add(-maxTickerAge * time.Second)) {
-					var ticker= Ticker{}
+					var ticker = Ticker{}
 					ticker.Rate = value.Rate
 					ticker.Symbol = value.Symbol
 
@@ -118,8 +116,7 @@ func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 	}
 }
 
-
-func (b *BitfinexManager) addMessage (message []byte) {
+func (b *BitfinexManager) addMessage(message []byte) {
 
 	var bitfinexTicker BitfinexTicker
 	json.Unmarshal(message, &bitfinexTicker)
@@ -131,7 +128,6 @@ func (b *BitfinexManager) addMessage (message []byte) {
 
 		var unmarshaledTickerMessage []interface{}
 		json.Unmarshal(message, &unmarshaledTickerMessage)
-
 
 		if len(unmarshaledTickerMessage) > 1 {
 			var chanId = int(unmarshaledTickerMessage[0].(float64))

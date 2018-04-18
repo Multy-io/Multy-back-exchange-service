@@ -1,19 +1,14 @@
 package core
 
 import (
-
-	"log"
-	//"fmt"
 	"encoding/json"
-	//"github.com/Appscrunch/Multy-back/client"
-	"time"
-	//"strconv"
-	"Multy-back-exchange-service/api"
+	"log"
 	"strings"
-	"Multy-back-exchange-service/currencies"
+	"time"
+
+	"github.com/Appscrunch/Multy-back-exchange-service/api"
+	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 )
-
-
 
 type OkexManager struct {
 	tickers map[string]Ticker
@@ -21,9 +16,9 @@ type OkexManager struct {
 }
 
 type OkexTicker struct {
-	Binary  int    `json:"binary"`
+	Binary int    `json:"binary"`
 	Symbol string `json:"channel"`
-	Data    struct {
+	Data   struct {
 		High       string `json:"high"`
 		LimitLow   string `json:"limitLow"`
 		Vol        string `json:"vol"`
@@ -42,7 +37,7 @@ func (b *OkexTicker) getCurriences() (currencies.Currency, currencies.Currency) 
 
 	if len(b.Symbol) > 0 {
 		var symbol = b.Symbol
-		var currencyCode = strings.TrimPrefix(strings.TrimSuffix(symbol, "_ticker_this_week"),"ok_sub_futureusd_")
+		var currencyCode = strings.TrimPrefix(strings.TrimSuffix(symbol, "_ticker_this_week"), "ok_sub_futureusd_")
 		if len(currencyCode) > 2 {
 			return currencies.NewCurrencyWithCode(currencyCode), currencies.Tether
 		}
@@ -53,8 +48,6 @@ func (b *OkexTicker) getCurriences() (currencies.Currency, currencies.Currency) 
 func (ticker OkexTicker) IsFilled() bool {
 	return (len(ticker.Symbol) > 0 && len(ticker.Data.Last) > 0)
 }
-
-
 
 func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
 
@@ -84,7 +77,7 @@ func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, c
 				}
 			}
 
-			var tickerCollection= TickerCollection{}
+			var tickerCollection = TickerCollection{}
 			tickerCollection.TimpeStamp = time.Now()
 			tickerCollection.Tickers = tickers
 			if len(tickerCollection.Tickers) > 0 {
@@ -94,9 +87,9 @@ func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, c
 	}
 }
 
-func (b *OkexManager) addMessage (message []byte) {
+func (b *OkexManager) addMessage(message []byte) {
 
-	var okexTickers =[]OkexTicker{}
+	var okexTickers = []OkexTicker{}
 	json.Unmarshal(message, &okexTickers)
 
 	for _, okexTicker := range okexTickers {
@@ -105,14 +98,13 @@ func (b *OkexManager) addMessage (message []byte) {
 			ticker.Symbol = okexTicker.Symbol
 			ticker.Rate = okexTicker.Data.Last
 
-			targetCurrency, referenceCurrency  := okexTicker.getCurriences()
+			targetCurrency, referenceCurrency := okexTicker.getCurriences()
 			ticker.TargetCurrency = targetCurrency
 			ticker.ReferenceCurrency = referenceCurrency
 			ticker.TimpeStamp = time.Now()
 			b.tickers[ticker.Symbol] = ticker
 		}
 	}
-
 
 	//fmt.Println(b.tickers)
 

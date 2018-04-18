@@ -1,18 +1,15 @@
 package core
 
 import (
-
-	"log"
-	"fmt"
 	"encoding/json"
-	//"github.com/Appscrunch/Multy-back/client"
-	"time"
-	"Multy-back-exchange-service/api"
+	"fmt"
+	"log"
 	"strings"
-	"Multy-back-exchange-service/currencies"
+	"time"
+
+	"github.com/Appscrunch/Multy-back-exchange-service/api"
+	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 )
-
-
 
 type GdaxManager struct {
 	tickers map[string]Ticker
@@ -25,8 +22,8 @@ type GdaxTicker struct {
 	High24h   string `json:"high_24h"`
 	Low24h    string `json:"low_24h"`
 	Open24h   string `json:"open_24h"`
-	Rate     string `json:"price"`
-	Symbol string `json:"product_id"`
+	Rate      string `json:"price"`
+	Symbol    string `json:"product_id"`
 	Sequence  int    `json:"sequence"`
 	Type      string `json:"type"`
 	Volume24h string `json:"volume_24h"`
@@ -49,8 +46,6 @@ func (b *GdaxTicker) getCurriences() (currencies.Currency, currencies.Currency) 
 	return currencies.NotAplicable, currencies.NotAplicable
 }
 
-
-
 func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
 
 	b.tickers = make(map[string]Ticker)
@@ -68,11 +63,11 @@ func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, c
 			//fmt.Printf("%s \n", message)
 			var gdaxTicker GdaxTicker
 			error := json.Unmarshal(message, &gdaxTicker)
-			if error == nil && gdaxTicker.IsFilled()  {
+			if error == nil && gdaxTicker.IsFilled() {
 				b.add(gdaxTicker)
 				//fmt.Println(gdaxTicker)
 			} else {
-				fmt.Println( "error parsing hitBtc ticker:", error)
+				fmt.Println("error parsing hitBtc ticker:", error)
 			}
 		}
 	})
@@ -101,7 +96,7 @@ func (b *GdaxManager) add(gdaxTicker GdaxTicker) {
 	ticker.Rate = gdaxTicker.Rate
 	ticker.Symbol = gdaxTicker.Symbol
 
-	targetCurrency, referenceCurrency  := gdaxTicker.getCurriences()
+	targetCurrency, referenceCurrency := gdaxTicker.getCurriences()
 	ticker.TargetCurrency = targetCurrency
 	ticker.ReferenceCurrency = referenceCurrency
 	ticker.TimpeStamp = time.Now()

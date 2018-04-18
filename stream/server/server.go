@@ -1,6 +1,5 @@
 package server
 
-
 //var configString = `{
 //		"targetCurrencies" : ["BTC", "ETH", "GOLOS", "BTS", "STEEM", "WAVES", "LTC", "BCH", "ETC", "DASH", "EOS"],
 //		"referenceCurrencies" : ["USD", "BTC"],
@@ -13,9 +12,10 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"google.golang.org/grpc"
 	"time"
-	"Multy-back-exchange-service/currencies"
+
+	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -24,35 +24,31 @@ var (
 
 type StreamTickerCollection struct {
 	TimpeStamp time.Time
-	Tickers []StreamTicker
+	Tickers    []StreamTicker
 }
 
 type StreamTicker struct {
-	TargetCurrency currencies.Currency
+	TargetCurrency    currencies.Currency
 	ReferenceCurrency currencies.Currency
-	Symbol 	string
-	Rate	string
+	Symbol            string
+	Rate              string
 }
 
-
 type Server struct {
-	ServerHandler func(*map[string]StreamTickerCollection)
+	ServerHandler   func(*map[string]StreamTickerCollection)
 	RefreshInterval time.Duration
 }
 
-func (s *Server) Tickers(whoAreYouParams *WhoAreYouParams, stream TickerGRPCServer_TickersServer) error {
+func (s *Server) Tickers(_ *Empty, stream TickerGRPCServer_TickersServer) error {
 
 	for range time.Tick(s.RefreshInterval * time.Second) {
-		if streemError := stream.Context().Err(); streemError != nil  {
+		if streemError := stream.Context().Err(); streemError != nil {
 			println("error getting contex from client: ", streemError)
 			break
 		}
-
 		var allTickers = make(map[string]StreamTickerCollection)
 		s.ServerHandler(&allTickers)
 		//fmt.Println(allTickers)
-
-
 
 		var streamTickers = Tickers{}
 		streamTickers.ExchangeTickers = []*ExchangeTickers{}
@@ -71,7 +67,6 @@ func (s *Server) Tickers(whoAreYouParams *WhoAreYouParams, stream TickerGRPCServ
 				nodeTicker.Referrence = ticker.ReferenceCurrency.CurrencyCode()
 				nodeTicker.Target = ticker.TargetCurrency.CurrencyCode()
 
-
 				nodeTickers = append(nodeTickers, &nodeTicker)
 			}
 
@@ -89,7 +84,6 @@ func (s *Server) Tickers(whoAreYouParams *WhoAreYouParams, stream TickerGRPCServ
 	}
 	return nil
 }
-
 
 func (s *Server) StartServer() {
 	fmt.Println("starting sever")

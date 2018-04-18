@@ -1,49 +1,38 @@
 package exchangeRates
 
 import (
-	"Multy-back-exchange-service/stream/server"
-	//"fmt"
-	//"fmt"
-	//"fmt"
+	"fmt"
+	"strconv"
 	"sync"
 	"time"
-	"Multy-back-exchange-service/currencies"
-	//"fmt"
-	//"strings"
-	//"fmt"
-	//"fmt"
-	"strconv"
 
-	"fmt"
+	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
+	"github.com/Appscrunch/Multy-back-exchange-service/stream/server"
 )
 
 type Exchange struct {
-	name string
+	name    string
 	Tickers map[string]*Ticker
 }
 
-
 type Ticker struct {
-	TargetCurrency currencies.Currency
+	TargetCurrency    currencies.Currency
 	ReferenceCurrency currencies.Currency
-	Rate	string
-	TimpeStamp time.Time
+	Rate              string
+	TimpeStamp        time.Time
 }
 
 func (b *Ticker) symbol() string {
 	return b.TargetCurrency.CurrencyCode() + "-" + b.ReferenceCurrency.CurrencyCode()
 }
 
-
 type ExchangeManager struct {
 	sync.Mutex
-	exchanges map[string]*Exchange
+	exchanges  map[string]*Exchange
 	grpcClient *GrpcClient
-	fiatureCh chan *server.Tickers
-	dbManger *DbManager
+	fiatureCh  chan *server.Tickers
+	dbManger   *DbManager
 }
-
-
 
 func NewExchangeManager() *ExchangeManager {
 	var manger = ExchangeManager{}
@@ -60,7 +49,6 @@ func (b *ExchangeManager) StartGetingData() {
 	go b.grpcClient.printAllTickers(b.fiatureCh)
 	go b.fillDb()
 
-
 	ch := make(chan []*Exchange)
 	go b.subscribe(ch, 5, []string{"BTC", "ETH"}, "USDT")
 
@@ -70,7 +58,6 @@ func (b *ExchangeManager) StartGetingData() {
 			//fmt.Println("received message", msg)
 			b.add(msg)
 		case ex := <-ch:
-
 
 			for _, exx := range ex {
 				fmt.Println("received ex", exx)
@@ -82,14 +69,13 @@ func (b *ExchangeManager) StartGetingData() {
 	}
 }
 
-
-func  (b *ExchangeManager) subscribe(ch chan []*Exchange, refreshInterval time.Duration, targetCodes  []string, referenceCode string) {
+func (b *ExchangeManager) subscribe(ch chan []*Exchange, refreshInterval time.Duration, targetCodes []string, referenceCode string) {
 
 	for range time.Tick(refreshInterval * time.Second) {
 
-		var newExchanges= []*Exchange{}
+		var newExchanges = []*Exchange{}
 		for _, exchange := range b.exchanges {
-			var newTickers= map[string]*Ticker{}
+			var newTickers = map[string]*Ticker{}
 			for _, ticker := range exchange.Tickers {
 
 				//fmt.Println(exchange.name)
@@ -99,7 +85,7 @@ func  (b *ExchangeManager) subscribe(ch chan []*Exchange, refreshInterval time.D
 				}
 			}
 			if len(newTickers) > 0 {
-				var newExchange= Exchange{}
+				var newExchange = Exchange{}
 				newExchange.name = exchange.name
 				newExchange.Tickers = newTickers
 				newExchanges = append(newExchanges, &newExchange)
@@ -136,7 +122,7 @@ func (b *ExchangeManager) add(tikers *server.Tickers) {
 	b.Unlock()
 }
 
-func (b *ExchangeManager) getRates(timeStamp time.Time, exchangeName string, targetCode string, referecies []string)  []*Ticker {
+func (b *ExchangeManager) getRates(timeStamp time.Time, exchangeName string, targetCode string, referecies []string) []*Ticker {
 
 	var dbRates = b.dbManger.getRates(timeStamp, exchangeName, targetCode, referecies)
 
@@ -144,7 +130,7 @@ func (b *ExchangeManager) getRates(timeStamp time.Time, exchangeName string, tar
 
 	for _, dbRate := range dbRates {
 
-		var ticker= Ticker{}
+		var ticker = Ticker{}
 		ticker.TargetCurrency = currencies.NewCurrencyWithCode(dbRate.targetCode)
 		ticker.ReferenceCurrency = currencies.NewCurrencyWithCode(dbRate.referenceCode)
 		ticker.TimpeStamp = dbRate.timeStamp
@@ -153,7 +139,6 @@ func (b *ExchangeManager) getRates(timeStamp time.Time, exchangeName string, tar
 	}
 	return tickers
 }
-
 
 func (b *ExchangeManager) fillDb() {
 
