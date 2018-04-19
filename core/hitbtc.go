@@ -55,7 +55,7 @@ func (hitBtcTicker HitBtcTicker) IsFilled() bool {
 	return (len(hitBtcTicker.Params.Symbol) > 0 && len(hitBtcTicker.Params.Rate) > 0)
 }
 
-func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
+func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, err error)) {
 
 	b.tickers = make(map[string]Ticker)
 	b.hitBtcApi = &api.HitBtcApi{}
@@ -64,18 +64,18 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
 	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
 
-	go b.hitBtcApi.StartListen(apiCurrenciesConfiguration, func(message []byte, error error) {
-		if error != nil {
-			log.Println("error:", error)
+	go b.hitBtcApi.StartListen(apiCurrenciesConfiguration, func(message []byte, err error) {
+		if err != nil {
+			log.Println("error:", err)
 			//callback(nil, error)
 		} else if message != nil {
 			//fmt.Printf("%s \n", message)
 			var hitBtcTicker HitBtcTicker
-			error := json.Unmarshal(message, &hitBtcTicker)
-			if error == nil && hitBtcTicker.IsFilled() {
+			err := json.Unmarshal(message, &hitBtcTicker)
+			if err == nil && hitBtcTicker.IsFilled() {
 				b.add(hitBtcTicker)
 			} else {
-				fmt.Println("error parsing hitBtc ticker:", error)
+				fmt.Println("error parsing hitBtc ticker:", err)
 			}
 		}
 	})

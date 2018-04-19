@@ -79,58 +79,58 @@ type ExchangeConfiguration struct {
 	RefreshInterval     int
 }
 
-func (b *Manager) lunchExchange(exchangeConfiguration ExchangeConfiguration) {
+func (b *Manager) launchExchange(exchangeConfiguration ExchangeConfiguration) {
 
 	switch exchangeConfiguration.Exchange {
 	case Binance:
-		go b.binanceManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, error error) {
-			if error != nil {
-				log.Println("error:", error)
+		go b.binanceManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, err error) {
+			if err != nil {
+				log.Println("error:", err)
 			} else {
 				//fmt.Println(tickerCollection)
 				b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
 			}
 		})
 	case Bitfinex:
-		go b.bitfinexManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, error error) {
-			if error != nil {
-				log.Println("error:", error)
+		go b.bitfinexManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, err error) {
+			if err != nil {
+				log.Println("error:", err)
 			} else {
 				//fmt.Println(tickerCollection)
 				b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
 			}
 		})
 	case Gdax:
-		go b.gdaxManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, error error) {
-			if error != nil {
-				log.Println("error:", error)
+		go b.gdaxManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, err error) {
+			if err != nil {
+				log.Println("error:", err)
 			} else {
 				//fmt.Println(tickerCollection)
 				b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
 			}
 		})
 	case HitBtc:
-		go b.hitBtcManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, error error) {
-			if error != nil {
-				log.Println("error:", error)
+		go b.hitBtcManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, err error) {
+			if err != nil {
+				log.Println("error:", err)
 			} else {
 				//fmt.Println(tickerCollection)
 				b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
 			}
 		})
 	case Okex:
-		go b.okexManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, error error) {
-			if error != nil {
-				log.Println("error:", error)
+		go b.okexManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, err error) {
+			if err != nil {
+				log.Println("error:", err)
 			} else {
 				//fmt.Println(tickerCollection)
 				b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
 			}
 		})
 	case Poloniex:
-		go b.poloniexManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, error error) {
-			if error != nil {
-				log.Println("error:", error)
+		go b.poloniexManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, err error) {
+			if err != nil {
+				log.Println("error:", err)
 			} else {
 				//fmt.Println(tickerCollection)
 				b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
@@ -150,7 +150,7 @@ func (b *Manager) StartListen(configuration ManagerConfiguration) {
 		exchangeConfiguration.Exchange = NewExchange(exchangeString)
 		exchangeConfiguration.TargetCurrencies = configuration.TargetCurrencies
 		exchangeConfiguration.ReferenceCurrencies = configuration.ReferenceCurrencies
-		b.lunchExchange(exchangeConfiguration)
+		b.launchExchange(exchangeConfiguration)
 	}
 
 	b.server.RefreshInterval = configuration.RefreshInterval

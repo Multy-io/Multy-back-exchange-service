@@ -46,7 +46,7 @@ func (b *GdaxTicker) getCurriences() (currencies.Currency, currencies.Currency) 
 	return currencies.NotAplicable, currencies.NotAplicable
 }
 
-func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
+func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, err error)) {
 
 	b.tickers = make(map[string]Ticker)
 	b.gdaxApi = &api.GdaxApi{}
@@ -55,19 +55,19 @@ func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, c
 	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
 	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
 
-	go b.gdaxApi.StartListen(apiCurrenciesConfiguration, func(message []byte, error error) {
-		if error != nil {
-			log.Println("error:", error)
+	go b.gdaxApi.StartListen(apiCurrenciesConfiguration, func(message []byte, err error) {
+		if err != nil {
+			log.Println("error:", err)
 			//callback(nil, error)
 		} else if message != nil {
 			//fmt.Printf("%s \n", message)
 			var gdaxTicker GdaxTicker
-			error := json.Unmarshal(message, &gdaxTicker)
-			if error == nil && gdaxTicker.IsFilled() {
+			err := json.Unmarshal(message, &gdaxTicker)
+			if err == nil && gdaxTicker.IsFilled() {
 				b.add(gdaxTicker)
 				//fmt.Println(gdaxTicker)
 			} else {
-				fmt.Println("error parsing hitBtc ticker:", error)
+				fmt.Println("error parsing hitBtc ticker:", err)
 			}
 		}
 	})

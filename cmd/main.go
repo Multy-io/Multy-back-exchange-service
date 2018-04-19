@@ -19,11 +19,10 @@ var waitGroup = &sync.WaitGroup{}
 //		}`
 
 func main() {
-
 	var configuration = core.ManagerConfiguration{}
+
 	configuration.TargetCurrencies = []string{"BTC", "ETH", "GOLOS", "BTS", "STEEM", "WAVES", "LTC", "BCH", "ETC", "DASH", "EOS"}
 	configuration.ReferenceCurrencies = []string{"USDT", "BTC"}
-	//configuration.Exchanges = []string{"Bitfinex"}
 	configuration.Exchanges = []string{"Binance", "Bitfinex", "Gdax", "HitBtc", "Okex", "Poloniex"}
 	configuration.RefreshInterval = 1
 

@@ -62,21 +62,21 @@ func (b *PoloniexApi) connectWs() *websocket.Conn {
 
 }
 
-func (b *PoloniexApi) StartListen(callback func(message []byte, error error)) {
+func (b *PoloniexApi) StartListen(callback func(message []byte, err error)) {
 
 	for {
 		if b.connection == nil {
 			b.connection = b.connectWs()
 		} else if b.connection != nil {
 			func() {
-				_, message, error := b.connection.ReadMessage()
-				if error != nil {
-					fmt.Println("Poloniex read message error:", error)
+				_, message, err := b.connection.ReadMessage()
+				if err != nil {
+					fmt.Println("Poloniex read message error:", err)
 					b.connection.Close()
 					b.connection = nil
 				} else {
 					//fmt.Printf("%s \n", message)
-					callback(message, error)
+					callback(message, err)
 				}
 			}()
 		}

@@ -49,7 +49,7 @@ func (ticker OkexTicker) IsFilled() bool {
 	return (len(ticker.Symbol) > 0 && len(ticker.Data.Last) > 0)
 }
 
-func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
+func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, err error)) {
 
 	b.tickers = make(map[string]Ticker)
 	b.okexApi = &api.OkexApi{}
@@ -58,9 +58,9 @@ func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, c
 	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
 	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
 
-	go b.okexApi.StartListen(apiCurrenciesConfiguration, func(message []byte, error error) {
-		if error != nil {
-			log.Println("error:", error)
+	go b.okexApi.StartListen(apiCurrenciesConfiguration, func(message []byte, err error) {
+		if err != nil {
+			log.Println("error:", err)
 			//callback(nil, error)
 		} else if message != nil {
 			//fmt.Printf("%s \n", message)

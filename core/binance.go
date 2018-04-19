@@ -51,12 +51,12 @@ func NewBinanceManager() *BinanceManager {
 	return &manger
 }
 
-func (b *BinanceManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
+func (b *BinanceManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, err error)) {
 	b.symbolsToParse = b.composeSybolsToParse(exchangeConfiguration)
-	b.binanceApi.StartListen(func(message []byte, error error) {
-		if error != nil {
-			log.Println("binance error:", error)
-			callback(TickerCollection{}, error)
+	b.binanceApi.StartListen(func(message []byte, err error) {
+		if err != nil {
+			log.Println("binance error:", err)
+			callback(TickerCollection{}, err)
 		} else if message != nil {
 			//fmt.Printf("%s", message)
 			var binanceTickers []BinanceTicker

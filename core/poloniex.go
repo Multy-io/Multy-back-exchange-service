@@ -47,7 +47,7 @@ func (poloniexTicker PoloniexTicker) IsFilled() bool {
 	return (len(poloniexTicker.Symbol) > 0 && len(poloniexTicker.Last) > 0)
 }
 
-func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
+func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, err error)) {
 
 	b.tickers = make(map[string]Ticker)
 	b.poloniexApi = api.NewPoloniexApi()
@@ -57,10 +57,10 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 	b.symbolsToParse = b.composeSybolsToParse(exchangeConfiguration)
 	b.setchannelids()
 
-	go b.poloniexApi.StartListen(func(message []byte, error error) {
-		if error != nil {
-			log.Println("error:", error)
-			callback(TickerCollection{}, error)
+	go b.poloniexApi.StartListen(func(message []byte, err error) {
+		if err != nil {
+			log.Println("error:", err)
+			callback(TickerCollection{}, err)
 		} else if message != nil {
 			var unmarshaledMessage []interface{}
 
@@ -74,7 +74,7 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 				poloniexTicker, err = b.convertArgsToTicker(args)
 				//fmt.Println(poloniexTicker.CurrencyPair)
 
-				if error == nil && poloniexTicker.IsFilled() && b.symbolsToParse[poloniexTicker.Symbol] {
+				if err == nil && poloniexTicker.IsFilled() && b.symbolsToParse[poloniexTicker.Symbol] {
 
 					var ticker Ticker
 					ticker.Rate = poloniexTicker.Last
@@ -87,7 +87,7 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 					b.tickers[ticker.Symbol] = ticker
 				}
 			} else {
-				fmt.Println("error parsing Poloniex ticker:", error)
+				fmt.Println("error parsing Poloniex ticker:", err)
 			}
 		}
 	})

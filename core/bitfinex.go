@@ -65,7 +65,7 @@ func (b *BitfinexTicker) getCurriences() (currencies.Currency, currencies.Curren
 	return currencies.NotAplicable, currencies.NotAplicable
 }
 
-func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
+func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, err error)) {
 	b.bitfinexTickers = make(map[int]BitfinexTicker)
 	b.api = api.NewBitfinexApi()
 
@@ -73,18 +73,18 @@ func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
 	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
 
-	go b.api.StartListen(apiCurrenciesConfiguration, func(message []byte, error error) {
+	go b.api.StartListen(apiCurrenciesConfiguration, func(message []byte, err error) {
 		//fmt.Println(0)
-		if error != nil {
-			log.Println("error:", error)
-			callback(TickerCollection{}, error)
+		if err != nil {
+			log.Println("error:", err)
+			callback(TickerCollection{}, err)
 		} else if message != nil {
 			//fmt.Printf("%s \n", message)
 			//fmt.Println(1)
 			b.addMessage(message)
 			//fmt.
 		} else {
-			fmt.Println("error parsing Bitfinex ticker:", error)
+			fmt.Println("error parsing Bitfinex ticker:", err)
 		}
 	})
 

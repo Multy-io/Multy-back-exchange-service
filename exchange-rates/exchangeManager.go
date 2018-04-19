@@ -50,7 +50,7 @@ func (b *ExchangeManager) StartGetingData() {
 	go b.fillDb()
 
 	ch := make(chan []*Exchange)
-	go b.subscribe(ch, 5, []string{"BTC", "ETH"}, "USDT")
+	go b.Subscribe(ch, 5, []string{"BTC", "ETH"}, "USDT")
 
 	for {
 		select {
@@ -69,7 +69,7 @@ func (b *ExchangeManager) StartGetingData() {
 	}
 }
 
-func (b *ExchangeManager) subscribe(ch chan []*Exchange, refreshInterval time.Duration, targetCodes []string, referenceCode string) {
+func (b *ExchangeManager) Subscribe(ch chan []*Exchange, refreshInterval time.Duration, targetCodes []string, referenceCode string) {
 
 	for range time.Tick(refreshInterval * time.Second) {
 
@@ -122,7 +122,7 @@ func (b *ExchangeManager) add(tikers *server.Tickers) {
 	b.Unlock()
 }
 
-func (b *ExchangeManager) getRates(timeStamp time.Time, exchangeName string, targetCode string, referecies []string) []*Ticker {
+func (b *ExchangeManager) GetRates(timeStamp time.Time, exchangeName string, targetCode string, referecies []string) []*Ticker {
 
 	var dbRates = b.dbManger.getRates(timeStamp, exchangeName, targetCode, referecies)
 
