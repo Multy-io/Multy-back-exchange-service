@@ -2,22 +2,19 @@ package exchangeRates
 
 import (
 	"flag"
+	"fmt"
 	"io"
 	"log"
+	"time"
 
+	"github.com/Appscrunch/Multy-back-exchange-service/stream/server"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"Multy-back-exchange-service/stream/server"
-
-	"fmt"
-	"time"
 )
-
-
 
 type GrpcClient struct {
 	serverAddr *string
-	client server.TickerGRPCServerClient
+	client     server.TickerGRPCServerClient
 }
 
 func NewGrpcClient() *GrpcClient {
@@ -38,19 +35,18 @@ func NewGrpcClient() *GrpcClient {
 	return &grpcClient
 }
 
-func (b* GrpcClient) connectToServer() (server.TickerGRPCServer_TickersClient, error) {
-	log.Printf("Connecting to GPRS server")
+func (b *GrpcClient) connectToServer() (server.TickerGRPCServer_TickersClient, error) {
+	log.Printf("Connecting to GRPC server")
 	ctx, _ := context.WithCancel(context.Background())
-	stream, error := b.client.Tickers(ctx, &server.WhoAreYouParams{})
+	stream, error := b.client.Tickers(ctx, &server.Empty{})
 	return stream, error
 	//defer cancel()
 }
 
-func (b* GrpcClient) printAllTickers(ch  chan *server.Tickers) {
+func (b *GrpcClient) printAllTickers(ch chan *server.Tickers) {
 
 	stream, err := b.connectToServer()
 	if err != nil {
-		//log.Fatalf("%v.ListFeatures(_) = _, %v", b.client, err)
 		fmt.Println(err)
 	}
 	for range time.Tick(1 * time.Second) {
@@ -74,7 +70,6 @@ func (b* GrpcClient) printAllTickers(ch  chan *server.Tickers) {
 		}
 	}
 }
-
 
 func main() {
 

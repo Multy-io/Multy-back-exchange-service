@@ -1,28 +1,25 @@
 package core
 
 import (
-
-	"log"
-	"fmt"
 	"encoding/json"
-	"time"
-	"Multy-back-exchange-service/api"
-	"Multy-back-exchange-service/utiles"
+	"fmt"
+	"log"
 	"strings"
-	"Multy-back-exchange-service/currencies"
+	"time"
+
+	"github.com/Appscrunch/Multy-back-exchange-service/api"
+	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 )
 
-
-
 type HitBtcManager struct {
-	tickers map[string]Ticker
+	tickers   map[string]Ticker
 	hitBtcApi *api.HitBtcApi
 }
 
 type HitBtcTicker struct {
-	Params  struct {
-		Rate        string    `json:"last"`
-		Symbol      string    `json:"symbol"`
+	Params struct {
+		Rate   string `json:"last"`
+		Symbol string `json:"symbol"`
 	} `json:"params"`
 }
 
@@ -30,7 +27,7 @@ func (b *HitBtcTicker) getCurriences() (currencies.Currency, currencies.Currency
 
 	if len(b.Params.Symbol) > 0 {
 		var symbol = b.Params.Symbol
-		var damagedSymbol = utiles.TrimLeftChars(symbol, 1)
+		var damagedSymbol = TrimLeftChars(symbol, 1)
 		for _, referenceCurrency := range currencies.DefaultReferenceCurrencies {
 			//fmt.Println(damagedSymbol, referenceCurrency.CurrencyCode())
 
@@ -58,9 +55,7 @@ func (hitBtcTicker HitBtcTicker) IsFilled() bool {
 	return (len(hitBtcTicker.Params.Symbol) > 0 && len(hitBtcTicker.Params.Rate) > 0)
 }
 
-
-
-func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
+func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, err error)) {
 
 	b.tickers = make(map[string]Ticker)
 	b.hitBtcApi = &api.HitBtcApi{}
@@ -69,18 +64,18 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
 	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
 
-	go b.hitBtcApi.StartListen(apiCurrenciesConfiguration, func(message []byte, error error) {
-		if error != nil {
-			log.Println("error:", error)
+	go b.hitBtcApi.StartListen(apiCurrenciesConfiguration, func(message []byte, err error) {
+		if err != nil {
+			log.Println("error:", err)
 			//callback(nil, error)
 		} else if message != nil {
 			//fmt.Printf("%s \n", message)
 			var hitBtcTicker HitBtcTicker
-			error := json.Unmarshal(message, &hitBtcTicker)
-			if error == nil && hitBtcTicker.IsFilled()  {
+			err := json.Unmarshal(message, &hitBtcTicker)
+			if err == nil && hitBtcTicker.IsFilled() {
 				b.add(hitBtcTicker)
 			} else {
-				fmt.Println( "error parsing hitBtc ticker:", error)
+				fmt.Println("error parsing hitBtc ticker:", err)
 			}
 		}
 	})
@@ -111,7 +106,7 @@ func (b *HitBtcManager) add(hitBtcTicker HitBtcTicker) {
 	ticker.Rate = hitBtcTicker.Params.Rate
 	ticker.Symbol = hitBtcTicker.Params.Symbol
 	//fmt.Println(hitBtcTicker)
-	targetCurrency, referenceCurrency  := hitBtcTicker.getCurriences()
+	targetCurrency, referenceCurrency := hitBtcTicker.getCurriences()
 	ticker.TargetCurrency = targetCurrency
 	ticker.ReferenceCurrency = referenceCurrency
 	ticker.TimpeStamp = time.Now()

@@ -1,16 +1,15 @@
 package core
 
 import (
-
-	"log"
-	"fmt"
 	"encoding/json"
-	"time"
+	"fmt"
+	"log"
 	"strconv"
-	"Multy-back-exchange-service/api"
-	//"sync"
 	"strings"
-	"Multy-back-exchange-service/currencies"
+	"time"
+
+	"github.com/Appscrunch/Multy-back-exchange-service/api"
+	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 )
 
 const (
@@ -19,8 +18,8 @@ const (
 )
 
 type PoloniexTicker struct {
-	Symbol  string  `json:"currencyPair"`
-	Last          string `json:"last"`
+	Symbol string `json:"currencyPair"`
+	Last   string `json:"last"`
 }
 
 func (b *PoloniexTicker) getCurriences() (currencies.Currency, currencies.Currency) {
@@ -35,26 +34,20 @@ func (b *PoloniexTicker) getCurriences() (currencies.Currency, currencies.Curren
 	return currencies.NotAplicable, currencies.NotAplicable
 }
 
-
 type PoloniexManager struct {
-	tickers map[string]Ticker
-	poloniexApi *api.PoloniexApi
-	channelsByID map[string]string
+	tickers        map[string]Ticker
+	poloniexApi    *api.PoloniexApi
+	channelsByID   map[string]string
 	channelsByName map[string]string
 	marketChannels []string
 	symbolsToParse map[string]bool
 }
 
-
 func (poloniexTicker PoloniexTicker) IsFilled() bool {
 	return (len(poloniexTicker.Symbol) > 0 && len(poloniexTicker.Last) > 0)
 }
 
-
-
-
-
-func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, error error)) {
+func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, err error)) {
 
 	b.tickers = make(map[string]Ticker)
 	b.poloniexApi = api.NewPoloniexApi()
@@ -64,10 +57,10 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 	b.symbolsToParse = b.composeSybolsToParse(exchangeConfiguration)
 	b.setchannelids()
 
-	go b.poloniexApi.StartListen( func(message []byte, error error) {
-		if error != nil {
-			log.Println("error:", error)
-			callback(TickerCollection{}, error)
+	go b.poloniexApi.StartListen(func(message []byte, err error) {
+		if err != nil {
+			log.Println("error:", err)
+			callback(TickerCollection{}, err)
 		} else if message != nil {
 			var unmarshaledMessage []interface{}
 
@@ -81,20 +74,20 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 				poloniexTicker, err = b.convertArgsToTicker(args)
 				//fmt.Println(poloniexTicker.CurrencyPair)
 
-				if error == nil && poloniexTicker.IsFilled() && b.symbolsToParse[poloniexTicker.Symbol]  {
+				if err == nil && poloniexTicker.IsFilled() && b.symbolsToParse[poloniexTicker.Symbol] {
 
 					var ticker Ticker
 					ticker.Rate = poloniexTicker.Last
 					ticker.Symbol = poloniexTicker.Symbol
 					ticker.TimpeStamp = time.Now()
-					targetCurrency, referenceCurrency  := poloniexTicker.getCurriences()
+					targetCurrency, referenceCurrency := poloniexTicker.getCurriences()
 					ticker.TargetCurrency = targetCurrency
 					ticker.ReferenceCurrency = referenceCurrency
 					//fmt.Println(targetCurrency.CurrencyCode(), referenceCurrency.CurrencyCode())
 					b.tickers[ticker.Symbol] = ticker
 				}
 			} else {
-				fmt.Println( "error parsing Poloniex ticker:", error)
+				fmt.Println("error parsing Poloniex ticker:", err)
 			}
 		}
 	})
@@ -119,7 +112,6 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 	}
 }
 
-
 func (b *PoloniexManager) convertArgsToTicker(args []interface{}) (wsticker PoloniexTicker, err error) {
 
 	if len(b.channelsByID) < 1 {
@@ -130,8 +122,6 @@ func (b *PoloniexManager) convertArgsToTicker(args []interface{}) (wsticker Polo
 	wsticker.Last = args[1].(string)
 	return
 }
-
-
 
 func (b *PoloniexManager) setchannelids() (err error) {
 
@@ -152,7 +142,7 @@ func (b *PoloniexManager) setchannelids() (err error) {
 	return
 }
 
-func (b *PoloniexManager)  composeSybolsToParse(exchangeConfiguration ExchangeConfiguration) map[string]bool {
+func (b *PoloniexManager) composeSybolsToParse(exchangeConfiguration ExchangeConfiguration) map[string]bool {
 	var symbolsToParse = map[string]bool{}
 	for _, targetCurrency := range exchangeConfiguration.TargetCurrencies {
 		for _, referenceCurrency := range exchangeConfiguration.ReferenceCurrencies {
@@ -161,7 +151,7 @@ func (b *PoloniexManager)  composeSybolsToParse(exchangeConfiguration ExchangeCo
 				referenceCurrency = "USDT"
 			}
 
-			symbol := referenceCurrency  + "_" + targetCurrency
+			symbol := referenceCurrency + "_" + targetCurrency
 			symbolsToParse[symbol] = true
 		}
 	}

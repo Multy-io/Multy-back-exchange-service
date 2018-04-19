@@ -1,24 +1,22 @@
 package core
 
 import (
-	stream "Multy-back-exchange-service/stream/server"
-	//"time"
 	"log"
-
-	"time"
 	"strings"
-	//"fmt"
+	"time"
+
+	stream "github.com/Appscrunch/Multy-back-exchange-service/stream/server"
 )
 
-const maxTickerAge  = 5
+const maxTickerAge = 5
 
 type Manager struct {
-	binanceManager *BinanceManager
-	hitBtcManager *HitBtcManager
+	binanceManager  *BinanceManager
+	hitBtcManager   *HitBtcManager
 	poloniexManager *PoloniexManager
 	bitfinexManager *BitfinexManager
-	gdaxManager *GdaxManager
-	okexManager *OkexManager
+	gdaxManager     *GdaxManager
+	okexManager     *OkexManager
 
 	server *stream.Server
 
@@ -40,23 +38,22 @@ func NewManager() *Manager {
 }
 
 type ManagerConfiguration struct {
-	TargetCurrencies    []string `json:"targetCurrencies"`
-	ReferenceCurrencies []string `json:"referenceCurrencies"`
-	Exchanges           []string `json:"exchanges"`
-	RefreshInterval     time.Duration   `json:"refreshInterval"`
+	TargetCurrencies    []string      `json:"targetCurrencies"`
+	ReferenceCurrencies []string      `json:"referenceCurrencies"`
+	Exchanges           []string      `json:"exchanges"`
+	RefreshInterval     time.Duration `json:"refreshInterval"`
 }
-
 
 type Exchange int
 
-func NewExchange(exchangeString string ) Exchange {
-	exchanges := map[string]Exchange{"BINANCE":Binance, "BITFINEX":Bitfinex, "GDAX":Gdax, "HITBTC":HitBtc, "OKEX":Okex, "POLONIEX":Poloniex}
+func NewExchange(exchangeString string) Exchange {
+	exchanges := map[string]Exchange{"BINANCE": Binance, "BITFINEX": Bitfinex, "GDAX": Gdax, "HITBTC": HitBtc, "OKEX": Okex, "POLONIEX": Poloniex}
 	exchange := exchanges[strings.ToUpper(exchangeString)]
 	return exchange
 }
 
 func (exchange Exchange) String() string {
-	exchanges := [...]string {
+	exchanges := [...]string{
 		"BINANCE",
 		"BITFINEX",
 		"GDAX",
@@ -65,81 +62,80 @@ func (exchange Exchange) String() string {
 		"POLONIEX"}
 	return exchanges[exchange]
 }
+
 const (
-	Binance 	Exchange = 0
-	Bitfinex 	Exchange = 1
-	Gdax 		Exchange = 2
-	HitBtc 		Exchange = 3
-	Okex 		Exchange = 4
-	Poloniex 	Exchange = 5
+	Binance  Exchange = 0
+	Bitfinex Exchange = 1
+	Gdax     Exchange = 2
+	HitBtc   Exchange = 3
+	Okex     Exchange = 4
+	Poloniex Exchange = 5
 )
 
 type ExchangeConfiguration struct {
 	Exchange            Exchange
 	TargetCurrencies    []string
 	ReferenceCurrencies []string
-	RefreshInterval int
+	RefreshInterval     int
 }
 
-
-
-func (b *Manager)lunchExchange(exchangeConfiguration ExchangeConfiguration) {
+func (b *Manager) launchExchange(exchangeConfiguration ExchangeConfiguration) {
 
 	switch exchangeConfiguration.Exchange {
 	case Binance:
-		go b.binanceManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, error error) {
-			if error != nil {
-				log.Println("error:", error)
+		go b.binanceManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, err error) {
+			if err != nil {
+				log.Println("error:", err)
 			} else {
 				//fmt.Println(tickerCollection)
 				b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
 			}
-		} )
+		})
 	case Bitfinex:
-		go b.bitfinexManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, error error) {
-			if error != nil {
-				log.Println("error:", error)
+		go b.bitfinexManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, err error) {
+			if err != nil {
+				log.Println("error:", err)
 			} else {
 				//fmt.Println(tickerCollection)
 				b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
 			}
-		} )
+		})
 	case Gdax:
-		go b.gdaxManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, error error) {
-		if error != nil {
-			log.Println("error:", error)
-		} else {
-			//fmt.Println(tickerCollection)
-			b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
-		}
-	} )
-	case HitBtc:
-		go b.hitBtcManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, error error) {
-		if error != nil {
-			log.Println("error:", error)
-		} else {
-			//fmt.Println(tickerCollection)
-			b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
-		}
-	} )
-	case Okex:
-		go b.okexManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, error error) {
-			if error != nil {
-				log.Println("error:", error)
+		go b.gdaxManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, err error) {
+			if err != nil {
+				log.Println("error:", err)
 			} else {
 				//fmt.Println(tickerCollection)
 				b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
 			}
-		} )
+		})
+	case HitBtc:
+		go b.hitBtcManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, err error) {
+			if err != nil {
+				log.Println("error:", err)
+			} else {
+				//fmt.Println(tickerCollection)
+				b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
+			}
+		})
+	case Okex:
+		go b.okexManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, err error) {
+			if err != nil {
+				log.Println("error:", err)
+			} else {
+				//fmt.Println(tickerCollection)
+				b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
+			}
+		})
 	case Poloniex:
-		go b.poloniexManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, error error) {
-		if error != nil {
-			log.Println("error:", error)
-		} else {
-			//fmt.Println(tickerCollection)
-			b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
-		}
-	} )
+		go b.poloniexManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, err error) {
+			if err != nil {
+				log.Println("error:", err)
+			} else {
+				//fmt.Println(tickerCollection)
+				b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
+			}
+		})
 	default:
 		return
 
@@ -149,18 +145,17 @@ func (b *Manager)lunchExchange(exchangeConfiguration ExchangeConfiguration) {
 
 func (b *Manager) StartListen(configuration ManagerConfiguration) {
 
-
 	for _, exchangeString := range configuration.Exchanges {
 		exchangeConfiguration := ExchangeConfiguration{}
 		exchangeConfiguration.Exchange = NewExchange(exchangeString)
 		exchangeConfiguration.TargetCurrencies = configuration.TargetCurrencies
 		exchangeConfiguration.ReferenceCurrencies = configuration.ReferenceCurrencies
-		b.lunchExchange(exchangeConfiguration)
+		b.launchExchange(exchangeConfiguration)
 	}
 
 	b.server.RefreshInterval = configuration.RefreshInterval
 	go b.server.StartServer()
-	b.server.ServerHandler =  func(allTickers *map[string]stream.StreamTickerCollection) {
+	b.server.ServerHandler = func(allTickers *map[string]stream.StreamTickerCollection) {
 
 		var tickerCollections = b.agregator.getTickers(time.Now().Add(-maxTickerAge * time.Second))
 		//fmt.Println(tickerCollections)
@@ -175,7 +170,7 @@ func (b *Manager) StartListen(configuration ManagerConfiguration) {
 
 }
 
-func (b *Manager) convertToTickerCollection (tickerCollection TickerCollection) stream.StreamTickerCollection {
+func (b *Manager) convertToTickerCollection(tickerCollection TickerCollection) stream.StreamTickerCollection {
 	var streamTickerCollection = stream.StreamTickerCollection{}
 	var streamTickers = []stream.StreamTicker{}
 
@@ -190,7 +185,7 @@ func (b *Manager) convertToTickerCollection (tickerCollection TickerCollection) 
 
 }
 
-func (b *Manager) convertToStreamTicker (ticker Ticker) stream.StreamTicker {
+func (b *Manager) convertToStreamTicker(ticker Ticker) stream.StreamTicker {
 	var streamTicker = stream.StreamTicker{}
 	streamTicker.Symbol = ticker.Symbol
 	streamTicker.Rate = ticker.Rate

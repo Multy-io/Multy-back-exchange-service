@@ -5,7 +5,7 @@ syntax = "proto3";
 package server;
 
 service TickerGRPCServer {
-    rpc tickers(WhoAreYouParams) returns (stream Tickers) {}
+    rpc tickers(Empty) returns (stream Tickers) {}
 }
 
 message Tickers {
@@ -26,4 +26,4 @@ message Ticker {
 
 }
 
-message WhoAreYouParams {}
+message Empty {}

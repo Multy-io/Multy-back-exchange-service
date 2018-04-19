@@ -1,14 +1,12 @@
 package api
 
 import (
-	"net/url"
-	"log"
-	"github.com/gorilla/websocket"
-	//"fmt"
-	"fmt"
 	"encoding/json"
-)
+	"net/url"
 
+	_ "github.com/KristinaEtc/slflog"
+	"github.com/gorilla/websocket"
+)
 
 const okexHost = "real.okex.com:10440"
 const okexPath = "/websocket/okexapi"
@@ -22,22 +20,21 @@ type OkexSubscription struct {
 	Channel string `json:"channel"`
 }
 
-
-func (b *OkexApi)  connectWs(apiCurrenciesConfiguration ApiCurrenciesConfiguration) *websocket.Conn {
+func (b *OkexApi) connectWs(apiCurrenciesConfiguration ApiCurrenciesConfiguration) *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: okexHost, Path: ""}
-	log.Printf("connecting to %s", url.String())
+	log.Infof("connecting to %s", url.String())
 
-	connection, _, error := websocket.DefaultDialer.Dial(url.String(), nil)
+	connection, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
 
-	if error != nil || connection == nil {
-		fmt.Println("Okex ws connection error: ",error)
+	if err != nil || connection == nil {
+		log.Errorf("Okex ws connection error: %v", err.Error())
 		return nil
-	} else  {
-		fmt.Println("Okex ws connected")
+	} else {
+		log.Debugf("Okex ws connected")
 
-		productsIds :=  b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
+		productsIds := b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
 
-		for _, productId := range  productsIds {
+		for _, productId := range productsIds {
 			subscribtion := OkexSubscription{}
 			subscribtion.Event = "addChannel"
 			subscribtion.Channel = productId
@@ -50,23 +47,20 @@ func (b *OkexApi)  connectWs(apiCurrenciesConfiguration ApiCurrenciesConfigurati
 	}
 }
 
-
-func (b *OkexApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback func(message []byte, error error)) {
-
+func (b *OkexApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback func(message []byte, err error)) {
 	for {
 		if b.connection == nil {
 			b.connection = b.connectWs(apiCurrenciesConfiguration)
 		} else if b.connection != nil {
 
 			func() {
-				_, message, error := b.connection.ReadMessage()
-				if error != nil {
-					fmt.Println("okex read message error:", error)
+				_, message, err := b.connection.ReadMessage()
+				if err != nil {
+					log.Errorf("okex read message error: %v", err.Error())
 					b.connection.Close()
 					b.connection = nil
 				} else {
-					//fmt.Printf("%s \n", message)
-					callback(message, error)
+					callback(message, err)
 				}
 			}()
 		}
@@ -74,20 +68,19 @@ func (b *OkexApi)  StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigura
 
 }
 
-func (b *OkexApi)  StopListen() {
-	//fmt.Println("before close")
+func (b *OkexApi) StopListen() {
 	if b.connection != nil {
 		b.connection.Close()
 		b.connection = nil
 	}
-	fmt.Println("Okex ws closed")
+	log.Debugf("Okex ws closed")
 }
 
-func (b *OkexApi)  composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCurrenciesConfiguration) []string {
+func (b *OkexApi) composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCurrenciesConfiguration) []string {
 	var smybolsForSubscirbe = []string{}
 	for _, targetCurrency := range apiCurrenciesConfiguration.TargetCurrencies {
 
-		symbol := "ok_sub_futureusd_" +  targetCurrency + "_ticker_this_week"
+		symbol := "ok_sub_futureusd_" + targetCurrency + "_ticker_this_week"
 		smybolsForSubscirbe = append(smybolsForSubscirbe, symbol)
 
 	}
