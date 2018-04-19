@@ -1,13 +1,11 @@
 package api
 
 import (
-	"log"
+	"encoding/json"
 	"net/url"
 
+	_ "github.com/KristinaEtc/slflog"
 	"github.com/gorilla/websocket"
-	//"fmt"
-	"encoding/json"
-	"fmt"
 )
 
 const hitBtcHost = "api.hitbtc.com"
@@ -29,15 +27,15 @@ type HitBtcSubscriptionParams struct {
 
 func (b *HitBtcApi) connectWs(apiCurrenciesConfiguration ApiCurrenciesConfiguration) *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: hitBtcHost, Path: hitBtcPath}
-	log.Printf("connecting to %s", url.String())
+	log.Infof("connecting to %s", url.String())
 
-	connection, _, error := websocket.DefaultDialer.Dial(url.String(), nil)
+	connection, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
 
-	if error != nil || connection == nil {
-		fmt.Println("HitBtc ws connection error: ", error)
+	if err != nil || connection == nil {
+		log.Errorf("HitBtc ws connection error: %v", err.Error())
 		return nil
 	} else {
-		fmt.Println("HitBtc ws connected")
+		log.Debugf("HitBtc ws connected")
 
 		productsIds := b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
 
@@ -69,11 +67,10 @@ func (b *HitBtcApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigur
 			func() {
 				_, message, err := b.connection.ReadMessage()
 				if err != nil {
-					fmt.Println("HitBtc read message error:", err)
+					log.Errorf("HitBtc read message error:%v", err.Error())
 					b.connection.Close()
 					b.connection = nil
 				} else {
-					//fmt.Printf("%s \n", message)
 					callback(message, err)
 				}
 			}()
@@ -83,12 +80,11 @@ func (b *HitBtcApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigur
 }
 
 func (b *HitBtcApi) StopListen() {
-	//fmt.Println("before close")
 	if b.connection != nil {
 		b.connection.Close()
 		b.connection = nil
 	}
-	fmt.Println("HitBtc ws closed")
+	log.Debugf("HitBtc ws closed")
 }
 
 func (b *HitBtcApi) composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCurrenciesConfiguration) []string {

@@ -36,7 +36,7 @@ func NewGrpcClient() *GrpcClient {
 }
 
 func (b *GrpcClient) connectToServer() (server.TickerGRPCServer_TickersClient, error) {
-	log.Printf("Connecting to GPRS server")
+	log.Printf("Connecting to GRPC server")
 	ctx, _ := context.WithCancel(context.Background())
 	stream, error := b.client.Tickers(ctx, &server.Empty{})
 	return stream, error
@@ -47,7 +47,6 @@ func (b *GrpcClient) printAllTickers(ch chan *server.Tickers) {
 
 	stream, err := b.connectToServer()
 	if err != nil {
-		//log.Fatalf("%v.ListFeatures(_) = _, %v", b.client, err)
 		fmt.Println(err)
 	}
 	for range time.Tick(1 * time.Second) {

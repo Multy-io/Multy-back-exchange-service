@@ -1,13 +1,11 @@
 package api
 
 import (
-	"log"
+	"encoding/json"
 	"net/url"
 
+	_ "github.com/KristinaEtc/slflog"
 	"github.com/gorilla/websocket"
-	//"fmt"
-	"encoding/json"
-	"fmt"
 )
 
 const okexHost = "real.okex.com:10440"
@@ -24,15 +22,15 @@ type OkexSubscription struct {
 
 func (b *OkexApi) connectWs(apiCurrenciesConfiguration ApiCurrenciesConfiguration) *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: okexHost, Path: ""}
-	log.Printf("connecting to %s", url.String())
+	log.Infof("connecting to %s", url.String())
 
-	connection, _, error := websocket.DefaultDialer.Dial(url.String(), nil)
+	connection, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
 
-	if error != nil || connection == nil {
-		fmt.Println("Okex ws connection error: ", error)
+	if err != nil || connection == nil {
+		log.Errorf("Okex ws connection error: %v", err.Error())
 		return nil
 	} else {
-		fmt.Println("Okex ws connected")
+		log.Debugf("Okex ws connected")
 
 		productsIds := b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
 
@@ -58,11 +56,10 @@ func (b *OkexApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigurat
 			func() {
 				_, message, err := b.connection.ReadMessage()
 				if err != nil {
-					fmt.Println("okex read message error:", err)
+					log.Errorf("okex read message error: %v", err.Error())
 					b.connection.Close()
 					b.connection = nil
 				} else {
-					//fmt.Printf("%s \n", message)
 					callback(message, err)
 				}
 			}()
@@ -72,12 +69,11 @@ func (b *OkexApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigurat
 }
 
 func (b *OkexApi) StopListen() {
-	//fmt.Println("before close")
 	if b.connection != nil {
 		b.connection.Close()
 		b.connection = nil
 	}
-	fmt.Println("Okex ws closed")
+	log.Debugf("Okex ws closed")
 }
 
 func (b *OkexApi) composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCurrenciesConfiguration) []string {

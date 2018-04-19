@@ -2,12 +2,15 @@ package api
 
 import (
 	"fmt"
-	"log"
 	"net/url"
 	"time"
 
+	"github.com/KristinaEtc/slf"
+	_ "github.com/KristinaEtc/slflog"
 	"github.com/gorilla/websocket"
 )
+
+var log = slf.WithContext("api")
 
 const binanceHost = "stream.binance.com:9443"
 const tickerPath = "/ws/!ticker@arr"
@@ -18,14 +21,14 @@ type BinanceApi struct {
 
 func (b *BinanceApi) connectWs() *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: binanceHost, Path: tickerPath}
-	log.Printf("connecting to %s", url.String())
+	log.Infof("connecting to %s", url.String())
 
-	connection, _, error := websocket.DefaultDialer.Dial(url.String(), nil)
-	if error != nil || connection == nil {
-		fmt.Println("Binance ws connection error: ", error)
+	connection, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
+	if err != nil || connection == nil {
+		fmt.Errorf("Binance ws connection error: %v", err.Error())
 		return nil
 	} else {
-		fmt.Println("Binance ws connected")
+		log.Debugf("Binance ws connected")
 		return connection
 	}
 }
@@ -39,7 +42,7 @@ func (b *BinanceApi) StartListen(callback func(message []byte, err error)) {
 			func() {
 				_, message, err := b.connection.ReadMessage()
 				if err != nil {
-					fmt.Println("Binance read message error:", err)
+					log.Errorf("Binance read message error: %v", err.Error())
 					b.connection.Close()
 					b.connection = nil
 				} else {
@@ -56,5 +59,5 @@ func (b *BinanceApi) StopListen() {
 		b.connection.Close()
 		b.connection = nil
 	}
-	fmt.Println("Binance ws closed")
+	log.Debugf("Binance ws closed")
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/Appscrunch/Multy-back-exchange-service/core"
 	"github.com/Appscrunch/Multy-back-exchange-service/exchange-rates"
+	_ "github.com/KristinaEtc/slflog"
 )
 
 var manager = core.NewManager()
@@ -19,6 +20,7 @@ var waitGroup = &sync.WaitGroup{}
 //		}`
 
 func main() {
+
 	var configuration = core.ManagerConfiguration{}
 
 	configuration.TargetCurrencies = []string{"BTC", "ETH", "GOLOS", "BTS", "STEEM", "WAVES", "LTC", "BCH", "ETC", "DASH", "EOS"}

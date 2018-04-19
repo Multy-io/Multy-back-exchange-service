@@ -1,0 +1,4 @@
+2018-04-19/13:55:47.803 [[32mINFO[0m] api: connecting to wss://ws-feed.gdax.com 
+2018-04-19/13:55:47.818 [[32mINFO[0m] api: connecting to wss://api.hitbtc.com/api/2/ws 
+2018-04-19/13:55:47.819 [[32mINFO[0m] api: connecting to wss://real.okex.com:10440 
+2018-04-19/13:55:48.806 [[32mINFO[0m] api: connecting to wss://stream.binance.com:9443/ws/%21ticker@arr 

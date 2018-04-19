@@ -1,15 +1,11 @@
 package api
 
 import (
-	"log"
+	"encoding/json"
 	"net/url"
 
+	_ "github.com/KristinaEtc/slflog"
 	"github.com/gorilla/websocket"
-	//"fmt"
-	"encoding/json"
-	"fmt"
-	//"net"
-	//"bytes"
 )
 
 const gdaxHost = "ws-feed.gdax.com"
@@ -32,15 +28,15 @@ type Channel struct {
 
 func (b *GdaxApi) connectWs(apiCurrenciesConfiguration ApiCurrenciesConfiguration) *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: gdaxHost, Path: ""}
-	log.Printf("connecting to %s", url.String())
+	log.Infof("connecting to %s", url.String())
 
-	connection, _, error := websocket.DefaultDialer.Dial(url.String(), nil)
+	connection, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
 
-	if error != nil || connection == nil {
-		fmt.Println("Gdax ws connection error: ", error)
+	if err != nil || connection == nil {
+		log.Errorf("Gdax ws connection error:%v", err.Error())
 		return nil
 	} else {
-		fmt.Println("Gdax ws connected")
+		log.Debugf("Gdax ws connected")
 
 		productsIds := b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
 
@@ -71,11 +67,10 @@ func (b *GdaxApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigurat
 			func() {
 				_, message, err := b.connection.ReadMessage()
 				if err != nil {
-					fmt.Println("Gdax read message error:", err)
+					log.Errorf("Gdax read message error:", err.Error())
 					b.connection.Close()
 					b.connection = nil
 				} else {
-					//fmt.Printf("%s \n", message)
 					callback(message, err)
 				}
 			}()
@@ -84,12 +79,11 @@ func (b *GdaxApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigurat
 }
 
 func (b *GdaxApi) StopListen() {
-	//fmt.Println("before close")
 	if b.connection != nil {
 		b.connection.Close()
 		b.connection = nil
 	}
-	fmt.Println("Gdax ws closed")
+	log.Debugf("Gdax ws closed")
 }
 
 func (b *GdaxApi) composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCurrenciesConfiguration) []string {

@@ -5,12 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"sync"
 	"time"
 
+	_ "github.com/KristinaEtc/slflog"
 	"github.com/gorilla/websocket"
 	"github.com/shopspring/decimal"
 )
@@ -45,15 +45,15 @@ func NewPoloniexApi() *PoloniexApi {
 
 func (b *PoloniexApi) connectWs() *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: host, Path: path}
-	log.Printf("connecting to %s", url.String())
+	log.Infof("connecting to %s", url.String())
 
-	connection, _, error := websocket.DefaultDialer.Dial(url.String(), nil)
+	connection, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
 
-	if error != nil || connection == nil {
-		fmt.Println("Poloniex ws connection error: ", error)
+	if err != nil || connection == nil {
+		log.Errorf("Poloniex ws connection error: %v", err.Error())
 		return nil
 	} else {
-		fmt.Println("Poloniex ws connected")
+		log.Debugf("Poloniex ws connected")
 		subs := subscription{Command: "subscribe", Channel: "1002"}
 		msg, _ := json.Marshal(subs)
 		connection.WriteMessage(websocket.BinaryMessage, msg)
@@ -71,7 +71,7 @@ func (b *PoloniexApi) StartListen(callback func(message []byte, err error)) {
 			func() {
 				_, message, err := b.connection.ReadMessage()
 				if err != nil {
-					fmt.Println("Poloniex read message error:", err)
+					log.Errorf("Poloniex read message error: %v", err.Error())
 					b.connection.Close()
 					b.connection = nil
 				} else {
