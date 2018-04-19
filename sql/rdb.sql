@@ -28,11 +28,23 @@ FROM sa_rates sr, exchanges ex, currencies tcr,  currencies rcr
 WHERE sr.exchange_title = ex.title and sr.target_code = tcr.code and sr.reference_code = rcr.code
  ON CONFLICT DO NOTHING;
 
+
 INSERT INTO rates
-SELECT ex.id exchange_id, tcr.id target_id, rcr.id reference_id, sr.time_stamp, sr.rate
+SELECT ex.id exchange_id, tcr.id target_id, rcr.id reference_id, sr.time_stamp, sr.rate, false as is_calculated
 FROM sa_rates sr, exchanges ex, currencies tcr,  currencies rcr
-WHERE sr.exchange_title = ex.title and sr.target_code = tcr.code and sr.reference_code = rcr.code;
-      TRUNCATE sa_rates;
+WHERE sr.exchange_title = ex.title and sr.target_code = tcr.code and sr.reference_code = rcr.code
+UNION
+SELECT ex.id exchange_id, tcr.id target_id, rcr.id reference_id, sr.time_stamp, sr.rates, true as is_calculated
+FROM sa_cross_rates sr, exchanges ex, currencies tcr,  currencies rcr
+WHERE sr.exchange_title = ex.title and sr.tc_code = tcr.code and sr.rc_cross_code = rcr.code;
+
+INSERT INTO exchanges_pairs
+SELECT DISTINCT on (ex.id, tcr.id, rcr.id ) ex.id exchange_id, tcr.id target_id, rcr.id reference_id, time_stamp,is_calculated
+FROM sa_cross_rates sr, exchanges ex, currencies tcr,  currencies rcr
+WHERE sr.exchange_title = ex.title and sr.tc_code = tcr.code and sr.rc_cross_code = rcr.code
+ ON CONFLICT DO NOTHING;
+
+    TRUNCATE sa_rates;
     END;
     $$ LANGUAGE plpgsql;
 
@@ -181,26 +193,7 @@ SELECT exchange_id, target_id, *
 FROM exchanges_pairs ex, currencies rcr
 WHERE ex.reference_id = rcr.id and code in ('USDT','USD');
 
-CREATE or replace view sa_calculates as
-SELECT ex.id ex_id, tc.id tc_id, rc.id rc_id, ex.title, tc.code as tc_code, rc.code as rc_code from (
-SELECT a.id as exchange_id, a.target_id, a.reference_id, exp.exchange_id as exist
-FROM exchanges_pairs exp
-RIGHT OUTER JOIN
-(
-SELECT * from (
-SELECT DISTINCT target_id
-FROM exchanges_pairs
-WHERE is_calculated = FALSE) t,
-(SELECT DISTINCT reference_id
-FROM exchanges_pairs
-WHERE is_calculated = FALSE) r,
-(SELECT DISTINCT exchanges.id
-FROM exchanges) ex
-WHERE t.target_id != r.reference_id
-) a
-on exp.reference_id = a.reference_id and exp.target_id = a.target_id and exp.exchange_id = a.id) result, exchanges ex, currencies tc, currencies rc, exchanges_pairs ep
-WHERE result.exist is NULL and result.exchange_id = ex.id and result.target_id = tc.id and result.reference_id = rc.id and result.exchange_id = ep.exchange_id and result.target_id = ep.target_id and ep.is_calculated = FALSE
-ORDER  by ex.title, 2;
+
 
 
 SELECT e.title, tc.code, rc.code
@@ -243,18 +236,72 @@ TRUNCATE TABLE sa_rates
     CONTINUE IDENTITY
     RESTRICT;
 
+CREATE or replace view sa_cross_pairs as
+SELECT ex.id ex_id, tc.id tc_id, rc.id rc_id, ex.title, tc.code as tc_code, rc.code as rc_code from (
+SELECT a.id as exchange_id, a.target_id, a.reference_id, exp.exchange_id as exist
+FROM exchanges_pairs exp
+RIGHT OUTER JOIN
+(
+SELECT * from (
+SELECT DISTINCT target_id
+FROM exchanges_pairs
+WHERE is_calculated = FALSE) t,
+(SELECT DISTINCT reference_id
+FROM exchanges_pairs
+WHERE is_calculated = FALSE) r,
+(SELECT DISTINCT exchanges.id
+FROM exchanges) ex
+WHERE t.target_id != r.reference_id
+) a
+on exp.reference_id = a.reference_id and exp.target_id = a.target_id and exp.exchange_id = a.id and exp.is_calculated = FALSE ) result, exchanges ex, currencies tc, currencies rc, exchanges_pairs ep
+WHERE result.exist is NULL and result.exchange_id = ex.id and result.target_id = tc.id and result.reference_id = rc.id and result.exchange_id = ep.exchange_id and result.target_id = ep.target_id and ep.is_calculated = FALSE
+ORDER  by ex.title, 2;
+
 
 SELECT *
-from sa_calculates
+from sa_cross_pairs;
 
 
-SELECT *
+CREATE or replace view sa_cross_curriences as
+SELECT c.title exchange_title, c.tc_code, cr.cross_code rf_code,  c.rc_code as rc_cross_code
 FROM
-(
-SELECT *
-from sa_calculates) c ,
-(
-SELECT DISTINCT exchange_id, reference_id, is_calculated, ex.title, c.code
+( SELECT *
+from sa_cross_pairs) c ,
+( SELECT DISTINCT exchange_id cross_exchange_id, reference_id cross_reference_id, is_calculated, ex.title cross_title, c.code cross_code
 from exchanges_pairs ep, exchanges ex, currencies c
-WHERE ep.exchange_id = ex.id and reference_id = c.id) r
-WHERE c.ex_id = r.exchange_id and c.rc_id != r.reference_id
+WHERE ep.exchange_id = ex.id and reference_id = c.id)  cr
+WHERE c.ex_id = cr.cross_exchange_id and c.rc_id != cr.cross_reference_id;
+
+
+SELECT *
+from sa_cross_curriences;
+
+SELECT cr.exchange_title, cr.tc_code, cr.rf_code, sar.rate, cr.rc_cross_code--, sar_cross.rate
+from sa_cross_curr cr, sa_rates sar--, sa_rates sar_cross
+WHERE cr.exchange_title = sar.exchange_title and cr.tc_code = sar.target_code and cr.rf_code = sar.reference_code
+
+
+CREATE or replace view sa_cross_rates as;
+
+
+SELECT cr.exchange_title, cr.tc_code, cr.rc_cross_code,  sar.rate/sar_cross.rate as rates, true as is_calculated, sar.time_stamp
+from sa_cross_curriences cr, sa_rates sar, sa_rates sar_cross
+WHERE cr.exchange_title = sar.exchange_title and cr.tc_code = sar.target_code and cr.rf_code = sar.reference_code
+and cr.exchange_title = sar_cross.exchange_title and cr.rc_cross_code = sar_cross.target_code and cr.rf_code = sar_cross.reference_code
+UNION all
+SELECT cr.exchange_title, cr.tc_code, cr.rc_cross_code, sar.rate *  sar_cross.rate rates, true as is_calculated, sar.time_stamp
+from sa_cross_curriences cr, sa_rates sar, sa_rates sar_cross
+WHERE cr.exchange_title = sar.exchange_title and cr.tc_code = sar.target_code and cr.rf_code = sar.reference_code
+and cr.exchange_title = sar_cross.exchange_title and  cr.rc_cross_code = sar_cross.reference_code and cr.rf_code = sar_cross.target_code;
+
+SELECT *
+FROM  sa_cross_rates;
+
+
+
+ SELECT  DISTINCT on (reference_code) exchange_title as o_exchnage_title, target_code as o_target_code, reference_code as o_reference_code, time_stamp as o_time_stamp, rate as o_rate
+FROM rates_view
+WHERE exchange_title = p_exchange_title
+and target_code = p_target_code
+and reference_code = 'STEEM'
+ORDER by reference_code, time_stamp DESC;

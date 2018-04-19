@@ -62,7 +62,7 @@ func (b *ExchangeManager) StartGetingData() {
 
 
 	ch := make(chan []*Exchange)
-	go b.subscribe(ch, 5, []string{"BTC", "ETH"}, "USDT")
+	go b.subscribe(ch, 5, []string{"STEEM", "EOS", "ETH"}, "USDT")
 
 	for {
 		select {
@@ -179,11 +179,11 @@ func (b *ExchangeManager) fillDb() {
 
 		b.dbManger.FillDb(dbExchanges)
 
-		//v := b.getRates(time.Now().Add(-4 * time.Minute), "BINANCE", "ETH", []string{"BTC", "USDT"})
-		//
-		//for _,value := range v {
-		//	fmt.Println("rasult:", value)
-		//}
+		v := b.getRates(time.Now().Add(-4 * time.Minute), "BINANCE", "STEEM", []string{"BTC", "USDT"})
+
+		for _,value := range v {
+			fmt.Println(" :", value)
+		}
 	}
 }
 
