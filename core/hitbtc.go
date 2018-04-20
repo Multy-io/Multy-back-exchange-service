@@ -12,7 +12,7 @@ import (
 )
 
 type HitBtcManager struct {
-	tickers   map[string]Ticker
+	BasicManager
 	hitBtcApi *api.HitBtcApi
 }
 
@@ -84,12 +84,13 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 		//TODO: add check if data is old and don't sent it ti callback
 		func() {
 			values := []Ticker{}
+			b.Lock()
 			for _, value := range b.tickers {
 				if value.TimpeStamp.After(time.Now().Add(-maxTickerAge * time.Second)) {
 					values = append(values, value)
 				}
 			}
-
+			b.Unlock()
 			var tickerCollection = TickerCollection{}
 			tickerCollection.TimpeStamp = time.Now()
 			tickerCollection.Tickers = values
@@ -110,6 +111,7 @@ func (b *HitBtcManager) add(hitBtcTicker HitBtcTicker) {
 	ticker.TargetCurrency = targetCurrency
 	ticker.ReferenceCurrency = referenceCurrency
 	ticker.TimpeStamp = time.Now()
-
+	b.Lock()
 	b.tickers[ticker.Symbol] = ticker
+	b.Unlock()
 }

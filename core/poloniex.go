@@ -35,7 +35,7 @@ func (b *PoloniexTicker) getCurriences() (currencies.Currency, currencies.Curren
 }
 
 type PoloniexManager struct {
-	tickers        map[string]Ticker
+	BasicManager
 	poloniexApi    *api.PoloniexApi
 	channelsByID   map[string]string
 	channelsByName map[string]string
@@ -84,7 +84,9 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 					ticker.TargetCurrency = targetCurrency
 					ticker.ReferenceCurrency = referenceCurrency
 					//fmt.Println(targetCurrency.CurrencyCode(), referenceCurrency.CurrencyCode())
+					b.Lock()
 					b.tickers[ticker.Symbol] = ticker
+					b.Unlock()
 				}
 			} else {
 				fmt.Println("error parsing Poloniex ticker:", err)
@@ -95,12 +97,13 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 	for range time.Tick(1 * time.Second) {
 		func() {
 			values := []Ticker{}
+			b.Lock()
 			for _, value := range b.tickers {
 				if value.TimpeStamp.After(time.Now().Add(-maxTickerAge * time.Second)) {
 					values = append(values, value)
 				}
 			}
-
+			b.Unlock()
 			var tickerCollection = TickerCollection{}
 			tickerCollection.TimpeStamp = time.Now()
 			tickerCollection.Tickers = values

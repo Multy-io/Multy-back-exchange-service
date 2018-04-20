@@ -22,18 +22,18 @@ type Ticker struct {
 
 type Agregator struct {
 	sync.Mutex
-	allTickers map[string]TickerCollection
+	allTickers map[string]*TickerCollection
 }
 
 func NewAgregator() *Agregator {
 	var agregator = Agregator{}
-	agregator.allTickers = make(map[string]TickerCollection)
+	agregator.allTickers = make(map[string]*TickerCollection)
 	return &agregator
 }
 
 func (b *Agregator) add(tickerCollection TickerCollection, forExchange string) {
 	b.Lock()
-	b.allTickers[forExchange] = tickerCollection
+	b.allTickers[forExchange] = &tickerCollection
 	//fmt.Println("added:", tickerCollection)
 	b.Unlock()
 }
@@ -43,7 +43,7 @@ func (b *Agregator) getTickers(startDate time.Time) map[string]TickerCollection 
 	b.Lock()
 	for exhange, tickerCollection := range b.allTickers {
 		if tickerCollection.TimpeStamp.After(startDate) {
-			filteredTickers[exhange] = tickerCollection
+			filteredTickers[exhange] = *tickerCollection
 		}
 	}
 	b.Unlock()

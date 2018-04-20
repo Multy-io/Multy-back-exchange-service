@@ -40,6 +40,7 @@ func (b *BinanceTicker) getCurriences() (currencies.Currency, currencies.Currenc
 }
 
 type BinanceManager struct {
+	BasicManager
 	binanceApi     *api.BinanceApi
 	symbolsToParse map[string]bool
 }
@@ -51,38 +52,48 @@ func NewBinanceManager() *BinanceManager {
 	return &manger
 }
 
-func (b *BinanceManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, err error)) {
+func (b *BinanceManager) StartListen(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
 	b.symbolsToParse = b.composeSybolsToParse(exchangeConfiguration)
-	b.binanceApi.StartListen(func(message []byte, err error) {
-		if err != nil {
-			log.Println("binance error:", err)
-			callback(TickerCollection{}, err)
-		} else if message != nil {
-			//fmt.Printf("%s", message)
-			var binanceTickers []BinanceTicker
-			json.Unmarshal(message, &binanceTickers)
+	ch := make(chan api.Reposponse)
+	go b.binanceApi.StartListen(ch)
 
-			var tickers = []Ticker{}
 
-			for _, binanceTicker := range binanceTickers {
-				if b.symbolsToParse[binanceTicker.Symbol] {
-					var ticker = Ticker{}
-					targetCurrency, referenceCurrency := binanceTicker.getCurriences()
-					ticker.Symbol = binanceTicker.Symbol
-					ticker.Rate = binanceTicker.Rate
-					ticker.TargetCurrency = targetCurrency
-					ticker.ReferenceCurrency = referenceCurrency
-					tickers = append(tickers, ticker)
-					//fmt.Println(binanceTicker.Symbol ,targetCurrency.CurrencyName(), referenceCurrency.CurrencyName())
+	for {
+		select {
+		case response := <-ch:
+
+			if *response.Err != nil {
+				log.Println("binance error:", *response.Err)
+				resultChan <- Result{exchangeConfiguration.Exchange.String(), nil, response.Err}
+			} else if response.Message != nil {
+				//fmt.Printf("%s", message)
+				var binanceTickers []BinanceTicker
+				json.Unmarshal(*response.Message, &binanceTickers)
+
+				var tickers = []Ticker{}
+
+				for _, binanceTicker := range binanceTickers {
+					if b.symbolsToParse[binanceTicker.Symbol] {
+						var ticker = Ticker{}
+						targetCurrency, referenceCurrency := binanceTicker.getCurriences()
+						ticker.Symbol = binanceTicker.Symbol
+						ticker.Rate = binanceTicker.Rate
+						ticker.TargetCurrency = targetCurrency
+						ticker.ReferenceCurrency = referenceCurrency
+						tickers = append(tickers, ticker)
+						//fmt.Println(binanceTicker.Symbol ,targetCurrency.CurrencyName(), referenceCurrency.CurrencyName())
+					}
 				}
-			}
 
-			var tickerCollection TickerCollection
-			tickerCollection.TimpeStamp = time.Now()
-			tickerCollection.Tickers = tickers
-			callback(tickerCollection, nil)
+				var tickerCollection TickerCollection
+				tickerCollection.TimpeStamp = time.Now()
+				tickerCollection.Tickers = tickers
+				resultChan <- Result{exchangeConfiguration.Exchange.String(), &tickerCollection, nil}
+			}
+		default:
+			//fmt.Println("no activity")
 		}
-	})
+	}
 
 }
 

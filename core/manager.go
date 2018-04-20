@@ -6,9 +6,23 @@ import (
 	"time"
 
 	stream "github.com/Appscrunch/Multy-back-exchange-service/stream/server"
+	"sync"
+	"fmt"
 )
 
 const maxTickerAge = 5
+
+type BasicManager struct {
+	sync.Mutex
+	tickers   map[string]Ticker
+}
+
+type Result struct {
+	exchangeTitle string
+	TickerCollection *TickerCollection
+	Err *error
+}
+
 
 type Manager struct {
 	binanceManager  *BinanceManager
@@ -79,18 +93,12 @@ type ExchangeConfiguration struct {
 	RefreshInterval     int
 }
 
-func (b *Manager) launchExchange(exchangeConfiguration ExchangeConfiguration) {
+func (b *Manager) launchExchange(exchangeConfiguration ExchangeConfiguration, ch chan Result) {
 
 	switch exchangeConfiguration.Exchange {
 	case Binance:
-		go b.binanceManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, err error) {
-			if err != nil {
-				log.Println("error:", err)
-			} else {
-				//fmt.Println(tickerCollection)
-				b.agregator.add(tickerCollection, exchangeConfiguration.Exchange.String())
-			}
-		})
+		go b.binanceManager.StartListen(exchangeConfiguration, ch)
+
 	case Bitfinex:
 		go b.bitfinexManager.StartListen(exchangeConfiguration, func(tickerCollection TickerCollection, err error) {
 			if err != nil {
@@ -137,20 +145,21 @@ func (b *Manager) launchExchange(exchangeConfiguration ExchangeConfiguration) {
 			}
 		})
 	default:
-		return
+		fmt.Println(exchangeConfiguration.Exchange.String())
 
 	}
-
 }
 
 func (b *Manager) StartListen(configuration ManagerConfiguration) {
+
+	ch := make(chan Result)
 
 	for _, exchangeString := range configuration.Exchanges {
 		exchangeConfiguration := ExchangeConfiguration{}
 		exchangeConfiguration.Exchange = NewExchange(exchangeString)
 		exchangeConfiguration.TargetCurrencies = configuration.TargetCurrencies
 		exchangeConfiguration.ReferenceCurrencies = configuration.ReferenceCurrencies
-		b.launchExchange(exchangeConfiguration)
+		b.launchExchange(exchangeConfiguration, ch)
 	}
 
 	b.server.RefreshInterval = configuration.RefreshInterval
@@ -166,6 +175,22 @@ func (b *Manager) StartListen(configuration ManagerConfiguration) {
 			streamTickerCollections[key] = streamTickerColection
 		}
 		*allTickers = streamTickerCollections
+	}
+
+	for {
+		select {
+		case result := <-ch:
+
+			if result.Err != nil {
+				log.Println("error:", result.Err)
+			} else {
+				//fmt.Println(result.TickerCollection)
+				b.agregator.add(*result.TickerCollection, result.exchangeTitle)
+			}
+
+		default:
+			//fmt.Println("no activity")
+		}
 	}
 
 }

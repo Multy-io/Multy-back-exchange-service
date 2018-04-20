@@ -8,6 +8,7 @@ import (
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 	"github.com/Appscrunch/Multy-back-exchange-service/stream/server"
 	"github.com/Appscrunch/Multy-back-exchange-service/core"
+	"sync"
 )
 
 type Exchange struct {
@@ -75,6 +76,7 @@ type ExchangeManager struct {
 	dbManger   *DbManager
 	referenceCurrencies []currencies.Currency
 	configuration core.ManagerConfiguration
+	sync.Mutex
 
 }
 
@@ -154,6 +156,7 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 			pair.ReferenceCurrency = referenceCurrency
 
 			//fmt.Println("pair is:",pair.TargetCurrency.CurrencyCode(), pair.ReferenceCurrency.CurrencyCode())
+			b.Lock()
 			for _, exchange := range b.exchanges {
 
 				var newTickers = map[string]*Ticker{}
@@ -216,6 +219,7 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 				}
 
 			}
+			b.Unlock()
 
 		}
 
@@ -225,7 +229,7 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 
 func (b *ExchangeManager) add(tikers *server.Tickers) {
 	for _, exchangeTicker := range tikers.ExchangeTickers {
-
+	b.Lock()
 		if b.exchanges[exchangeTicker.Exchange] == nil {
 			var ex = Exchange{}
 			ex.name = exchangeTicker.Exchange
@@ -244,6 +248,7 @@ func (b *ExchangeManager) add(tikers *server.Tickers) {
 			}
 			b.exchanges[exchangeTicker.Exchange].Tickers[ticker.symbol()] = &ticker
 		}
+		b.Unlock()
 	}
 }
 

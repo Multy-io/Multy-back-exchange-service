@@ -19,6 +19,12 @@ type BinanceApi struct {
 	connection *websocket.Conn
 }
 
+type Reposponse struct {
+	Message *[]byte
+	Err *error
+}
+
+
 func (b *BinanceApi) connectWs() *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: binanceHost, Path: tickerPath}
 	log.Infof("connecting to %s", url.String())
@@ -33,7 +39,7 @@ func (b *BinanceApi) connectWs() *websocket.Conn {
 	}
 }
 
-func (b *BinanceApi) StartListen(callback func(message []byte, err error)) {
+func (b *BinanceApi) StartListen(ch chan Reposponse) {
 
 	for range time.Tick(1 * time.Second) {
 		if b.connection == nil {
@@ -47,7 +53,7 @@ func (b *BinanceApi) StartListen(callback func(message []byte, err error)) {
 					b.connection = nil
 				} else {
 					//fmt.Printf("%s \n", message)
-					callback(message, err)
+					ch <- Reposponse{Message:&message, Err:&err}
 				}
 			}()
 		}

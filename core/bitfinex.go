@@ -13,6 +13,7 @@ import (
 )
 
 type BitfinexManager struct {
+	BasicManager
 	bitfinexTickers map[int]BitfinexTicker
 	api             *api.BitfinexApi
 }
@@ -120,7 +121,7 @@ func (b *BitfinexManager) addMessage(message []byte) {
 
 	var bitfinexTicker BitfinexTicker
 	json.Unmarshal(message, &bitfinexTicker)
-
+b.Lock()
 	if bitfinexTicker.ChanID > 0 {
 		//fmt.Println(bitfinexTicker)
 		b.bitfinexTickers[bitfinexTicker.ChanID] = bitfinexTicker
@@ -140,6 +141,7 @@ func (b *BitfinexManager) addMessage(message []byte) {
 			}
 		}
 	}
+	b.Unlock()
 }
 
 //func (b PoloniexManager) convertArgsToTicker(args []interface{}) (wsticker PoloniexTicker, err error) {

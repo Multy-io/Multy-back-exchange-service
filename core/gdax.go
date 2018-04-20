@@ -12,7 +12,7 @@ import (
 )
 
 type GdaxManager struct {
-	tickers map[string]Ticker
+	BasicManager
 	gdaxApi *api.GdaxApi
 }
 
@@ -75,12 +75,13 @@ func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, c
 	for range time.Tick(1 * time.Second) {
 		func() {
 			values := []Ticker{}
+			b.Lock()
 			for _, value := range b.tickers {
 				if value.TimpeStamp.After(time.Now().Add(-maxTickerAge * time.Second)) {
 					values = append(values, value)
 				}
 			}
-
+			b.Unlock()
 			var tickerCollection = TickerCollection{}
 			tickerCollection.TimpeStamp = time.Now()
 			tickerCollection.Tickers = values
@@ -100,6 +101,7 @@ func (b *GdaxManager) add(gdaxTicker GdaxTicker) {
 	ticker.TargetCurrency = targetCurrency
 	ticker.ReferenceCurrency = referenceCurrency
 	ticker.TimpeStamp = time.Now()
-
+	b.Lock()
 	b.tickers[ticker.Symbol] = ticker
+	b.Unlock()
 }

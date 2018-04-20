@@ -11,7 +11,7 @@ import (
 )
 
 type OkexManager struct {
-	tickers map[string]Ticker
+	BasicManager
 	okexApi *api.OkexApi
 }
 
@@ -102,7 +102,9 @@ func (b *OkexManager) addMessage(message []byte) {
 			ticker.TargetCurrency = targetCurrency
 			ticker.ReferenceCurrency = referenceCurrency
 			ticker.TimpeStamp = time.Now()
+			b.Lock()
 			b.tickers[ticker.Symbol] = ticker
+			b.Unlock()
 		}
 	}
 
