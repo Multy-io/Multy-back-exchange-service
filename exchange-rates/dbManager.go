@@ -26,7 +26,7 @@ type DbExchange struct {
 type DbTicker struct {
 	TargetCurrency    currencies.Currency
 	ReferenceCurrency currencies.Currency
-	Rate              string
+	Rate              float64
 	TimpeStamp        time.Time
 }
 
@@ -68,7 +68,7 @@ func (b *DbManager) FillDb(withExchanges []*DbExchange) {
 
 	for _, exchange := range withExchanges {
 		for _, ticker := range exchange.Tickers {
-			b.insertSaRate(exchange.name, ticker.TargetCurrency, ticker.ReferenceCurrency, ticker.Rate)
+			b.insertSaRate(exchange.name, ticker.TargetCurrency, ticker.ReferenceCurrency, strconv.FormatFloat(ticker.Rate, 'f', 8, 64) )
 		}
 	}
 	b.fillRateFromSA()

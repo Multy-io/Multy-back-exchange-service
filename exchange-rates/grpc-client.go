@@ -43,7 +43,7 @@ func (b *GrpcClient) connectToServer() (server.TickerGRPCServer_TickersClient, e
 	//defer cancel()
 }
 
-func (b *GrpcClient) printAllTickers(ch chan *server.Tickers) {
+func (b *GrpcClient) listenTickers(ch chan *server.Tickers) {
 
 	stream, err := b.connectToServer()
 	if err != nil {

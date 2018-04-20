@@ -33,7 +33,7 @@ func main() {
 	go manager.StartListen(configuration)
 
 	exchangeManger = exchangeRates.NewExchangeManager()
-	go exchangeManger.StartGetingData()
+	go exchangeManger.StartGetingData(configuration)
 
 	waitGroup.Wait()
 
