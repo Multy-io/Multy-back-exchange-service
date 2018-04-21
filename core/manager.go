@@ -56,6 +56,13 @@ type ManagerConfiguration struct {
 	ReferenceCurrencies []string      `json:"referenceCurrencies"`
 	Exchanges           []string      `json:"exchanges"`
 	RefreshInterval     time.Duration `json:"refreshInterval"`
+	DBConfiguration DBConfiguration `json:"dbconfiguration"`
+}
+
+type DBConfiguration struct {
+	User     string `json:"user"`
+	Password string `json:"password"`
+	Name     string `json:"name"`
 }
 
 type Exchange int

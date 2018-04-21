@@ -10,13 +10,20 @@ import (
 
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 	_ "github.com/lib/pq"
+	//"github.com/ethereum/go-ethereum/log"
+	//"github.com/golang/protobuf/_conformance/conformance_proto"
+	_ "github.com/KristinaEtc/slflog"
+	//"github.com/KristinaEtc/slf"
+	"github.com/KristinaEtc/slf"
 )
 
-const (
-	DbUser     = "postgres"
-	DbPassword = "postgres"
-	DbName     = "test"
-)
+var logg = slf.WithContext("db")
+
+type DBConfiguration struct {
+	User     string `json:"user"`
+	Password string `json:"password"`
+	Name     string `json:"name"`
+}
 
 type DbExchange struct {
 	name    string
@@ -42,17 +49,21 @@ type DbRate struct {
 	rate          float64
 }
 
-func NewDbManager() *DbManager {
+func NewDbManager(configuration DBConfiguration) *DbManager {
 	manager := DbManager{}
-	manager.db = manager.connectDb()
+	manager.db = manager.connectDb(configuration)
 	return &manager
 }
 
-func (b *DbManager) connectDb() *sql.DB {
-	fmt.Println("Db connected")
+func (b *DbManager) connectDb(configuration DBConfiguration) *sql.DB {
 	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
-		DbUser, DbPassword, DbName)
+		configuration.User,configuration.Password, configuration.Name)
 	db, err := sql.Open("postgres", dbinfo)
+	if err != nil {
+		logg.Error(err.Error())
+	} else {
+		logg.Info("Db connected")
+	}
 	checkErr(err)
 	return db
 	//defer db.Close()
@@ -60,7 +71,7 @@ func (b *DbManager) connectDb() *sql.DB {
 
 func checkErr(err error) {
 	if err != nil {
-		panic(err)
+		logg.Error(err.Error())
 	}
 }
 

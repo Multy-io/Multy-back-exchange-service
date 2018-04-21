@@ -19,6 +19,13 @@ var waitGroup = &sync.WaitGroup{}
 //		"refreshInterval" : "3"
 //		}`
 
+//const (
+//	DbUser     = "postgres"
+//	DbPassword = "postgres"
+//	DbName     = "test"
+//)
+
+
 func main() {
 
 	var configuration = core.ManagerConfiguration{}
@@ -28,12 +35,18 @@ func main() {
 	configuration.Exchanges = []string{"Binance", "Bitfinex", "Gdax", "HitBtc", "Okex", "Poloniex"}
 	configuration.RefreshInterval = 1
 
+	dbConfig := core.DBConfiguration{}
+	dbConfig.User = "postgres"
+	dbConfig.Password = "postgres"
+	dbConfig.Name = "test"
+	configuration.DBConfiguration = dbConfig
+
 	waitGroup.Add(len(configuration.Exchanges) + 5)
 
 	go manager.StartListen(configuration)
 
-	exchangeManger = exchangeRates.NewExchangeManager()
-	go exchangeManger.StartGetingData(configuration)
+	exchangeManger = exchangeRates.NewExchangeManager(configuration)
+	go exchangeManger.StartGetingData()
 
 	waitGroup.Wait()
 

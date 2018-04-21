@@ -80,41 +80,48 @@ type ExchangeManager struct {
 
 }
 
-func NewExchangeManager() *ExchangeManager {
+func NewExchangeManager(configuration core.ManagerConfiguration) *ExchangeManager {
 	var manger = ExchangeManager{}
+	manger.configuration = configuration
 	manger.exchanges = map[string]*Exchange{}
 	manger.grpcClient = NewGrpcClient()
 	manger.tickersCh = make(chan *server.Tickers)
-	manger.dbManger = NewDbManager()
+
+
+	dbConfig := DBConfiguration{}
+	dbConfig.Name = configuration.DBConfiguration.Name
+	dbConfig.Password = configuration.DBConfiguration.Password
+	dbConfig.User = configuration.DBConfiguration.User
+
+	manger.dbManger = NewDbManager(dbConfig)
 
 	return &manger
 }
 
-func (b *ExchangeManager) StartGetingData(configuration core.ManagerConfiguration) {
+func (b *ExchangeManager) StartGetingData() {
 
-	b.configuration = configuration
 
 	go b.grpcClient.listenTickers(b.tickersCh)
 	go b.fillDb()
 
-	ch := make(chan []*Exchange)
-	go b.Subscribe(ch, 5, []string{"DASH", "ETC", "EOS", "WAVES", "STEEM", "BTS", "ETH"}, "BTC")
+	//ch := make(chan []*Exchange)
+	//go b.Subscribe(ch, 5, []string{"DASH", "ETC", "EOS", "WAVES", "STEEM", "BTS", "ETH"}, "BTC")
 
 	for {
 		select {
 		case msg := <-b.tickersCh:
 			//fmt.Println("received message", msg)
 			b.add(msg)
-		case ex := <-ch:
-
-			for _, exx := range ex {
-				//fmt.Println("received ex", exx.name, exx.Tickers)
-				for _, v := range exx.Tickers {
-					if v.isCalculated {
-						//fmt.Println(exx.name, v.symbol(), v.Rate)
-					}
-				}
-			}
+		//case ex := <-ch:
+		//
+		//	for _, exx := range ex {
+		//		//fmt.Println("received ex", exx.name, exx.Tickers)
+		//		for _, v := range exx.Tickers {
+		//			if v.isCalculated {
+		//				fmt.Println(exx.name, v.symbol(), v.Rate)
+		//			}
+		//		}
+		//	}
 
 		default:
 			//fmt.Println("no activity")
