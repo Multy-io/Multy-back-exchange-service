@@ -3,18 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="e3e9b443-a36f-45e0-aa81-fde12a7a3dba" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/api/bitfinex.go" afterPath="$PROJECT_DIR$/api/bitfinex.go" />
-      <change beforePath="$PROJECT_DIR$/api/gdax.go" afterPath="$PROJECT_DIR$/api/gdax.go" />
-      <change beforePath="$PROJECT_DIR$/api/hitbtc.go" afterPath="$PROJECT_DIR$/api/hitbtc.go" />
-      <change beforePath="$PROJECT_DIR$/api/okex.go" afterPath="$PROJECT_DIR$/api/okex.go" />
-      <change beforePath="$PROJECT_DIR$/api/poloniex.go" afterPath="$PROJECT_DIR$/api/poloniex.go" />
-      <change beforePath="$PROJECT_DIR$/core/binance.go" afterPath="$PROJECT_DIR$/core/binance.go" />
-      <change beforePath="$PROJECT_DIR$/core/bitfinex.go" afterPath="$PROJECT_DIR$/core/bitfinex.go" />
-      <change beforePath="$PROJECT_DIR$/core/gdax.go" afterPath="$PROJECT_DIR$/core/gdax.go" />
-      <change beforePath="$PROJECT_DIR$/core/hitbtc.go" afterPath="$PROJECT_DIR$/core/hitbtc.go" />
-      <change beforePath="$PROJECT_DIR$/core/manager.go" afterPath="$PROJECT_DIR$/core/manager.go" />
-      <change beforePath="$PROJECT_DIR$/core/okex.go" afterPath="$PROJECT_DIR$/core/okex.go" />
-      <change beforePath="$PROJECT_DIR$/core/poloniex.go" afterPath="$PROJECT_DIR$/core/poloniex.go" />
+      <change beforePath="$PROJECT_DIR$/cmd/logs/debug.log" afterPath="$PROJECT_DIR$/cmd/logs/debug.log" />
+      <change beforePath="$PROJECT_DIR$/cmd/logs/info.log" afterPath="$PROJECT_DIR$/cmd/logs/info.log" />
+      <change beforePath="$PROJECT_DIR$/exchange-rates/exchangeManager.go" afterPath="$PROJECT_DIR$/exchange-rates/exchangeManager.go" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -29,7 +20,17 @@
         <entry file="file://$PROJECT_DIR$/core/bitfinex.go">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="278">
-              <caret line="80" column="64" lean-forward="true" selection-start-line="80" selection-start-column="4" selection-end-line="80" selection-end-column="64" />
+              <caret line="80" column="64" lean-forward="false" selection-start-line="80" selection-start-column="4" selection-end-line="80" selection-end-column="64" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="exchangeManager.go" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/exchange-rates/exchangeManager.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1207">
+              <caret line="310" column="12" lean-forward="false" selection-start-line="310" selection-start-column="12" selection-end-line="314" selection-end-column="11" />
               <folding />
             </state>
           </provider>
@@ -61,7 +62,7 @@
         <entry file="file://$PROJECT_DIR$/core/hitbtc.go">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="212">
-              <caret line="68" column="62" lean-forward="true" selection-start-line="68" selection-start-column="62" selection-end-line="69" selection-end-column="64" />
+              <caret line="68" column="62" lean-forward="false" selection-start-line="68" selection-start-column="62" selection-end-line="69" selection-end-column="64" />
               <folding />
             </state>
           </provider>
@@ -77,11 +78,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="manager.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="manager.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/manager.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="392">
-              <caret line="109" column="67" lean-forward="false" selection-start-line="109" selection-start-column="67" selection-end-line="109" selection-end-column="67" />
+            <state relative-caret-position="514">
+              <caret line="116" column="20" lean-forward="false" selection-start-line="116" selection-start-column="20" selection-end-line="116" selection-end-column="20" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Makefile" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Makefile">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="279">
+              <caret line="24" column="5" lean-forward="true" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -91,7 +102,7 @@
         <entry file="file://$PROJECT_DIR$/core/gdax.go">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="117">
-              <caret line="59" column="60" lean-forward="true" selection-start-line="59" selection-start-column="60" selection-end-line="60" selection-end-column="64" />
+              <caret line="59" column="60" lean-forward="false" selection-start-line="59" selection-start-column="60" selection-end-line="60" selection-end-column="64" />
               <folding />
             </state>
           </provider>
@@ -124,6 +135,8 @@
       <find>b.tickers</find>
       <find>exchanges</find>
       <find>launchExchange</find>
+      <find>Subscribe</find>
+      <find>GetRates</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
@@ -138,7 +151,6 @@
         <option value="$PROJECT_DIR$/exchange-rates/dbManager.go" />
         <option value="$PROJECT_DIR$/cmd/main.go" />
         <option value="$PROJECT_DIR$/core/agregator.go" />
-        <option value="$PROJECT_DIR$/exchange-rates/exchangeManager.go" />
         <option value="$PROJECT_DIR$/api/binance.go" />
         <option value="$PROJECT_DIR$/api/gdax.go" />
         <option value="$PROJECT_DIR$/api/hitbtc.go" />
@@ -152,6 +164,7 @@
         <option value="$PROJECT_DIR$/core/okex.go" />
         <option value="$PROJECT_DIR$/core/poloniex.go" />
         <option value="$PROJECT_DIR$/core/manager.go" />
+        <option value="$PROJECT_DIR$/exchange-rates/exchangeManager.go" />
       </list>
     </option>
   </component>
@@ -269,10 +282,10 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31923077" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.42884615" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295562" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.43153918" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.43076923" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.45703495" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -554,13 +567,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Makefile">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="351">
-          <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/core/agregator.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
@@ -574,16 +580,6 @@
         <state relative-caret-position="435">
           <caret line="35" column="31" lean-forward="false" selection-start-line="35" selection-start-column="31" selection-end-line="35" selection-end-column="31" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/exchange-rates/exchangeManager.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1245">
-          <caret line="92" column="26" lean-forward="false" selection-start-line="92" selection-start-column="26" selection-end-line="92" selection-end-column="26" />
-          <folding>
-            <element signature="e#23#257#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -646,7 +642,7 @@
     <entry file="file://$PROJECT_DIR$/core/bitfinex.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="278">
-          <caret line="80" column="64" lean-forward="true" selection-start-line="80" selection-start-column="4" selection-end-line="80" selection-end-column="64" />
+          <caret line="80" column="64" lean-forward="false" selection-start-line="80" selection-start-column="4" selection-end-line="80" selection-end-column="64" />
           <folding />
         </state>
       </provider>
@@ -654,7 +650,7 @@
     <entry file="file://$PROJECT_DIR$/core/hitbtc.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="212">
-          <caret line="68" column="62" lean-forward="true" selection-start-line="68" selection-start-column="62" selection-end-line="69" selection-end-column="64" />
+          <caret line="68" column="62" lean-forward="false" selection-start-line="68" selection-start-column="62" selection-end-line="69" selection-end-column="64" />
           <folding />
         </state>
       </provider>
@@ -662,7 +658,7 @@
     <entry file="file://$PROJECT_DIR$/core/gdax.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="117">
-          <caret line="59" column="60" lean-forward="true" selection-start-line="59" selection-start-column="60" selection-end-line="60" selection-end-column="64" />
+          <caret line="59" column="60" lean-forward="false" selection-start-line="59" selection-start-column="60" selection-end-line="60" selection-end-column="64" />
           <folding />
         </state>
       </provider>
@@ -685,10 +681,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Makefile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="279">
+          <caret line="24" column="5" lean-forward="true" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/core/manager.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="392">
-          <caret line="109" column="67" lean-forward="false" selection-start-line="109" selection-start-column="67" selection-end-line="109" selection-end-column="67" />
+        <state relative-caret-position="514">
+          <caret line="116" column="20" lean-forward="false" selection-start-line="116" selection-start-column="20" selection-end-line="116" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/exchange-rates/exchangeManager.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1207">
+          <caret line="310" column="12" lean-forward="false" selection-start-line="310" selection-start-column="12" selection-end-line="314" selection-end-column="11" />
           <folding />
         </state>
       </provider>

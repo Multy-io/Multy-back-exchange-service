@@ -86,3 +86,14 @@
 2018-04-20/20:04:25.661 [[34mDEBUG[0m] api: Okex ws connected 
 2018-04-20/20:04:26.215 [[34mDEBUG[0m] api: Poloniex ws connected 
 2018-04-20/20:04:26.371 [[34mDEBUG[0m] api: Binance ws connected 
+2018-04-21/16:28:47.865 [[32mINFO[0m] api: connecting to wss://api.hitbtc.com/api/2/ws 
+2018-04-21/16:28:47.879 [[32mINFO[0m] api: connecting to wss://ws-feed.gdax.com 
+2018-04-21/16:28:47.899 [[32mINFO[0m] api: connecting to wss://real.okex.com:10440 
+2018-04-21/16:28:48.880 [[32mINFO[0m] api: connecting to wss://stream.binance.com:9443/ws/%21ticker@arr 
+2018-04-21/16:28:48.929 [[34mDEBUG[0m] api: HitBtc ws connected 
+2018-04-21/16:28:49.174 [[34mDEBUG[0m] api: Gdax ws connected 
+2018-04-21/16:28:49.213 [[34mDEBUG[0m] api: Bitfinex ws connected 
+2018-04-21/16:28:49.225 [[32mINFO[0m] api: connecting to wss://api2.poloniex.com/realm1 
+2018-04-21/16:28:49.969 [[34mDEBUG[0m] api: Okex ws connected 
+2018-04-21/16:28:50.809 [[34mDEBUG[0m] api: Binance ws connected 
+2018-04-21/16:28:50.911 [[34mDEBUG[0m] api: Poloniex ws connected 
