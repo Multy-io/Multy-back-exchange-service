@@ -57,7 +57,8 @@ func (b *HitBtcApi) connectWs(apiCurrenciesConfiguration ApiCurrenciesConfigurat
 	}
 }
 
-func (b *HitBtcApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback func(message []byte, err error)) {
+func (b *HitBtcApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, ch chan Reposponse) {
+
 
 	for {
 		if b.connection == nil {
@@ -71,7 +72,7 @@ func (b *HitBtcApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigur
 					b.connection.Close()
 					b.connection = nil
 				} else {
-					callback(message, err)
+					ch <- Reposponse{Message:&message, Err:&err}
 				}
 			}()
 		}

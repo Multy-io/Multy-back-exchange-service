@@ -46,31 +46,49 @@ func (b *GdaxTicker) getCurriences() (currencies.Currency, currencies.Currency) 
 	return currencies.NotAplicable, currencies.NotAplicable
 }
 
-func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, err error)) {
+func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
 
 	b.tickers = make(map[string]Ticker)
 	b.gdaxApi = &api.GdaxApi{}
 
-	var apiCurrenciesConfiguration = api.ApiCurrenciesConfiguration{}
+	var apiCurrenciesConfiguration= api.ApiCurrenciesConfiguration{}
 	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
 	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
 
-	go b.gdaxApi.StartListen(apiCurrenciesConfiguration, func(message []byte, err error) {
-		if err != nil {
-			log.Println("error:", err)
-			//callback(nil, error)
-		} else if message != nil {
-			//fmt.Printf("%s \n", message)
-			var gdaxTicker GdaxTicker
-			err := json.Unmarshal(message, &gdaxTicker)
-			if err == nil && gdaxTicker.IsFilled() {
-				b.add(gdaxTicker)
-				//fmt.Println(gdaxTicker)
-			} else {
-				fmt.Println("error parsing hitBtc ticker:", err)
+	ch := make(chan api.Reposponse)
+
+	go b.gdaxApi.StartListen(apiCurrenciesConfiguration, ch)
+	go b.startSendingDataBack(exchangeConfiguration, resultChan)
+
+	for {
+		select {
+		case response := <-ch:
+
+			if *response.Err != nil {
+				log.Println("error:", response.Err)
+				//callback(nil, error)
+			} else if response.Message != nil {
+				//fmt.Printf("%s \n", message)
+				var gdaxTicker GdaxTicker
+				err := json.Unmarshal(*response.Message, &gdaxTicker)
+				if err == nil && gdaxTicker.IsFilled() {
+					b.add(gdaxTicker)
+					//fmt.Println(gdaxTicker)
+				} else {
+					fmt.Println("error parsing hitBtc ticker:", err)
+				}
 			}
+
+
+		default:
+			//fmt.Println("no activity")
 		}
-	})
+	}
+
+}
+
+func (b *GdaxManager) startSendingDataBack(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
+
 
 	for range time.Tick(1 * time.Second) {
 		func() {
@@ -86,7 +104,7 @@ func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, c
 			tickerCollection.TimpeStamp = time.Now()
 			tickerCollection.Tickers = values
 			if len(tickerCollection.Tickers) > 0 {
-				callback(tickerCollection, nil)
+				resultChan <- Result{exchangeConfiguration.Exchange.String(), &tickerCollection, nil}
 			}
 		}()
 	}

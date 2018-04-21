@@ -58,7 +58,8 @@ func (b *GdaxApi) connectWs(apiCurrenciesConfiguration ApiCurrenciesConfiguratio
 	}
 }
 
-func (b *GdaxApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback func(message []byte, err error)) {
+func (b *GdaxApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, ch chan Reposponse) {
+
 	for {
 		if b.connection == nil {
 			b.connection = b.connectWs(apiCurrenciesConfiguration)
@@ -71,7 +72,7 @@ func (b *GdaxApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigurat
 					b.connection.Close()
 					b.connection = nil
 				} else {
-					callback(message, err)
+					ch <- Reposponse{Message:&message, Err:&err}
 				}
 			}()
 		}

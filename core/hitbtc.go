@@ -55,30 +55,47 @@ func (hitBtcTicker HitBtcTicker) IsFilled() bool {
 	return (len(hitBtcTicker.Params.Symbol) > 0 && len(hitBtcTicker.Params.Rate) > 0)
 }
 
-func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, err error)) {
+func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
 
 	b.tickers = make(map[string]Ticker)
 	b.hitBtcApi = &api.HitBtcApi{}
 
-	var apiCurrenciesConfiguration = api.ApiCurrenciesConfiguration{}
+	var apiCurrenciesConfiguration= api.ApiCurrenciesConfiguration{}
 	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
 	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
 
-	go b.hitBtcApi.StartListen(apiCurrenciesConfiguration, func(message []byte, err error) {
-		if err != nil {
-			log.Println("error:", err)
-			//callback(nil, error)
-		} else if message != nil {
-			//fmt.Printf("%s \n", message)
-			var hitBtcTicker HitBtcTicker
-			err := json.Unmarshal(message, &hitBtcTicker)
-			if err == nil && hitBtcTicker.IsFilled() {
-				b.add(hitBtcTicker)
-			} else {
-				fmt.Println("error parsing hitBtc ticker:", err)
+	ch := make(chan api.Reposponse)
+
+	go b.hitBtcApi.StartListen(apiCurrenciesConfiguration, ch)
+	go b.startSendingDataBack(exchangeConfiguration, resultChan)
+
+	for {
+		select {
+		case response := <-ch:
+
+			if *response.Err != nil {
+				log.Println("error:", response.Err)
+				//callback(nil, error)
+			} else if response.Message != nil {
+				//fmt.Printf("%s \n", message)
+				var hitBtcTicker HitBtcTicker
+				err := json.Unmarshal(*response.Message, &hitBtcTicker)
+				if err == nil && hitBtcTicker.IsFilled() {
+					b.add(hitBtcTicker)
+				} else {
+					fmt.Println("error parsing hitBtc ticker:", err)
+				}
 			}
+
+		default:
+			//fmt.Println("no activity")
 		}
-	})
+	}
+
+}
+
+func (b *HitBtcManager) startSendingDataBack(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
+
 
 	for range time.Tick(1 * time.Second) {
 		//TODO: add check if data is old and don't sent it ti callback
@@ -96,7 +113,7 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 			tickerCollection.Tickers = values
 			if len(tickerCollection.Tickers) > 0 {
 				//fmt.Println(tickerCollection)
-				callback(tickerCollection, nil)
+				resultChan <- Result{exchangeConfiguration.Exchange.String(), &tickerCollection, nil}
 			}
 		}()
 	}

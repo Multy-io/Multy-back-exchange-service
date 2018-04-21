@@ -49,24 +49,40 @@ func (ticker OkexTicker) IsFilled() bool {
 	return (len(ticker.Symbol) > 0 && len(ticker.Data.Last) > 0)
 }
 
-func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, err error)) {
+func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
 
 	b.tickers = make(map[string]Ticker)
 	b.okexApi = &api.OkexApi{}
 
-	var apiCurrenciesConfiguration = api.ApiCurrenciesConfiguration{}
+	var apiCurrenciesConfiguration= api.ApiCurrenciesConfiguration{}
 	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
 	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
 
-	go b.okexApi.StartListen(apiCurrenciesConfiguration, func(message []byte, err error) {
-		if err != nil {
-			log.Println("error:", err)
-			//callback(nil, error)
-		} else if message != nil {
-			//fmt.Printf("%s \n", message)
-			b.addMessage(message)
+	ch := make(chan api.Reposponse)
+
+	go b.okexApi.StartListen(apiCurrenciesConfiguration, ch)
+	go b.startSendingDataBack(exchangeConfiguration, resultChan)
+
+	for {
+		select {
+		case response := <-ch:
+
+			if *response.Err != nil {
+				log.Println("error:", response.Err)
+				//callback(nil, error)
+			} else if response.Message != nil {
+				//fmt.Printf("%s \n", message)
+				b.addMessage(*response.Message)
+			}
+
+		default:
+			//fmt.Println("no activity")
 		}
-	})
+	}
+}
+
+
+func (b *OkexManager) startSendingDataBack(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
 
 	for range time.Tick(1 * time.Second) {
 		func() {
@@ -81,7 +97,7 @@ func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, c
 			tickerCollection.TimpeStamp = time.Now()
 			tickerCollection.Tickers = tickers
 			if len(tickerCollection.Tickers) > 0 {
-				callback(tickerCollection, nil)
+				resultChan <- Result{exchangeConfiguration.Exchange.String(), &tickerCollection, nil}
 			}
 		}()
 	}

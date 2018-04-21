@@ -66,7 +66,7 @@ func (b *BitfinexTicker) getCurriences() (currencies.Currency, currencies.Curren
 	return currencies.NotAplicable, currencies.NotAplicable
 }
 
-func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, err error)) {
+func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
 	b.bitfinexTickers = make(map[int]BitfinexTicker)
 	b.api = api.NewBitfinexApi()
 
@@ -74,23 +74,42 @@ func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
 	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
 
-	go b.api.StartListen(apiCurrenciesConfiguration, func(message []byte, err error) {
-		//fmt.Println(0)
-		if err != nil {
-			log.Println("error:", err)
-			callback(TickerCollection{}, err)
-		} else if message != nil {
-			//fmt.Printf("%s \n", message)
-			//fmt.Println(1)
-			b.addMessage(message)
-			//fmt.
-		} else {
-			fmt.Println("error parsing Bitfinex ticker:", err)
+	ch := make(chan api.Reposponse)
+
+	go b.api.StartListen(apiCurrenciesConfiguration, ch)
+
+	go b.startSendingDataBack(exchangeConfiguration, resultChan)
+
+	for {
+		select {
+		case response := <-ch:
+
+			//fmt.Println(0)
+			if *response.Err != nil {
+				log.Println("error:", response.Err)
+				resultChan <- Result{exchangeConfiguration.Exchange.String(),nil, response.Err}
+			} else if *response.Message != nil {
+				//fmt.Printf("%s \n", response.Message)
+				//fmt.Println(1)
+				b.addMessage(*response.Message)
+				//fmt.
+			} else {
+				fmt.Println("error parsing Bitfinex ticker:", response.Err)
+			}
+		default:
+			//fmt.Println("no activity")
 		}
-	})
+	}
+
+
+
+
+
+}
+
+func (b *BitfinexManager) startSendingDataBack(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
 
 	for range time.Tick(1 * time.Second) {
-		//TODO: add check if data is old and don't sent it to callback
 		func() {
 			tickers := []Ticker{}
 			for _, value := range b.bitfinexTickers {
@@ -111,7 +130,7 @@ func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 			tickerCollection.Tickers = tickers
 			//fmt.Println(tickerCollection)
 			if len(tickerCollection.Tickers) > 0 {
-				callback(tickerCollection, nil)
+				resultChan <- Result{exchangeConfiguration.Exchange.String(), &tickerCollection, nil}
 			}
 		}()
 	}

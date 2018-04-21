@@ -47,7 +47,7 @@ func (poloniexTicker PoloniexTicker) IsFilled() bool {
 	return (len(poloniexTicker.Symbol) > 0 && len(poloniexTicker.Last) > 0)
 }
 
-func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguration, callback func(tickerCollection TickerCollection, err error)) {
+func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
 
 	b.tickers = make(map[string]Ticker)
 	b.poloniexApi = api.NewPoloniexApi()
@@ -57,42 +57,57 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 	b.symbolsToParse = b.composeSybolsToParse(exchangeConfiguration)
 	b.setchannelids()
 
-	go b.poloniexApi.StartListen(func(message []byte, err error) {
-		if err != nil {
-			log.Println("error:", err)
-			callback(TickerCollection{}, err)
-		} else if message != nil {
-			var unmarshaledMessage []interface{}
+	ch := make(chan api.Reposponse)
 
-			err := json.Unmarshal(message, &unmarshaledMessage)
-			if err != nil {
-				fmt.Println(err)
-				callback(TickerCollection{}, err)
-			} else if len(unmarshaledMessage) > 2 {
-				var poloniexTicker PoloniexTicker
-				args := unmarshaledMessage[2].([]interface{})
-				poloniexTicker, err = b.convertArgsToTicker(args)
-				//fmt.Println(poloniexTicker.CurrencyPair)
+	go b.poloniexApi.StartListen(ch)
+	go b.startSendingDataBack(exchangeConfiguration, resultChan)
 
-				if err == nil && poloniexTicker.IsFilled() && b.symbolsToParse[poloniexTicker.Symbol] {
+	for {
+		select {
+		case response := <-ch:
 
-					var ticker Ticker
-					ticker.Rate = poloniexTicker.Last
-					ticker.Symbol = poloniexTicker.Symbol
-					ticker.TimpeStamp = time.Now()
-					targetCurrency, referenceCurrency := poloniexTicker.getCurriences()
-					ticker.TargetCurrency = targetCurrency
-					ticker.ReferenceCurrency = referenceCurrency
-					//fmt.Println(targetCurrency.CurrencyCode(), referenceCurrency.CurrencyCode())
-					b.Lock()
-					b.tickers[ticker.Symbol] = ticker
-					b.Unlock()
+			if *response.Err != nil {
+				log.Println("error:", response.Err)
+				//callback(TickerCollection{}, err)
+			} else if *response.Message != nil {
+				var unmarshaledMessage []interface{}
+
+				err := json.Unmarshal(*response.Message, &unmarshaledMessage)
+				if err != nil {
+					fmt.Println(err)
+					//callback(TickerCollection{}, err)
+				} else if len(unmarshaledMessage) > 2 {
+					var poloniexTicker PoloniexTicker
+					args := unmarshaledMessage[2].([]interface{})
+					poloniexTicker, err = b.convertArgsToTicker(args)
+					//fmt.Println(poloniexTicker.CurrencyPair)
+
+					if err == nil && poloniexTicker.IsFilled() && b.symbolsToParse[poloniexTicker.Symbol] {
+
+						var ticker Ticker
+						ticker.Rate = poloniexTicker.Last
+						ticker.Symbol = poloniexTicker.Symbol
+						ticker.TimpeStamp = time.Now()
+						targetCurrency, referenceCurrency := poloniexTicker.getCurriences()
+						ticker.TargetCurrency = targetCurrency
+						ticker.ReferenceCurrency = referenceCurrency
+						//fmt.Println(targetCurrency.CurrencyCode(), referenceCurrency.CurrencyCode())
+						b.Lock()
+						b.tickers[ticker.Symbol] = ticker
+						b.Unlock()
+					}
+				} else {
+					fmt.Println("error parsing Poloniex ticker:", err)
 				}
-			} else {
-				fmt.Println("error parsing Poloniex ticker:", err)
 			}
+
+		default:
+			//fmt.Println("no activity")
 		}
-	})
+	}
+}
+
+	func (b *PoloniexManager) startSendingDataBack(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
 
 	for range time.Tick(1 * time.Second) {
 		func() {
@@ -109,7 +124,7 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 			tickerCollection.Tickers = values
 			//fmt.Println(tickerCollection)
 			if len(tickerCollection.Tickers) > 0 {
-				callback(tickerCollection, nil)
+				resultChan <- Result{exchangeConfiguration.Exchange.String(), &tickerCollection, nil}
 			}
 		}()
 	}

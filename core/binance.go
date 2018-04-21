@@ -8,6 +8,7 @@ import (
 
 	"github.com/Appscrunch/Multy-back-exchange-service/api"
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
+	"fmt"
 )
 
 type BinanceTicker struct {
@@ -53,6 +54,7 @@ func NewBinanceManager() *BinanceManager {
 }
 
 func (b *BinanceManager) StartListen(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
+	fmt.Println("start binance manager listen")
 	b.symbolsToParse = b.composeSybolsToParse(exchangeConfiguration)
 	ch := make(chan api.Reposponse)
 	go b.binanceApi.StartListen(ch)
@@ -65,7 +67,7 @@ func (b *BinanceManager) StartListen(exchangeConfiguration ExchangeConfiguration
 			if *response.Err != nil {
 				log.Println("binance error:", *response.Err)
 				resultChan <- Result{exchangeConfiguration.Exchange.String(), nil, response.Err}
-			} else if response.Message != nil {
+			} else if *response.Message != nil {
 				//fmt.Printf("%s", message)
 				var binanceTickers []BinanceTicker
 				json.Unmarshal(*response.Message, &binanceTickers)
@@ -89,6 +91,8 @@ func (b *BinanceManager) StartListen(exchangeConfiguration ExchangeConfiguration
 				tickerCollection.TimpeStamp = time.Now()
 				tickerCollection.Tickers = tickers
 				resultChan <- Result{exchangeConfiguration.Exchange.String(), &tickerCollection, nil}
+			} else {
+				fmt.Println("Binance mesage is nill")
 			}
 		default:
 			//fmt.Println("no activity")

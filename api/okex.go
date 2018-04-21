@@ -47,7 +47,7 @@ func (b *OkexApi) connectWs(apiCurrenciesConfiguration ApiCurrenciesConfiguratio
 	}
 }
 
-func (b *OkexApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback func(message []byte, err error)) {
+func (b *OkexApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, ch chan Reposponse) {
 	for {
 		if b.connection == nil {
 			b.connection = b.connectWs(apiCurrenciesConfiguration)
@@ -60,7 +60,7 @@ func (b *OkexApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigurat
 					b.connection.Close()
 					b.connection = nil
 				} else {
-					callback(message, err)
+					ch <- Reposponse{Message:&message, Err:&err}
 				}
 			}()
 		}

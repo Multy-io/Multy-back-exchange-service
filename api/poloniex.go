@@ -62,7 +62,7 @@ func (b *PoloniexApi) connectWs() *websocket.Conn {
 
 }
 
-func (b *PoloniexApi) StartListen(callback func(message []byte, err error)) {
+func (b *PoloniexApi) StartListen(ch chan Reposponse) {
 
 	for {
 		if b.connection == nil {
@@ -76,7 +76,7 @@ func (b *PoloniexApi) StartListen(callback func(message []byte, err error)) {
 					b.connection = nil
 				} else {
 					//fmt.Printf("%s \n", message)
-					callback(message, err)
+					ch <- Reposponse{Message:&message, Err:&err}
 				}
 			}()
 		}

@@ -5,6 +5,7 @@ import (
 
 	_ "github.com/KristinaEtc/slflog"
 	"github.com/gorilla/websocket"
+	"fmt"
 )
 
 const bitfinexHost = "api.bitfinex.com"
@@ -52,8 +53,8 @@ func (b *BitfinexApi) connectWs(apiCurrenciesConfiguration ApiCurrenciesConfigur
 	}
 }
 
-func (b *BitfinexApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, callback func(message []byte, err error)) {
-
+func (b *BitfinexApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration,ch chan Reposponse) {
+	fmt.Println("Start listen Bitfinex")
 	for {
 		if b.connection == nil {
 			b.connection = b.connectWs(apiCurrenciesConfiguration)
@@ -66,7 +67,8 @@ func (b *BitfinexApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfig
 					b.connection.Close()
 					b.connection = nil
 				} else {
-					callback(message, err)
+					//fmt.Printf("%f", message)
+					ch <- Reposponse{Message:&message, Err:&err}
 				}
 			}()
 		}
