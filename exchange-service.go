@@ -11,21 +11,11 @@ type Exchanger struct {
 }
 
 func (e *Exchanger) InitExchanger(conf core.ManagerConfiguration) {
-	//var exchangeManger *exchangeRates.ExchangeManager
-	//
-	//var manager = core.NewManager()
-	//go manager.StartListen(conf)
-	//
-	//exchangeManger = exchangeRates.NewExchangeManager()
-	//go exchangeManger.StartGetingData(conf)
-	//
-	//
-	//waitGroup.Add(len(configuration.Exchanges) + 5)
-	//
-	//go manager.StartListen(configuration)
-	//
-	//exchangeManger = exchangeRates.NewExchangeManager()
-	//go exchangeManger.StartGetingData(configuration)
-	//
-	//waitGroup.Wait()
+	var manager = core.NewManager()
+	go manager.StartListen(conf)
+	e.Manager = manager
+
+	exManager := exchangeRates.NewExchangeManager(conf)
+	go exManager.StartGetingData()
+	e.Exchanger = exManager
 }

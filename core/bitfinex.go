@@ -87,7 +87,7 @@ func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 			//fmt.Println(0)
 			if *response.Err != nil {
 				log.Println("error:", response.Err)
-				resultChan <- Result{exchangeConfiguration.Exchange.String(),nil, response.Err}
+				resultChan <- Result{exchangeConfiguration.Exchange.String(), nil, response.Err}
 			} else if *response.Message != nil {
 				//fmt.Printf("%s \n", response.Message)
 				//fmt.Println(1)
@@ -100,10 +100,6 @@ func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 			//fmt.Println("no activity")
 		}
 	}
-
-
-
-
 
 }
 
@@ -140,27 +136,29 @@ func (b *BitfinexManager) addMessage(message []byte) {
 
 	var bitfinexTicker BitfinexTicker
 	json.Unmarshal(message, &bitfinexTicker)
-b.Lock()
+
 	if bitfinexTicker.ChanID > 0 {
 		//fmt.Println(bitfinexTicker)
+		b.Lock()
 		b.bitfinexTickers[bitfinexTicker.ChanID] = bitfinexTicker
+		b.Unlock()
 	} else {
-
 		var unmarshaledTickerMessage []interface{}
 		json.Unmarshal(message, &unmarshaledTickerMessage)
-
 		if len(unmarshaledTickerMessage) > 1 {
 			var chanId = int(unmarshaledTickerMessage[0].(float64))
 			//var unmarshaledTicker []interface{}
 			if v, ok := unmarshaledTickerMessage[1].([]interface{}); ok {
+				b.Lock()
 				var sub = b.bitfinexTickers[chanId]
 				sub.Rate = strconv.FormatFloat(v[0].(float64), 'f', 8, 64)
 				sub.TimpeStamp = time.Now()
 				b.bitfinexTickers[chanId] = sub
+				b.Unlock()
 			}
 		}
 	}
-	b.Unlock()
+
 }
 
 //func (b PoloniexManager) convertArgsToTicker(args []interface{}) (wsticker PoloniexTicker, err error) {

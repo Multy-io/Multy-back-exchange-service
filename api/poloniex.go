@@ -76,7 +76,7 @@ func (b *PoloniexApi) StartListen(ch chan Reposponse) {
 					b.connection = nil
 				} else {
 					//fmt.Printf("%s \n", message)
-					ch <- Reposponse{Message:&message, Err:&err}
+					ch <- Reposponse{Message: &message, Err: &err}
 				}
 			}()
 		}
@@ -193,15 +193,4 @@ func Error(msg string, args ...interface{}) error {
 type Logger struct {
 	isOpen bool
 	Lock   *sync.Mutex
-}
-
-func (l *Logger) LogRoutine(bus <-chan string) {
-	if l.isOpen {
-		for {
-			message := <-bus
-			l.Lock.Lock()
-			fmt.Println(message)
-			l.Lock.Unlock()
-		}
-	}
 }

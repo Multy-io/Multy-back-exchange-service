@@ -107,18 +107,21 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 	}
 }
 
-	func (b *PoloniexManager) startSendingDataBack(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
+func (b *PoloniexManager) startSendingDataBack(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
 
 	for range time.Tick(1 * time.Second) {
 		func() {
 			values := []Ticker{}
 			b.Lock()
-			for _, value := range b.tickers {
+			tickers := b.tickers
+			b.Unlock()
+
+			for _, value := range tickers {
 				if value.TimpeStamp.After(time.Now().Add(-maxTickerAge * time.Second)) {
 					values = append(values, value)
 				}
 			}
-			b.Unlock()
+
 			var tickerCollection = TickerCollection{}
 			tickerCollection.TimpeStamp = time.Now()
 			tickerCollection.Tickers = values

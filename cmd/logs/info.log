@@ -50,3 +50,8 @@
 2018-04-21/16:28:47.899 [[32mINFO[0m] api: connecting to wss://real.okex.com:10440 
 2018-04-21/16:28:48.880 [[32mINFO[0m] api: connecting to wss://stream.binance.com:9443/ws/%21ticker@arr 
 2018-04-21/16:28:49.225 [[32mINFO[0m] api: connecting to wss://api2.poloniex.com/realm1 
+2018-04-22/16:56:51.446 [[32mINFO[0m] db: Db connected 
+2018-04-22/16:56:51.508 [[32mINFO[0m] api: connecting to wss://api.hitbtc.com/api/2/ws 
+2018-04-22/16:56:51.519 [[32mINFO[0m] api: connecting to wss://real.okex.com:10440 
+2018-04-22/16:56:51.530 [[32mINFO[0m] api: connecting to wss://ws-feed.gdax.com 
+2018-04-22/16:56:52.541 [[32mINFO[0m] api: connecting to wss://stream.binance.com:9443/ws/%21ticker@arr 
