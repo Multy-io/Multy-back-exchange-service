@@ -9,15 +9,12 @@ import (
 	"time"
 
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
-	_ "github.com/lib/pq"
-	//"github.com/ethereum/go-ethereum/log"
-	//"github.com/golang/protobuf/_conformance/conformance_proto"
-	_ "github.com/KristinaEtc/slflog"
-	//"github.com/KristinaEtc/slf"
 	"github.com/KristinaEtc/slf"
+	_ "github.com/KristinaEtc/slflog"
+	_ "github.com/lib/pq"
 )
 
-var logg = slf.WithContext("db")
+var log = slf.WithContext("exchange-rates")
 
 type DBConfiguration struct {
 	User     string `json:"user"`
@@ -57,29 +54,22 @@ func NewDbManager(configuration DBConfiguration) *DbManager {
 
 func (b *DbManager) connectDb(configuration DBConfiguration) *sql.DB {
 	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
-		configuration.User,configuration.Password, configuration.Name)
+		configuration.User, configuration.Password, configuration.Name)
 	db, err := sql.Open("postgres", dbinfo)
 	if err != nil {
-		logg.Error(err.Error())
+		log.Errorf("connectDb:DbManager:sql.Open %v", err.Error())
 	} else {
-		logg.Info("Db connected")
+		log.Infof("Db connected")
 	}
-	checkErr(err)
 	return db
 	//defer db.Close()
-}
-
-func checkErr(err error) {
-	if err != nil {
-		logg.Error(err.Error())
-	}
 }
 
 func (b *DbManager) FillDb(withExchanges []*DbExchange) {
 
 	for _, exchange := range withExchanges {
 		for _, ticker := range exchange.Tickers {
-			b.insertSaRate(exchange.name, ticker.TargetCurrency, ticker.ReferenceCurrency, strconv.FormatFloat(ticker.Rate, 'f', 8, 64) )
+			b.insertSaRate(exchange.name, ticker.TargetCurrency, ticker.ReferenceCurrency, strconv.FormatFloat(ticker.Rate, 'f', 8, 64))
 		}
 	}
 	b.fillRateFromSA()
@@ -109,20 +99,26 @@ func (b *DbManager) FillDb(withExchanges []*DbExchange) {
 func (b *DbManager) insertSaRate(exchange_title string, target_currency currencies.Currency, reference_currency currencies.Currency, rateString string) {
 	rate, _ := strconv.ParseFloat(rateString, 64)
 	_, err := b.db.Exec("INSERT INTO sa_rates(exchange_title, target_title, target_code, target_native_id, reference_title, reference_code, reference_native_id, time_stamp, rate) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9);", exchange_title, target_currency.CurrencyName(), target_currency.CurrencyCode(), target_currency, reference_currency.CurrencyName(), reference_currency.CurrencyCode(), reference_currency, time.Now(), rate)
-	checkErr(err)
+	if err != nil {
+		log.Errorf("DbManager:insertSaRate:b.db.Exec %v", err.Error())
+	}
 	//b.db.
 }
 
 func (b *DbManager) fillRateFromSA() {
 	_, err := b.db.Exec("SELECT fill_rates()")
-	checkErr(err)
+	if err != nil {
+		log.Errorf("DbManager:fillRateFromSA:b.db.Exec %v", err.Error())
+	}
 }
 
 func (b *DbManager) getRates(timeStamp time.Time, exchangeTitle string, targetCode string, refereciesCodes []string) []DbRate {
 	var s = StringSlice{}
 	s = refereciesCodes
 	rows, err := b.db.Query("SELECT * from getRates($1, $2, $3, $4)", timeStamp, exchangeTitle, targetCode, s)
-	checkErr(err)
+	if err != nil {
+		log.Errorf("DbManager:getRates:b.db.Query %v", err.Error())
+	}
 
 	var dbRates = []DbRate{}
 
@@ -134,7 +130,9 @@ func (b *DbManager) getRates(timeStamp time.Time, exchangeTitle string, targetCo
 		var time_stamp time.Time
 		var rate float64
 		err = rows.Scan(&exchange_title, &target_code, &reference_code, &time_stamp, &rate)
-		checkErr(err)
+		if err != nil {
+			log.Errorf("DbManager:getRates:rows.Scan %v", err.Error())
+		}
 		dbRate.exchangeTitle = exchange_title
 		dbRate.targetCode = target_code
 		dbRate.referenceCode = reference_code

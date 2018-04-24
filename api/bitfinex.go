@@ -3,9 +3,10 @@ package api
 import (
 	"net/url"
 
+	"fmt"
+
 	_ "github.com/KristinaEtc/slflog"
 	"github.com/gorilla/websocket"
-	"fmt"
 )
 
 const bitfinexHost = "api.bitfinex.com"
@@ -40,10 +41,10 @@ func (b *BitfinexApi) connectWs(apiCurrenciesConfiguration ApiCurrenciesConfigur
 	connection, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
 
 	if err != nil || connection == nil {
-		log.Errorf("Bitfinex ws connection error: ", err)
+		log.Errorf("connectWs:Bitfinex ws connection error: ", err)
 		return nil
 	} else {
-		log.Debugf("Bitfinex ws connected")
+		log.Debugf("connectWs:Bitfinex ws connected")
 		b.symbolesForSubscirbe = b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
 		for _, symbol := range b.symbolesForSubscirbe {
 			subscribtion := `{"event":"subscribe","channel":"ticker","symbol": "` + symbol + `"}`
@@ -53,8 +54,8 @@ func (b *BitfinexApi) connectWs(apiCurrenciesConfiguration ApiCurrenciesConfigur
 	}
 }
 
-func (b *BitfinexApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration,ch chan Reposponse) {
-	fmt.Println("Start listen Bitfinex")
+func (b *BitfinexApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, ch chan Reposponse) {
+	fmt.Println("StartListen:Start listen Bitfinex")
 	for {
 		if b.connection == nil {
 			b.connection = b.connectWs(apiCurrenciesConfiguration)
@@ -63,12 +64,12 @@ func (b *BitfinexApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfig
 			func() {
 				_, message, err := b.connection.ReadMessage()
 				if err != nil {
-					log.Errorf("Bitfinex read message error: %v", err.Error())
+					log.Errorf("StartListen:Bitfinex read message error: %v", err.Error())
 					b.connection.Close()
 					b.connection = nil
 				} else {
 					//fmt.Printf("%f", message)
-					ch <- Reposponse{Message:&message, Err:&err}
+					ch <- Reposponse{Message: &message, Err: &err}
 				}
 			}()
 		}

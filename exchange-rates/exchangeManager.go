@@ -1,14 +1,14 @@
 package exchangeRates
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
+	"sync"
+
+	"github.com/Appscrunch/Multy-back-exchange-service/core"
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 	"github.com/Appscrunch/Multy-back-exchange-service/stream/server"
-	"github.com/Appscrunch/Multy-back-exchange-service/core"
-	"sync"
 )
 
 type Exchange struct {
@@ -47,9 +47,9 @@ type CurrencyPair struct {
 type Ticker struct {
 	//TargetCurrency    currencies.Currency
 	//ReferenceCurrency currencies.Currency
-	Pair CurrencyPair
-	Rate              float64
-	TimpeStamp        time.Time
+	Pair         CurrencyPair
+	Rate         float64
+	TimpeStamp   time.Time
 	isCalculated bool
 }
 
@@ -67,17 +67,14 @@ func (b *CurrencyPair) isEqualTo(pair CurrencyPair) bool {
 	return b.TargetCurrency == pair.TargetCurrency && b.ReferenceCurrency == pair.ReferenceCurrency
 }
 
-
-
 type ExchangeManager struct {
-	exchanges  map[string]*Exchange
-	grpcClient *GrpcClient
-	tickersCh  chan *server.Tickers
-	dbManger   *DbManager
+	exchanges           map[string]*Exchange
+	grpcClient          *GrpcClient
+	tickersCh           chan *server.Tickers
+	dbManger            *DbManager
 	referenceCurrencies []currencies.Currency
-	configuration core.ManagerConfiguration
+	configuration       core.ManagerConfiguration
 	sync.Mutex
-
 }
 
 func NewExchangeManager(configuration core.ManagerConfiguration) *ExchangeManager {
@@ -86,7 +83,6 @@ func NewExchangeManager(configuration core.ManagerConfiguration) *ExchangeManage
 	manger.exchanges = map[string]*Exchange{}
 	manger.grpcClient = NewGrpcClient()
 	manger.tickersCh = make(chan *server.Tickers)
-
 
 	dbConfig := DBConfiguration{}
 	dbConfig.Name = configuration.DBConfiguration.Name
@@ -99,7 +95,6 @@ func NewExchangeManager(configuration core.ManagerConfiguration) *ExchangeManage
 }
 
 func (b *ExchangeManager) StartGetingData() {
-
 
 	go b.grpcClient.listenTickers(b.tickersCh)
 	go b.fillDb()
@@ -129,8 +124,6 @@ func (b *ExchangeManager) StartGetingData() {
 	}
 }
 
-
-
 func (b *ExchangeManager) Subscribe(ch chan []*Exchange, refreshInterval time.Duration, targetCodes []string, referenceCode string) {
 
 	for range time.Tick(refreshInterval * time.Second) {
@@ -154,93 +147,93 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 
 	//fmt.Println(referenceCurrency.CurrencyCode(), referenceCrossCurrency.CurrencyCode())
 
+	var newExchanges = []*Exchange{}
 
-		var newExchanges = []*Exchange{}
+	for _, targetCode := range targetCodes {
+		var pair = CurrencyPair{}
+		pair.TargetCurrency = currencies.NewCurrencyWithCode(targetCode)
+		pair.ReferenceCurrency = referenceCurrency
 
-		for _, targetCode := range targetCodes {
-			var pair = CurrencyPair{}
-			pair.TargetCurrency = currencies.NewCurrencyWithCode(targetCode)
-			pair.ReferenceCurrency = referenceCurrency
+		//fmt.Println("pair is:",pair.TargetCurrency.CurrencyCode(), pair.ReferenceCurrency.CurrencyCode())
+		b.Lock()
+		exchanges := b.exchanges
+		b.Unlock()
+		for _, exchange := range exchanges {
 
-			//fmt.Println("pair is:",pair.TargetCurrency.CurrencyCode(), pair.ReferenceCurrency.CurrencyCode())
-			b.Lock()
-			for _, exchange := range b.exchanges {
+			var newTickers = map[string]*Ticker{}
 
-				var newTickers = map[string]*Ticker{}
-
-				if ticker := exchange.tickerForPair(pair); ticker != nil {
-					//fmt.Println("tikers si not nil:", exchange.name, ticker.symbol())
-					newTickers[ticker.symbol()] = ticker
+			if ticker := exchange.tickerForPair(pair); ticker != nil {
+				//fmt.Println("tikers si not nil:", exchange.name, ticker.symbol())
+				newTickers[ticker.symbol()] = ticker
+			} else {
+				//fmt.Println("tiker is nil", exchange.name)
+				crossPair := pair
+				crossPair.ReferenceCurrency = referenceCrossCurrency
+				//fmt.Println(crossPair.TargetCurrency.CurrencyCode(), crossPair.ReferenceCurrency.CurrencyCode())
+				if crossTicker := exchange.tickerForPair(crossPair); crossTicker == nil {
+					//fmt.Println("crossTiker is nil", exchange.name)
+					continue
 				} else {
-					//fmt.Println("tiker is nil", exchange.name)
-					crossPair := pair
-					crossPair.ReferenceCurrency = referenceCrossCurrency
-					//fmt.Println(crossPair.TargetCurrency.CurrencyCode(), crossPair.ReferenceCurrency.CurrencyCode())
-					if crossTicker := exchange.tickerForPair(crossPair); crossTicker == nil {
-						//fmt.Println("crossTiker is nil", exchange.name)
-						continue
-					} else {
-						exchangePair := CurrencyPair{}
-						isStreight := false
-						if pair.ReferenceCurrency == currencies.Tether {
-							exchangePair.TargetCurrency = crossPair.ReferenceCurrency
-							exchangePair.ReferenceCurrency = pair.ReferenceCurrency
-							isStreight = true
-						} else if pair.ReferenceCurrency == currencies.Bitcoin {
-							exchangePair.TargetCurrency = pair.ReferenceCurrency
-							exchangePair.ReferenceCurrency = crossPair.ReferenceCurrency
-						}
-						//fmt.Println("crossTiker is", crossTicker.Pair.TargetCurrency.CurrencyCode(), crossTicker.Pair.ReferenceCurrency.CurrencyCode(), exchange.name)
-						//fmt.Println(crossTicker.TargetCurrency, crossTicker.ReferenceCurrency)
-
-
-
-						if  exchangeTicker := exchange.tickerForPair(exchangePair) ; exchangeTicker != nil {
-							var rate float64
-							if isStreight {
-								rate = crossTicker.Rate * exchangeTicker.Rate
-							} else {
-								rate = crossTicker.Rate / exchangeTicker.Rate
-							}
-
-
-							//fmt.Println(rate)
-							ticker := Ticker{}
-							ticker.Rate = rate
-							ticker.Pair.TargetCurrency = pair.TargetCurrency
-							ticker.Pair.ReferenceCurrency = pair.ReferenceCurrency
-							ticker.isCalculated = true
-							newTickers[ticker.symbol()] = &ticker
-						} else {
-							fmt.Println("exchange ticket is nil", exchangePair.TargetCurrency.CurrencyCode(), exchangePair.ReferenceCurrency.CurrencyCode(), exchange.name)
-						}
+					exchangePair := CurrencyPair{}
+					isStreight := false
+					if pair.ReferenceCurrency == currencies.Tether {
+						exchangePair.TargetCurrency = crossPair.ReferenceCurrency
+						exchangePair.ReferenceCurrency = pair.ReferenceCurrency
+						isStreight = true
+					} else if pair.ReferenceCurrency == currencies.Bitcoin {
+						exchangePair.TargetCurrency = pair.ReferenceCurrency
+						exchangePair.ReferenceCurrency = crossPair.ReferenceCurrency
 					}
+					//fmt.Println("crossTiker is", crossTicker.Pair.TargetCurrency.CurrencyCode(), crossTicker.Pair.ReferenceCurrency.CurrencyCode(), exchange.name)
+					//fmt.Println(crossTicker.TargetCurrency, crossTicker.ReferenceCurrency)
 
-				}
+					if exchangeTicker := exchange.tickerForPair(exchangePair); exchangeTicker != nil {
+						var rate float64
+						if isStreight {
+							rate = crossTicker.Rate * exchangeTicker.Rate
+						} else {
+							rate = crossTicker.Rate / exchangeTicker.Rate
+						}
 
-				if len(newTickers) > 0 {
-					var newExchange = Exchange{}
-					newExchange.name = exchange.name
-					newExchange.Tickers = newTickers
-					newExchanges = append(newExchanges, &newExchange)
+						//fmt.Println(rate)
+						ticker := Ticker{}
+						ticker.Rate = rate
+						ticker.Pair.TargetCurrency = pair.TargetCurrency
+						ticker.Pair.ReferenceCurrency = pair.ReferenceCurrency
+						ticker.isCalculated = true
+						newTickers[ticker.symbol()] = &ticker
+					} else {
+						log.Errorf("calculateAllTickers: exchange ticket is nil %v %v %v ", exchangePair.TargetCurrency.CurrencyCode(), exchangePair.ReferenceCurrency.CurrencyCode(), exchange.name)
+					}
 				}
 
 			}
-			b.Unlock()
+
+			if len(newTickers) > 0 {
+				var newExchange = Exchange{}
+				newExchange.name = exchange.name
+				newExchange.Tickers = newTickers
+				newExchanges = append(newExchanges, &newExchange)
+			}
 
 		}
+
+	}
 
 	return newExchanges
 
 }
 
 func (b *ExchangeManager) add(tikers *server.Tickers) {
-	for _, exchangeTicker := range tikers.ExchangeTickers {
 	b.Lock()
-		if b.exchanges[exchangeTicker.Exchange] == nil {
+	exchanges := b.exchanges
+	b.Unlock()
+
+	for _, exchangeTicker := range tikers.ExchangeTickers {
+		if exchanges[exchangeTicker.Exchange] == nil {
 			var ex = Exchange{}
 			ex.name = exchangeTicker.Exchange
-			b.exchanges[exchangeTicker.Exchange] = &ex
+			exchanges[exchangeTicker.Exchange] = &ex
 		}
 
 		for _, value := range exchangeTicker.Tickers {
@@ -250,12 +243,12 @@ func (b *ExchangeManager) add(tikers *server.Tickers) {
 			ticker.Pair.ReferenceCurrency = currencies.NewCurrencyWithCode(value.Referrence)
 			ticker.Rate, _ = strconv.ParseFloat(value.Rate, 64)
 
-			if b.exchanges[exchangeTicker.Exchange].Tickers == nil {
-				b.exchanges[exchangeTicker.Exchange].Tickers = map[string]*Ticker{}
+			if exchanges[exchangeTicker.Exchange].Tickers == nil {
+				exchanges[exchangeTicker.Exchange].Tickers = map[string]*Ticker{}
 			}
-			b.exchanges[exchangeTicker.Exchange].Tickers[ticker.symbol()] = &ticker
+			exchanges[exchangeTicker.Exchange].Tickers[ticker.symbol()] = &ticker
 		}
-		b.Unlock()
+
 	}
 }
 

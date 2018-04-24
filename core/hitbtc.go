@@ -2,8 +2,6 @@ package core
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -29,8 +27,6 @@ func (b *HitBtcTicker) getCurriences() (currencies.Currency, currencies.Currency
 		var symbol = b.Params.Symbol
 		var damagedSymbol = TrimLeftChars(symbol, 1)
 		for _, referenceCurrency := range currencies.DefaultReferenceCurrencies {
-			//fmt.Println(damagedSymbol, referenceCurrency.CurrencyCode())
-
 			referenceCurrencyCode := referenceCurrency.CurrencyCode()
 
 			if referenceCurrencyCode == "USDT" {
@@ -60,7 +56,7 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 	b.tickers = make(map[string]Ticker)
 	b.hitBtcApi = &api.HitBtcApi{}
 
-	var apiCurrenciesConfiguration= api.ApiCurrenciesConfiguration{}
+	var apiCurrenciesConfiguration = api.ApiCurrenciesConfiguration{}
 	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
 	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
 
@@ -74,7 +70,7 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 		case response := <-ch:
 
 			if *response.Err != nil {
-				log.Println("error:", response.Err)
+				log.Errorf("StartListen:HitBtcManager:error:", response.Err)
 				//callback(nil, error)
 			} else if response.Message != nil {
 				//fmt.Printf("%s \n", message)
@@ -83,7 +79,7 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 				if err == nil && hitBtcTicker.IsFilled() {
 					b.add(hitBtcTicker)
 				} else {
-					fmt.Println("error parsing hitBtc ticker:", err)
+					log.Errorf("StartListen:HitBtcManager:error parsing hitBtc ticker:", err)
 				}
 			}
 
@@ -96,18 +92,20 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 
 func (b *HitBtcManager) startSendingDataBack(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
 
-
 	for range time.Tick(1 * time.Second) {
 		//TODO: add check if data is old and don't sent it ti callback
 		func() {
 			values := []Ticker{}
 			b.Lock()
-			for _, value := range b.tickers {
+			tickers := b.tickers
+			b.Unlock()
+
+			for _, value := range tickers {
 				if value.TimpeStamp.After(time.Now().Add(-maxTickerAge * time.Second)) {
 					values = append(values, value)
 				}
 			}
-			b.Unlock()
+
 			var tickerCollection = TickerCollection{}
 			tickerCollection.TimpeStamp = time.Now()
 			tickerCollection.Tickers = values

@@ -45,15 +45,15 @@ func NewPoloniexApi() *PoloniexApi {
 
 func (b *PoloniexApi) connectWs() *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: host, Path: path}
-	log.Infof("connecting to %s", url.String())
+	log.Infof("connectWs:onnecting to %s", url.String())
 
 	connection, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
 
 	if err != nil || connection == nil {
-		log.Errorf("Poloniex ws connection error: %v", err.Error())
+		log.Errorf("connectWs:Poloniex ws connection error: %v", err.Error())
 		return nil
 	} else {
-		log.Debugf("Poloniex ws connected")
+		log.Debugf("connectWs:Poloniex ws connected")
 		subs := subscription{Command: "subscribe", Channel: "1002"}
 		msg, _ := json.Marshal(subs)
 		connection.WriteMessage(websocket.BinaryMessage, msg)
@@ -71,12 +71,12 @@ func (b *PoloniexApi) StartListen(ch chan Reposponse) {
 			func() {
 				_, message, err := b.connection.ReadMessage()
 				if err != nil {
-					log.Errorf("Poloniex read message error: %v", err.Error())
+					log.Errorf("StartListen:Poloniex read message error: %v", err.Error())
 					b.connection.Close()
 					b.connection = nil
 				} else {
 					//fmt.Printf("%s \n", message)
-					ch <- Reposponse{Message:&message, Err:&err}
+					ch <- Reposponse{Message: &message, Err: &err}
 				}
 			}()
 		}
@@ -193,15 +193,4 @@ func Error(msg string, args ...interface{}) error {
 type Logger struct {
 	isOpen bool
 	Lock   *sync.Mutex
-}
-
-func (l *Logger) LogRoutine(bus <-chan string) {
-	if l.isOpen {
-		for {
-			message := <-bus
-			l.Lock.Lock()
-			fmt.Println(message)
-			l.Lock.Unlock()
-		}
-	}
 }

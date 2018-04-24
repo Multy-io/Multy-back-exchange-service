@@ -5,7 +5,10 @@ import (
 	"time"
 
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
+	"github.com/Appscrunch/deps/slf"
 )
+
+var log = slf.WithContext("core")
 
 type TickerCollection struct {
 	TimpeStamp time.Time
@@ -41,11 +44,13 @@ func (b *Agregator) add(tickerCollection TickerCollection, forExchange string) {
 func (b *Agregator) getTickers(startDate time.Time) map[string]TickerCollection {
 	var filteredTickers = make(map[string]TickerCollection)
 	b.Lock()
-	for exhange, tickerCollection := range b.allTickers {
+	allTickers := b.allTickers
+	b.Unlock()
+	for exhange, tickerCollection := range allTickers {
 		if tickerCollection.TimpeStamp.After(startDate) {
 			filteredTickers[exhange] = *tickerCollection
 		}
 	}
-	b.Unlock()
+
 	return filteredTickers
 }

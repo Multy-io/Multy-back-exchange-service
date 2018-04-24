@@ -32,10 +32,10 @@ func (b *HitBtcApi) connectWs(apiCurrenciesConfiguration ApiCurrenciesConfigurat
 	connection, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
 
 	if err != nil || connection == nil {
-		log.Errorf("HitBtc ws connection error: %v", err.Error())
+		log.Errorf("connectWs:HitBtc ws connection error: %v", err.Error())
 		return nil
 	} else {
-		log.Debugf("HitBtc ws connected")
+		log.Debugf("connectWs:HitBtc ws connected")
 
 		productsIds := b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
 
@@ -59,7 +59,6 @@ func (b *HitBtcApi) connectWs(apiCurrenciesConfiguration ApiCurrenciesConfigurat
 
 func (b *HitBtcApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfiguration, ch chan Reposponse) {
 
-
 	for {
 		if b.connection == nil {
 			b.connection = b.connectWs(apiCurrenciesConfiguration)
@@ -68,11 +67,11 @@ func (b *HitBtcApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigur
 			func() {
 				_, message, err := b.connection.ReadMessage()
 				if err != nil {
-					log.Errorf("HitBtc read message error:%v", err.Error())
+					log.Errorf("connectWs:HitBtc read message error:%v", err.Error())
 					b.connection.Close()
 					b.connection = nil
 				} else {
-					ch <- Reposponse{Message:&message, Err:&err}
+					ch <- Reposponse{Message: &message, Err: &err}
 				}
 			}()
 		}
@@ -85,7 +84,7 @@ func (b *HitBtcApi) StopListen() {
 		b.connection.Close()
 		b.connection = nil
 	}
-	log.Debugf("HitBtc ws closed")
+	log.Debugf("StopListen:HitBtc ws closed")
 }
 
 func (b *HitBtcApi) composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCurrenciesConfiguration) []string {

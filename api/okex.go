@@ -22,15 +22,15 @@ type OkexSubscription struct {
 
 func (b *OkexApi) connectWs(apiCurrenciesConfiguration ApiCurrenciesConfiguration) *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: okexHost, Path: ""}
-	log.Infof("connecting to %s", url.String())
+	log.Infof("connectWs:connecting to %s", url.String())
 
 	connection, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
 
 	if err != nil || connection == nil {
-		log.Errorf("Okex ws connection error: %v", err.Error())
+		log.Errorf("connectWs:Okex ws connection error: %v", err.Error())
 		return nil
 	} else {
-		log.Debugf("Okex ws connected")
+		log.Debugf("connectWs:Okex ws connected")
 
 		productsIds := b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
 
@@ -56,11 +56,11 @@ func (b *OkexApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigurat
 			func() {
 				_, message, err := b.connection.ReadMessage()
 				if err != nil {
-					log.Errorf("okex read message error: %v", err.Error())
+					log.Errorf("connectWs:okex read message error: %v", err.Error())
 					b.connection.Close()
 					b.connection = nil
 				} else {
-					ch <- Reposponse{Message:&message, Err:&err}
+					ch <- Reposponse{Message: &message, Err: &err}
 				}
 			}()
 		}
@@ -73,7 +73,7 @@ func (b *OkexApi) StopListen() {
 		b.connection.Close()
 		b.connection = nil
 	}
-	log.Debugf("Okex ws closed")
+	log.Debugf("StopListen:Okex ws closed")
 }
 
 func (b *OkexApi) composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCurrenciesConfiguration) []string {

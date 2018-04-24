@@ -28,15 +28,15 @@ type Channel struct {
 
 func (b *GdaxApi) connectWs(apiCurrenciesConfiguration ApiCurrenciesConfiguration) *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: gdaxHost, Path: ""}
-	log.Infof("connecting to %s", url.String())
+	log.Infof("connectWs:connecting to %s", url.String())
 
 	connection, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
 
 	if err != nil || connection == nil {
-		log.Errorf("Gdax ws connection error:%v", err.Error())
+		log.Errorf("connectWs:Gdax ws connection error:%v", err.Error())
 		return nil
 	} else {
-		log.Debugf("Gdax ws connected")
+		log.Debugf("connectWs:Gdax ws connected")
 
 		productsIds := b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
 
@@ -68,11 +68,11 @@ func (b *GdaxApi) StartListen(apiCurrenciesConfiguration ApiCurrenciesConfigurat
 			func() {
 				_, message, err := b.connection.ReadMessage()
 				if err != nil {
-					log.Errorf("Gdax read message error:", err.Error())
+					log.Errorf("StartListen:Gdax read message error:", err.Error())
 					b.connection.Close()
 					b.connection = nil
 				} else {
-					ch <- Reposponse{Message:&message, Err:&err}
+					ch <- Reposponse{Message: &message, Err: &err}
 				}
 			}()
 		}
@@ -84,7 +84,7 @@ func (b *GdaxApi) StopListen() {
 		b.connection.Close()
 		b.connection = nil
 	}
-	log.Debugf("Gdax ws closed")
+	log.Debugf("StopListen:Gdax ws closed")
 }
 
 func (b *GdaxApi) composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiCurrenciesConfiguration) []string {

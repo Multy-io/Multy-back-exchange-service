@@ -21,20 +21,19 @@ type BinanceApi struct {
 
 type Reposponse struct {
 	Message *[]byte
-	Err *error
+	Err     *error
 }
-
 
 func (b *BinanceApi) connectWs() *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: binanceHost, Path: tickerPath}
-	log.Infof("connecting to %s", url.String())
+	log.Infof("connectWs:connecting to %s", url.String())
 
 	connection, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
 	if err != nil || connection == nil {
-		fmt.Errorf("Binance ws connection error: %v", err.Error())
+		fmt.Errorf("connectWs:Binance ws connection error: %v", err.Error())
 		return nil
 	} else {
-		log.Debugf("Binance ws connected")
+		log.Debugf("connectWs:Binance ws connected")
 		return connection
 	}
 }
@@ -48,12 +47,12 @@ func (b *BinanceApi) StartListen(ch chan Reposponse) {
 			func() {
 				_, message, err := b.connection.ReadMessage()
 				if err != nil {
-					log.Errorf("Binance read message error: %v", err.Error())
+					log.Errorf("StartListen:Binance read message error: %v", err.Error())
 					b.connection.Close()
 					b.connection = nil
 				} else {
 					//fmt.Printf("%s \n", message)
-					ch <- Reposponse{Message:&message, Err:&err}
+					ch <- Reposponse{Message: &message, Err: &err}
 				}
 			}()
 		}
@@ -65,5 +64,5 @@ func (b *BinanceApi) StopListen() {
 		b.connection.Close()
 		b.connection = nil
 	}
-	log.Debugf("Binance ws closed")
+	log.Debugf("StopListen:Binance ws closed")
 }

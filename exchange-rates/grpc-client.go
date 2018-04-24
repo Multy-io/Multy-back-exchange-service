@@ -2,9 +2,7 @@ package exchangeRates
 
 import (
 	"flag"
-	"fmt"
 	"io"
-	"log"
 	"time"
 
 	"github.com/Appscrunch/Multy-back-exchange-service/stream/server"
@@ -21,7 +19,7 @@ func NewGrpcClient() *GrpcClient {
 	grpcClient := GrpcClient{}
 	grpcClient.serverAddr = flag.String("server_addr", "127.0.0.1:10000", "The server address in the format of host:port")
 
-	log.Println("starting client")
+	log.Infof("starting client")
 	flag.Parse()
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
@@ -36,7 +34,7 @@ func NewGrpcClient() *GrpcClient {
 }
 
 func (b *GrpcClient) connectToServer() (server.TickerGRPCServer_TickersClient, error) {
-	log.Printf("Connecting to GRPC server")
+	log.Infof("connectToServer:Connecting to GRPC server")
 	ctx, _ := context.WithCancel(context.Background())
 	stream, error := b.client.Tickers(ctx, &server.Empty{})
 	return stream, error
@@ -47,13 +45,13 @@ func (b *GrpcClient) listenTickers(ch chan *server.Tickers) {
 
 	stream, err := b.connectToServer()
 	if err != nil {
-		fmt.Println(err)
+		log.Errorf("GrpcClient:listenTickers:b.connectToServer %v", err.Error())
 	}
 	for range time.Tick(1 * time.Second) {
 
 		if stream == nil {
 			stream, err = b.connectToServer()
-			fmt.Println(err)
+			log.Errorf("GrpcClient:listenTickers:b.connectToServer %v", err.Error())
 		} else {
 			feature, err := stream.Recv()
 			if err == io.EOF {

@@ -2,8 +2,6 @@ package core
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -51,7 +49,7 @@ func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, r
 	b.tickers = make(map[string]Ticker)
 	b.gdaxApi = &api.GdaxApi{}
 
-	var apiCurrenciesConfiguration= api.ApiCurrenciesConfiguration{}
+	var apiCurrenciesConfiguration = api.ApiCurrenciesConfiguration{}
 	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
 	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
 
@@ -65,7 +63,7 @@ func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, r
 		case response := <-ch:
 
 			if *response.Err != nil {
-				log.Println("error:", response.Err)
+				log.Errorf("StartListen:GdaxManager:error:", response.Err)
 				//callback(nil, error)
 			} else if response.Message != nil {
 				//fmt.Printf("%s \n", message)
@@ -75,10 +73,9 @@ func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, r
 					b.add(gdaxTicker)
 					//fmt.Println(gdaxTicker)
 				} else {
-					fmt.Println("error parsing hitBtc ticker:", err)
+					log.Errorf("StartListen:error parsing hitBtc ticker:", err)
 				}
 			}
-
 
 		default:
 			//fmt.Println("no activity")
@@ -89,17 +86,19 @@ func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, r
 
 func (b *GdaxManager) startSendingDataBack(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
 
-
 	for range time.Tick(1 * time.Second) {
 		func() {
 			values := []Ticker{}
 			b.Lock()
-			for _, value := range b.tickers {
+			tickers := b.tickers
+			b.Unlock()
+
+			for _, value := range tickers {
 				if value.TimpeStamp.After(time.Now().Add(-maxTickerAge * time.Second)) {
 					values = append(values, value)
 				}
 			}
-			b.Unlock()
+
 			var tickerCollection = TickerCollection{}
 			tickerCollection.TimpeStamp = time.Now()
 			tickerCollection.Tickers = values
