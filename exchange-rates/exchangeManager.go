@@ -160,7 +160,6 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 		for k, v := range b.exchanges {
 			exchanges[k] = v
 		}
-		b.Unlock()
 
 		for _, exchange := range exchanges {
 
@@ -222,6 +221,7 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 
 		}
 
+		b.Unlock()
 	}
 
 	return newExchanges
