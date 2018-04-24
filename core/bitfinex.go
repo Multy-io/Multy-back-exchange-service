@@ -105,7 +105,16 @@ func (b *BitfinexManager) startSendingDataBack(exchangeConfiguration ExchangeCon
 	for range time.Tick(1 * time.Second) {
 		func() {
 			tickers := []Ticker{}
-			for _, value := range b.bitfinexTickers {
+
+			b.Lock()
+			tempTickers := map[int]BitfinexTicker{}
+			for k, v := range b.bitfinexTickers {
+				tempTickers[k] = v
+			}
+			b.Unlock()
+
+
+			for _, value := range tempTickers {
 				if value.TimpeStamp.After(time.Now().Add(-maxTickerAge * time.Second)) {
 					var ticker = Ticker{}
 					ticker.Rate = value.Rate

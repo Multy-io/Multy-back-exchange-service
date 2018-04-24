@@ -97,7 +97,10 @@ func (b *HitBtcManager) startSendingDataBack(exchangeConfiguration ExchangeConfi
 		func() {
 			values := []Ticker{}
 			b.Lock()
-			tickers := b.tickers
+			tickers := map[string]Ticker{}
+			for k, v := range b.tickers {
+				tickers[k] = v
+			}
 			b.Unlock()
 
 			for _, value := range tickers {

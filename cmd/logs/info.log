@@ -264,3 +264,58 @@
 2018-04-24/15:56:09.306 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
 2018-04-24/15:56:09.307 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
 2018-04-24/15:56:09.308 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:14.250 [[32mINFO[0m] exchange-rates: starting client 
+2018-04-24/16:03:14.252 [[32mINFO[0m] api: connecting to wss://api.hitbtc.com/api/2/ws 
+2018-04-24/16:03:14.253 [[32mINFO[0m] api: connectWs:connecting to wss://ws-feed.gdax.com 
+2018-04-24/16:03:14.253 [[32mINFO[0m] api: connectWs:connecting to wss://real.okex.com:10440 
+2018-04-24/16:03:14.254 [[32mINFO[0m] exchange-rates: Db connected 
+2018-04-24/16:03:14.267 [[32mINFO[0m] exchange-rates: connectToServer:Connecting to GRPC server 
+2018-04-24/16:03:14.268 [[31mERROR[0m] exchange-rates: GrpcClient:listenTickers:b.connectToServer rpc error: code = Unavailable desc = all SubConns are in TransientFailure, latest connection error: connection error: desc = "transport: Error while dialing dial tcp 127.0.0.1:10000: connect: connection refused" 
+2018-04-24/16:03:15.026 [[32mINFO[0m] api: connectWs:onnecting to wss://api2.poloniex.com/realm1 
+2018-04-24/16:03:15.135 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.138 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.139 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.141 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.142 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.143 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.146 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.148 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.150 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.151 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.153 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.154 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.156 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.157 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.159 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.160 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.162 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.164 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.165 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.167 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.168 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-04-24/16:03:15.270 [[32mINFO[0m] exchange-rates: connectToServer:Connecting to GRPC server 
+2018-04-24/16:03:15.270 [[32mINFO[0m] api: connectWs:connecting to wss://stream.binance.com:9443/ws/%21ticker@arr 
+2018-04-24/16:03:15.272 [[31mERROR[0m] exchange-rates: GrpcClient:listenTickers:b.connectToServer 
+2018-04-24/16:03:15.460 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.462 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.463 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.464 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.465 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.466 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.467 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.468 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.553 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.554 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.555 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.556 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.557 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.558 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.560 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.561 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.562 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.563 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.564 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.565 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:03:15.566 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-04-24/16:08:16.991 [[31mERROR[0m] api: connectWs:okex read message error: websocket: close 1006 (abnormal closure): unexpected EOF 
+2018-04-24/16:08:16.996 [[32mINFO[0m] api: connectWs:connecting to wss://real.okex.com:10440 
