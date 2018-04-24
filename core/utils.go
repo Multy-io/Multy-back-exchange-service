@@ -10,3 +10,15 @@ func TrimLeftChars(s string, n int) string {
 	}
 	return s[:0]
 }
+
+//type MapTickers struct {
+//	tickers map[string]Ticker
+//}
+//
+//func (b MapTickers) copy() MapTickers {
+//	tickers := map[string]Ticker{}
+//	for k, v := range b.tickers {
+//		tickers[k] = v
+//	}
+//	return  MapTickers{tickers}
+//}
