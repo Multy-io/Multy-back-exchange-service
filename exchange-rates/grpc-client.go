@@ -47,17 +47,18 @@ func (b *GrpcClient) listenTickers(ch chan *server.Tickers) {
 	if err != nil {
 		log.Errorf("GrpcClient:listenTickers:b.connectToServer %v", err.Error())
 	}
+
 	for range time.Tick(1 * time.Second) {
 
 		if stream == nil {
 			stream, err = b.connectToServer()
-			log.Errorf("GrpcClient:listenTickers:b.connectToServer %v", err.Error())
+			log.Errorf("GrpcClient:listenTickers:b.connectToServer")
 		} else {
 			feature, err := stream.Recv()
 			if err == io.EOF {
 				break
 			}
-			if err != nil {
+			if err != nil { 
 				//log.Fatalf("%v.ListFeatures(_) = _, %v", b.client, err)
 			}
 			//fmt.Println("before sendign")

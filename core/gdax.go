@@ -73,7 +73,7 @@ func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, r
 					b.add(gdaxTicker)
 					//fmt.Println(gdaxTicker)
 				} else {
-					log.Errorf("StartListen:error parsing hitBtc ticker:", err)
+					log.Errorf("StartListen:error parsing hitBtc ticker:")
 				}
 			}
 

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
-	"github.com/Appscrunch/deps/slf"
+	"github.com/KristinaEtc/slf"
 )
 
 var log = slf.WithContext("core")

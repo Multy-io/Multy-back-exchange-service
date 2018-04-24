@@ -94,9 +94,9 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 						b.tickers[ticker.Symbol] = ticker
 						b.Unlock()
 					}
-				} else {
-					log.Errorf("StartListen: error parsing Poloniex ticker: %v", err.Error)
 				}
+			} else {
+				log.Errorf("Poloniex Error and Message are nil")
 			}
 		default:
 			//fmt.Println("no activity")

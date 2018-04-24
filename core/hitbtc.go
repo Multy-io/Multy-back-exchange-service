@@ -79,7 +79,7 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 				if err == nil && hitBtcTicker.IsFilled() {
 					b.add(hitBtcTicker)
 				} else {
-					log.Errorf("StartListen:HitBtcManager:error parsing hitBtc ticker:", err)
+					log.Errorf("StartListen:HitBtcManager:error parsing hitBtc ticker")
 				}
 			}
 
