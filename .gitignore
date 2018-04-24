@@ -3,7 +3,7 @@
 *.dll
 *.so
 *.dylib
-.idea
+.idea/
 exchanger
 
 # Test binary, build with `go test -c`
