@@ -85,7 +85,15 @@ func (b *OkexManager) startSendingDataBack(exchangeConfiguration ExchangeConfigu
 	for range time.Tick(1 * time.Second) {
 		func() {
 			tickers := []Ticker{}
-			for _, ticker := range b.tickers {
+
+			b.Lock()
+			tempTickers := map[string]Ticker{}
+			for k, v := range b.tickers {
+				tempTickers[k] = v
+			}
+			b.Unlock()
+
+			for _, ticker := range tempTickers {
 				if ticker.TimpeStamp.After(time.Now().Add(-maxTickerAge * time.Second)) {
 					tickers = append(tickers, ticker)
 				}
