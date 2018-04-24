@@ -9,7 +9,6 @@ import (
 	"github.com/Appscrunch/Multy-back-exchange-service/core"
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 	"github.com/Appscrunch/Multy-back-exchange-service/stream/server"
-	"fmt"
 )
 
 type Exchange struct {
@@ -100,24 +99,24 @@ func (b *ExchangeManager) StartGetingData() {
 	go b.grpcClient.listenTickers(b.tickersCh)
 	go b.fillDb()
 
-	ch := make(chan []*Exchange)
-	go b.Subscribe(ch, 5, []string{"DASH", "ETC", "EOS", "WAVES", "STEEM", "BTS", "ETH"}, "USDT")
+	//ch := make(chan []*Exchange)
+	//go b.Subscribe(ch, 5, []string{"DASH", "ETC", "EOS", "WAVES", "STEEM", "BTS", "ETH"}, "USDT")
 
 	for {
 		select {
 		case msg := <-b.tickersCh:
 			//fmt.Println("received message", msg)
 			b.add(*msg)
-		case ex := <-ch:
+		//case ex := <-ch:
+		//
+		//	for _, exx := range ex {
+		//	}	//fmt.Println("received ex", exx.name, exx.Tickers)
+		//	for _, v := range exx.Tickers {
+		//		if v.isCalculated {
+		//			fmt.Println(exx.name, v.symbol(), v.Rate)
+		//		}
+		//	}
 
-			for _, exx := range ex {
-				//fmt.Println("received ex", exx.name, exx.Tickers)
-				for _, v := range exx.Tickers {
-					if v.isCalculated {
-						fmt.Println(exx.name, v.symbol(), v.Rate)
-					}
-				}
-			}
 
 		}
 	}
@@ -301,7 +300,7 @@ func (b *ExchangeManager) fillDb() {
 			for _, value := range newExchanges {
 				dbExchange := DbExchange{}
 				dbExchange.name = value.name
-				dbExchange.Tickers = []*DbTicker{}
+				dbExchange.Tickers = []DbTicker{}
 
 				for _, ticker := range value.Tickers {
 					dbTicker := DbTicker{}
@@ -309,7 +308,8 @@ func (b *ExchangeManager) fillDb() {
 					dbTicker.ReferenceCurrency = ticker.Pair.ReferenceCurrency
 					dbTicker.TargetCurrency = ticker.Pair.TargetCurrency
 					dbTicker.Rate = ticker.Rate
-					dbExchange.Tickers = append(dbExchange.Tickers, &dbTicker)
+					dbTicker.isCalculated = ticker.isCalculated
+					dbExchange.Tickers = append(dbExchange.Tickers, dbTicker)
 				}
 				dbExchanges = append(dbExchanges, &dbExchange)
 			}

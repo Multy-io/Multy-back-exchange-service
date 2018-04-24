@@ -24,7 +24,7 @@ type DBConfiguration struct {
 
 type DbExchange struct {
 	name    string
-	Tickers []*DbTicker
+	Tickers []DbTicker
 }
 
 type DbTicker struct {
@@ -32,6 +32,7 @@ type DbTicker struct {
 	ReferenceCurrency currencies.Currency
 	Rate              float64
 	TimpeStamp        time.Time
+	isCalculated 		bool
 }
 
 type DbManager struct {
@@ -69,7 +70,7 @@ func (b *DbManager) FillDb(withExchanges []*DbExchange) {
 
 	for _, exchange := range withExchanges {
 		for _, ticker := range exchange.Tickers {
-			b.insertSaRate(exchange.name, ticker.TargetCurrency, ticker.ReferenceCurrency, strconv.FormatFloat(ticker.Rate, 'f', 8, 64))
+			b.insertSaRate(exchange.name, ticker.TargetCurrency, ticker.ReferenceCurrency, strconv.FormatFloat(ticker.Rate, 'f', 8, 64), ticker.isCalculated)
 		}
 	}
 	b.fillRateFromSA()
@@ -96,9 +97,9 @@ func (b *DbManager) FillDb(withExchanges []*DbExchange) {
 //	//fmt.Println("inserted rows:", rows)
 //}
 //
-func (b *DbManager) insertSaRate(exchange_title string, target_currency currencies.Currency, reference_currency currencies.Currency, rateString string) {
+func (b *DbManager) insertSaRate(exchange_title string, target_currency currencies.Currency, reference_currency currencies.Currency, rateString string, isCalculated bool) {
 	rate, _ := strconv.ParseFloat(rateString, 64)
-	_, err := b.db.Exec("INSERT INTO sa_rates(exchange_title, target_title, target_code, target_native_id, reference_title, reference_code, reference_native_id, time_stamp, rate) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9);", exchange_title, target_currency.CurrencyName(), target_currency.CurrencyCode(), target_currency, reference_currency.CurrencyName(), reference_currency.CurrencyCode(), reference_currency, time.Now(), rate)
+	_, err := b.db.Exec("INSERT INTO sa_rates(exchange_title, target_title, target_code, target_native_id, reference_title, reference_code, reference_native_id, time_stamp, rate, is_calculated) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10);", exchange_title, target_currency.CurrencyName(), target_currency.CurrencyCode(), target_currency, reference_currency.CurrencyName(), reference_currency.CurrencyCode(), reference_currency, time.Now(), rate, isCalculated)
 	if err != nil {
 		log.Errorf("DbManager:insertSaRate:b.db.Exec %v", err.Error())
 	}
