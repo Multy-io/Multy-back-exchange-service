@@ -14,7 +14,7 @@ import (
 
 type Exchange struct {
 	name    string
-	Tickers map[string]*Ticker
+	Tickers map[string]Ticker
 	//StraightPares
 }
 
@@ -34,7 +34,7 @@ func (b *Exchange) tickerForPair(pair CurrencyPair) *Ticker {
 		//fmt.Println(ticker.TargetCurrency.CurrencyCode(), ticker.ReferenceCurrency.CurrencyCode())
 		if ticker.Pair.isEqualTo(pair) {
 			//fmt.Println("sdd", ticker.symbol())
-			return ticker
+			return &ticker
 		}
 	}
 	return nil
@@ -154,16 +154,21 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 		pair.ReferenceCurrency = referenceCurrency
 
 		//fmt.Println("pair is:",pair.TargetCurrency.CurrencyCode(), pair.ReferenceCurrency.CurrencyCode())
+
 		b.Lock()
-		exchanges := b.exchanges
+		exchanges := map[string]Exchange{}
+		for k, v := range b.exchanges {
+			exchanges[k] = v
+		}
 		b.Unlock()
+
 		for _, exchange := range exchanges {
 
-			var newTickers = map[string]*Ticker{}
+			var newTickers = map[string]Ticker{}
 
 			if ticker := exchange.tickerForPair(pair); ticker != nil {
 				//fmt.Println("tikers si not nil:", exchange.name, ticker.symbol())
-				newTickers[ticker.symbol()] = ticker
+				newTickers[ticker.symbol()] = *ticker
 			} else {
 				//fmt.Println("tiker is nil", exchange.name)
 				crossPair := pair
@@ -200,7 +205,7 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 						ticker.Pair.TargetCurrency = pair.TargetCurrency
 						ticker.Pair.ReferenceCurrency = pair.ReferenceCurrency
 						ticker.isCalculated = true
-						newTickers[ticker.symbol()] = &ticker
+						newTickers[ticker.symbol()] = ticker
 					} else {
 						log.Errorf("calculateAllTickers: exchange ticket is nil %v %v %v ", exchangePair.TargetCurrency.CurrencyCode(), exchangePair.ReferenceCurrency.CurrencyCode(), exchange.name)
 					}
@@ -226,8 +231,6 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 func (b *ExchangeManager) add(tikers server.Tickers) {
 	b.Lock()
 
-
-
 	for _, exchangeTicker := range tikers.ExchangeTickers {
 		if _, ok := b.exchanges[exchangeTicker.Exchange]; !ok {
 			var ex = Exchange{}
@@ -244,12 +247,12 @@ func (b *ExchangeManager) add(tikers server.Tickers) {
 
 			if v, ok := b.exchanges[exchangeTicker.Exchange]; ok {
 				if v.Tickers == nil {
-					v.Tickers =  map[string]*Ticker{}
+					v.Tickers =  map[string]Ticker{}
 					b.exchanges[exchangeTicker.Exchange] = v
 				}
 			}
 
-			b.exchanges[exchangeTicker.Exchange].Tickers[ticker.symbol()] = &ticker
+			b.exchanges[exchangeTicker.Exchange].Tickers[ticker.symbol()] = ticker
 		}
 
 	}
