@@ -9,6 +9,7 @@ import (
 	"github.com/Appscrunch/Multy-back-exchange-service/core"
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 	"github.com/Appscrunch/Multy-back-exchange-service/stream/server"
+	"fmt"
 )
 
 type Exchange struct {
@@ -68,7 +69,7 @@ func (b *CurrencyPair) isEqualTo(pair CurrencyPair) bool {
 }
 
 type ExchangeManager struct {
-	exchanges           map[string]*Exchange
+	exchanges           map[string]Exchange
 	grpcClient          *GrpcClient
 	tickersCh           chan *server.Tickers
 	dbManger            *DbManager
@@ -80,7 +81,7 @@ type ExchangeManager struct {
 func NewExchangeManager(configuration core.ManagerConfiguration) *ExchangeManager {
 	var manger = ExchangeManager{}
 	manger.configuration = configuration
-	manger.exchanges = map[string]*Exchange{}
+	manger.exchanges = map[string]Exchange{}
 	manger.grpcClient = NewGrpcClient()
 	manger.tickersCh = make(chan *server.Tickers)
 
@@ -99,24 +100,24 @@ func (b *ExchangeManager) StartGetingData() {
 	go b.grpcClient.listenTickers(b.tickersCh)
 	go b.fillDb()
 
-	//ch := make(chan []*Exchange)
-	//go b.Subscribe(ch, 5, []string{"DASH", "ETC", "EOS", "WAVES", "STEEM", "BTS", "ETH"}, "BTC")
+	ch := make(chan []*Exchange)
+	go b.Subscribe(ch, 5, []string{"DASH", "ETC", "EOS", "WAVES", "STEEM", "BTS", "ETH"}, "USDT")
 
 	for {
 		select {
 		case msg := <-b.tickersCh:
 			//fmt.Println("received message", msg)
-			b.add(msg)
-		//case ex := <-ch:
-		//
-		//	for _, exx := range ex {
-		//		//fmt.Println("received ex", exx.name, exx.Tickers)
-		//		for _, v := range exx.Tickers {
-		//			if v.isCalculated {
-		//				fmt.Println(exx.name, v.symbol(), v.Rate)
-		//			}
-		//		}
-		//	}
+			b.add(*msg)
+		case ex := <-ch:
+
+			for _, exx := range ex {
+				//fmt.Println("received ex", exx.name, exx.Tickers)
+				for _, v := range exx.Tickers {
+					if v.isCalculated {
+						fmt.Println(exx.name, v.symbol(), v.Rate)
+					}
+				}
+			}
 
 		}
 	}
@@ -222,16 +223,16 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 
 }
 
-func (b *ExchangeManager) add(tikers *server.Tickers) {
+func (b *ExchangeManager) add(tikers server.Tickers) {
 	b.Lock()
-	exchanges := b.exchanges
-	b.Unlock()
+
+
 
 	for _, exchangeTicker := range tikers.ExchangeTickers {
-		if exchanges[exchangeTicker.Exchange] == nil {
+		if _, ok := b.exchanges[exchangeTicker.Exchange]; !ok {
 			var ex = Exchange{}
 			ex.name = exchangeTicker.Exchange
-			exchanges[exchangeTicker.Exchange] = &ex
+			b.exchanges[exchangeTicker.Exchange] = ex
 		}
 
 		for _, value := range exchangeTicker.Tickers {
@@ -241,13 +242,18 @@ func (b *ExchangeManager) add(tikers *server.Tickers) {
 			ticker.Pair.ReferenceCurrency = currencies.NewCurrencyWithCode(value.Referrence)
 			ticker.Rate, _ = strconv.ParseFloat(value.Rate, 64)
 
-			if exchanges[exchangeTicker.Exchange].Tickers == nil {
-				exchanges[exchangeTicker.Exchange].Tickers = map[string]*Ticker{}
+			if v, ok := b.exchanges[exchangeTicker.Exchange]; ok {
+				if v.Tickers == nil {
+					v.Tickers =  map[string]*Ticker{}
+					b.exchanges[exchangeTicker.Exchange] = v
+				}
 			}
-			exchanges[exchangeTicker.Exchange].Tickers[ticker.symbol()] = &ticker
+
+			b.exchanges[exchangeTicker.Exchange].Tickers[ticker.symbol()] = &ticker
 		}
 
 	}
+	b.Unlock()
 }
 
 func (b *ExchangeManager) GetRates(timeStamp time.Time, exchangeName string, targetCode string, referecies []string) []*Ticker {
