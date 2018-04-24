@@ -156,7 +156,7 @@ func (b *Manager) StartListen(configuration ManagerConfiguration) {
 				b.agregator.add(*result.TickerCollection, result.exchangeTitle)
 			}
 
-		default:
+		//default:
 			//fmt.Println("no activity")
 		}
 	}

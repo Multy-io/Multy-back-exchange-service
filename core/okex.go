@@ -74,7 +74,7 @@ func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, r
 				b.addMessage(*response.Message)
 			}
 
-		default:
+		//default:
 			//fmt.Println("no activity")
 		}
 	}

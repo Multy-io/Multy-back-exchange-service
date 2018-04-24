@@ -98,7 +98,7 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 			} else {
 				log.Errorf("Poloniex Error and Message are nil")
 			}
-		default:
+		//default:
 			//fmt.Println("no activity")
 		}
 	}

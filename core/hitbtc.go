@@ -83,7 +83,7 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 				}
 			}
 
-		default:
+		//default:
 			//fmt.Println("no activity")
 		}
 	}

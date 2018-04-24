@@ -77,7 +77,7 @@ func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, r
 				}
 			}
 
-		default:
+		//default:
 			//fmt.Println("no activity")
 		}
 	}

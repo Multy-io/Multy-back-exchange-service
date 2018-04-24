@@ -93,7 +93,7 @@ func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 			} else {
 				log.Errorf("StartListen :error parsing Bitfinex ticker")
 			}
-		default:
+		//default:
 			//fmt.Println("no activity")
 		}
 	}
