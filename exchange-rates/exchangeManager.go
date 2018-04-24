@@ -149,6 +149,9 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 	var newExchanges = []*Exchange{}
 
 	for _, targetCode := range targetCodes {
+		if targetCode == referenceCode {
+			continue
+		}
 		var pair = CurrencyPair{}
 		pair.TargetCurrency = currencies.NewCurrencyWithCode(targetCode)
 		pair.ReferenceCurrency = referenceCurrency

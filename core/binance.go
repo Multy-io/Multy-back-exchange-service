@@ -7,6 +7,7 @@ import (
 
 	"github.com/Appscrunch/Multy-back-exchange-service/api"
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
+	//"fmt"
 )
 
 type BinanceTicker struct {
@@ -103,6 +104,9 @@ func (b *BinanceManager) composeSybolsToParse(exchangeConfiguration ExchangeConf
 
 			if referenceCurrency == "USD" {
 				referenceCurrency = "USDT"
+			} else if referenceCurrency == targetCurrency {
+				//fmt.Println(referenceCurrency, targetCurrency)
+				continue
 			}
 
 			symbol := targetCurrency + referenceCurrency
