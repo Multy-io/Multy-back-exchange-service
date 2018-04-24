@@ -2,8 +2,6 @@ package core
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -67,14 +65,14 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 		case response := <-ch:
 
 			if *response.Err != nil {
-				log.Println("error:", response.Err)
+				log.Errorf("StartListen:PoloniexManager: %v", &response.Err)
 				//callback(TickerCollection{}, err)
 			} else if *response.Message != nil {
 				var unmarshaledMessage []interface{}
 
 				err := json.Unmarshal(*response.Message, &unmarshaledMessage)
 				if err != nil {
-					fmt.Println(err)
+					log.Errorf("StartListen:PoloniexManager:json.Unmarshal %v", err.Error())
 					//callback(TickerCollection{}, err)
 				} else if len(unmarshaledMessage) > 2 {
 					var poloniexTicker PoloniexTicker
@@ -97,10 +95,9 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 						b.Unlock()
 					}
 				} else {
-					fmt.Println("error parsing Poloniex ticker:", err)
+					log.Errorf("StartListen: error parsing Poloniex ticker: %v", err.Error)
 				}
 			}
-
 		default:
 			//fmt.Println("no activity")
 		}

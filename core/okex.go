@@ -2,7 +2,6 @@ package core
 
 import (
 	"encoding/json"
-	"log"
 	"strings"
 	"time"
 
@@ -54,7 +53,7 @@ func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, r
 	b.tickers = make(map[string]Ticker)
 	b.okexApi = &api.OkexApi{}
 
-	var apiCurrenciesConfiguration= api.ApiCurrenciesConfiguration{}
+	var apiCurrenciesConfiguration = api.ApiCurrenciesConfiguration{}
 	apiCurrenciesConfiguration.TargetCurrencies = exchangeConfiguration.TargetCurrencies
 	apiCurrenciesConfiguration.ReferenceCurrencies = exchangeConfiguration.ReferenceCurrencies
 
@@ -68,7 +67,7 @@ func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, r
 		case response := <-ch:
 
 			if *response.Err != nil {
-				log.Println("error:", response.Err)
+				log.Errorf("error:StartListen:OkexManager %v", response.Err)
 				//callback(nil, error)
 			} else if response.Message != nil {
 				//fmt.Printf("%s \n", message)
@@ -80,7 +79,6 @@ func (b *OkexManager) StartListen(exchangeConfiguration ExchangeConfiguration, r
 		}
 	}
 }
-
 
 func (b *OkexManager) startSendingDataBack(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
 

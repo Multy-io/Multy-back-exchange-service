@@ -2,8 +2,6 @@ package core
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -33,7 +31,6 @@ func (bitfinexTicker BitfinexTicker) IsFilled() bool {
 }
 
 func (b *BitfinexTicker) getCurriences() (currencies.Currency, currencies.Currency) {
-	//fmt.Println(b.Symbol)
 	if len(b.Symbol) > 0 {
 		var symbol = b.Symbol
 		var damagedSymbol = TrimLeftChars(symbol, 2)
@@ -86,7 +83,7 @@ func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 
 			//fmt.Println(0)
 			if *response.Err != nil {
-				log.Println("error:", response.Err)
+				log.Errorf("StartListen *response.Err: %v", response.Err)
 				resultChan <- Result{exchangeConfiguration.Exchange.String(), nil, response.Err}
 			} else if *response.Message != nil {
 				//fmt.Printf("%s \n", response.Message)
@@ -94,7 +91,7 @@ func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 				b.addMessage(*response.Message)
 				//fmt.
 			} else {
-				fmt.Println("error parsing Bitfinex ticker:", response.Err)
+				log.Errorf("StartListen :error parsing Bitfinex ticker: %v", response.Err)
 			}
 		default:
 			//fmt.Println("no activity")

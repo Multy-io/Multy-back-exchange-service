@@ -2,8 +2,6 @@ package core
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -29,8 +27,6 @@ func (b *HitBtcTicker) getCurriences() (currencies.Currency, currencies.Currency
 		var symbol = b.Params.Symbol
 		var damagedSymbol = TrimLeftChars(symbol, 1)
 		for _, referenceCurrency := range currencies.DefaultReferenceCurrencies {
-			//fmt.Println(damagedSymbol, referenceCurrency.CurrencyCode())
-
 			referenceCurrencyCode := referenceCurrency.CurrencyCode()
 
 			if referenceCurrencyCode == "USDT" {
@@ -74,7 +70,7 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 		case response := <-ch:
 
 			if *response.Err != nil {
-				log.Println("error:", response.Err)
+				log.Errorf("StartListen:HitBtcManager:error:", response.Err)
 				//callback(nil, error)
 			} else if response.Message != nil {
 				//fmt.Printf("%s \n", message)
@@ -83,7 +79,7 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 				if err == nil && hitBtcTicker.IsFilled() {
 					b.add(hitBtcTicker)
 				} else {
-					fmt.Println("error parsing hitBtc ticker:", err)
+					log.Errorf("StartListen:HitBtcManager:error parsing hitBtc ticker:", err)
 				}
 			}
 

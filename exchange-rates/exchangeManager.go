@@ -1,7 +1,6 @@
 package exchangeRates
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
@@ -204,7 +203,7 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 						ticker.isCalculated = true
 						newTickers[ticker.symbol()] = &ticker
 					} else {
-						fmt.Println("exchange ticket is nil", exchangePair.TargetCurrency.CurrencyCode(), exchangePair.ReferenceCurrency.CurrencyCode(), exchange.name)
+						log.Errorf("calculateAllTickers: exchange ticket is nil %v %v %v ", exchangePair.TargetCurrency.CurrencyCode(), exchangePair.ReferenceCurrency.CurrencyCode(), exchange.name)
 					}
 				}
 

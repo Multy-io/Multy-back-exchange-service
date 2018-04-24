@@ -1,28 +1,25 @@
 package core
 
 import (
-	"log"
 	"strings"
+	"sync"
 	"time"
 
 	stream "github.com/Appscrunch/Multy-back-exchange-service/stream/server"
-	"sync"
-	"fmt"
 )
 
 const maxTickerAge = 5
 
 type BasicManager struct {
 	sync.Mutex
-	tickers   map[string]Ticker
+	tickers map[string]Ticker
 }
 
 type Result struct {
-	exchangeTitle string
+	exchangeTitle    string
 	TickerCollection *TickerCollection
-	Err *error
+	Err              *error
 }
-
 
 type Manager struct {
 	binanceManager  *BinanceManager
@@ -52,11 +49,11 @@ func NewManager() *Manager {
 }
 
 type ManagerConfiguration struct {
-	TargetCurrencies    []string      `json:"targetCurrencies"`
-	ReferenceCurrencies []string      `json:"referenceCurrencies"`
-	Exchanges           []string      `json:"exchanges"`
-	RefreshInterval     time.Duration `json:"refreshInterval"`
-	DBConfiguration DBConfiguration `json:"dbconfiguration"`
+	TargetCurrencies    []string        `json:"targetCurrencies"`
+	ReferenceCurrencies []string        `json:"referenceCurrencies"`
+	Exchanges           []string        `json:"exchanges"`
+	RefreshInterval     time.Duration   `json:"refreshInterval"`
+	DBConfiguration     DBConfiguration `json:"dbconfiguration"`
 }
 
 type DBConfiguration struct {
@@ -116,7 +113,7 @@ func (b *Manager) launchExchange(exchangeConfiguration ExchangeConfiguration, ch
 	case Poloniex:
 		go b.poloniexManager.StartListen(exchangeConfiguration, ch)
 	default:
-		fmt.Println(exchangeConfiguration.Exchange.String())
+		log.Errorf("launchExchange:default %v", exchangeConfiguration.Exchange.String())
 
 	}
 }
@@ -153,7 +150,7 @@ func (b *Manager) StartListen(configuration ManagerConfiguration) {
 		case result := <-ch:
 
 			if result.Err != nil {
-				log.Println("error:", result.Err)
+				log.Errorf("StartListen:error: %v", result.Err)
 			} else {
 				//fmt.Println(result.TickerCollection)
 				b.agregator.add(*result.TickerCollection, result.exchangeTitle)

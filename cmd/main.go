@@ -25,7 +25,6 @@ var waitGroup = &sync.WaitGroup{}
 //	DbName     = "test"
 //)
 
-
 func main() {
 
 	var configuration = core.ManagerConfiguration{}

@@ -2,13 +2,11 @@ package core
 
 import (
 	"encoding/json"
-	"log"
 	"strings"
 	"time"
 
 	"github.com/Appscrunch/Multy-back-exchange-service/api"
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
-	"fmt"
 )
 
 type BinanceTicker struct {
@@ -54,18 +52,17 @@ func NewBinanceManager() *BinanceManager {
 }
 
 func (b *BinanceManager) StartListen(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
-	fmt.Println("start binance manager listen")
+	log.Debugf("StartListen:start binance manager listen")
 	b.symbolsToParse = b.composeSybolsToParse(exchangeConfiguration)
 	ch := make(chan api.Reposponse)
 	go b.binanceApi.StartListen(ch)
-
 
 	for {
 		select {
 		case response := <-ch:
 
 			if *response.Err != nil {
-				log.Println("binance error:", *response.Err)
+				log.Errorf("StartListen: binance error:%v", *response.Err)
 				resultChan <- Result{exchangeConfiguration.Exchange.String(), nil, response.Err}
 			} else if *response.Message != nil {
 				//fmt.Printf("%s", message)
@@ -92,10 +89,9 @@ func (b *BinanceManager) StartListen(exchangeConfiguration ExchangeConfiguration
 				tickerCollection.Tickers = tickers
 				resultChan <- Result{exchangeConfiguration.Exchange.String(), &tickerCollection, nil}
 			} else {
-				fmt.Println("Binance mesage is nill")
+				log.Errorf("StartListen: Binance mesage is nil")
 			}
 		default:
-			//fmt.Println("no activity")
 		}
 	}
 
