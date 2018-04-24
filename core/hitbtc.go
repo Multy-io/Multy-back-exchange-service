@@ -82,9 +82,6 @@ func (b *HitBtcManager) StartListen(exchangeConfiguration ExchangeConfiguration,
 					log.Errorf("StartListen:HitBtcManager:error parsing hitBtc ticker")
 				}
 			}
-
-		//default:
-			//fmt.Println("no activity")
 		}
 	}
 

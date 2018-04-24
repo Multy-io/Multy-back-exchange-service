@@ -76,9 +76,6 @@ func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, r
 					log.Errorf("StartListen:error parsing hitBtc ticker:")
 				}
 			}
-
-		//default:
-			//fmt.Println("no activity")
 		}
 	}
 

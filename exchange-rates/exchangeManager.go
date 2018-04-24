@@ -118,8 +118,6 @@ func (b *ExchangeManager) StartGetingData() {
 		//		}
 		//	}
 
-		//default:
-			//fmt.Println("no activity")
 		}
 	}
 }

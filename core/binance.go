@@ -91,7 +91,6 @@ func (b *BinanceManager) StartListen(exchangeConfiguration ExchangeConfiguration
 			} else {
 				log.Errorf("StartListen: Binance mesage is nil")
 			}
-		//default:
 		}
 	}
 
