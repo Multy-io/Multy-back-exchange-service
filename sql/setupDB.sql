@@ -12,8 +12,6 @@ create unique index exchanges_title_uindex
 	on exchanges (title)
 ;
 
-
-
 create table currencies
 (
 	id serial not null
@@ -32,8 +30,6 @@ create unique index currencies_code_uindex
 
 
 
-
-
 create table rates
 (
 	exchange_id integer not null,
@@ -42,7 +38,7 @@ create table rates
 	time_stamp timestamp not null,
 	rate real not null,
 	is_calculated boolean not null
-)
+);
 
 
 create table exchanges_pairs
@@ -54,7 +50,7 @@ create table exchanges_pairs
 	is_calculated boolean not null,
 	constraint exchanges_pairs_exchange_id_reference_id_target_id_is_calculate
 		unique (exchange_id, reference_id, target_id, is_calculated)
-)
+);
 
 
 create table sa_rates
