@@ -114,14 +114,12 @@ func (b *ExchangeManager) StartGetingData() {
 }
 
 func (b *ExchangeManager) Subscribe(ch chan []*Exchange, refreshInterval time.Duration, targetCodes []string, referenceCode string) {
-
-	for range time.Tick(refreshInterval * time.Second) {
-
-		var newExchanges = b.calculateAllTickers(targetCodes, referenceCode)
-
-		ch <- newExchanges
-	}
-
+	go func() {
+		for range time.Tick(refreshInterval * time.Second) {
+			var newExchanges = b.calculateAllTickers(targetCodes, referenceCode)
+			ch <- newExchanges
+		}
+	}()
 }
 
 func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCode string) []*Exchange {
