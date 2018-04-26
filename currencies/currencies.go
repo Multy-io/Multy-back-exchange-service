@@ -4,6 +4,22 @@ import (
 	"strings"
 )
 
+type CurrencyPair struct {
+	TargetCurrency   Currency
+	ReferenceCurrency Currency
+}
+
+func (b *CurrencyPair) Symbol() string {
+	return b.TargetCurrency.CurrencyCode() + "-" + b.ReferenceCurrency.CurrencyCode()
+}
+
+func (b *CurrencyPair) IsEqualTo(pair CurrencyPair) bool {
+	//fmt.Println(b.TargetCurrency.CurrencyCode(), b.ReferenceCurrency.CurrencyCode(), pair.TargetCurrency.CurrencyCode(), pair.ReferenceCurrency.CurrencyCode())
+	//fmt.Println(b.TargetCurrency == pair.TargetCurrency && b.ReferenceCurrency == pair.ReferenceCurrency)
+	return b.TargetCurrency == pair.TargetCurrency && b.ReferenceCurrency == pair.ReferenceCurrency
+}
+
+
 var DefaultReferenceCurrencies = []Currency{Tether, Bitcoin}
 
 type Currency int

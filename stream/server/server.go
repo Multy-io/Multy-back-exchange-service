@@ -16,6 +16,7 @@ import (
 
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 	"google.golang.org/grpc"
+	"strconv"
 )
 
 var (
@@ -28,10 +29,8 @@ type StreamTickerCollection struct {
 }
 
 type StreamTicker struct {
-	TargetCurrency    currencies.Currency
-	ReferenceCurrency currencies.Currency
-	Symbol            string
-	Rate              string
+	Pair currencies.CurrencyPair
+	Rate              float64
 }
 
 type Server struct {
@@ -61,11 +60,11 @@ func (s *Server) Tickers(_ *Empty, stream TickerGRPCServer_TickersServer) error 
 			var nodeTickers = []*Ticker{}
 			for _, ticker := range tickers.Tickers {
 				var nodeTicker = Ticker{}
-				nodeTicker.Rate = ticker.Rate
+				nodeTicker.Rate = strconv.FormatFloat(ticker.Rate, 'f', 8, 64)
 				//nodeTicker.Symbol = ticker.Symbol
 
-				nodeTicker.Referrence = ticker.ReferenceCurrency.CurrencyCode()
-				nodeTicker.Target = ticker.TargetCurrency.CurrencyCode()
+				nodeTicker.Referrence = ticker.Pair.ReferenceCurrency.CurrencyCode()
+				nodeTicker.Target = ticker.Pair.TargetCurrency.CurrencyCode()
 
 				nodeTickers = append(nodeTickers, &nodeTicker)
 			}

@@ -7,6 +7,7 @@ import (
 
 	"github.com/Appscrunch/Multy-back-exchange-service/api"
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
+	"strconv"
 )
 
 type GdaxManager struct {
@@ -32,16 +33,16 @@ func (ticker GdaxTicker) IsFilled() bool {
 	return (len(ticker.Symbol) > 0 && len(ticker.Rate) > 0)
 }
 
-func (b *GdaxTicker) getCurriences() (currencies.Currency, currencies.Currency) {
+func (b *GdaxTicker) getCurriences() currencies.CurrencyPair {
 
 	if len(b.Symbol) > 0 {
 		var symbol = b.Symbol
 		var currencyCodes = strings.Split(symbol, "-")
 		if len(currencyCodes) > 1 {
-			return currencies.NewCurrencyWithCode(currencyCodes[0]), currencies.NewCurrencyWithCode(currencyCodes[1])
+			return currencies.CurrencyPair{currencies.NewCurrencyWithCode(currencyCodes[0]), currencies.NewCurrencyWithCode(currencyCodes[1])}
 		}
 	}
-	return currencies.NotAplicable, currencies.NotAplicable
+	return currencies.CurrencyPair{currencies.NotAplicable, currencies.NotAplicable}
 }
 
 func (b *GdaxManager) StartListen(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
@@ -108,14 +109,11 @@ func (b *GdaxManager) startSendingDataBack(exchangeConfiguration ExchangeConfigu
 
 func (b *GdaxManager) add(gdaxTicker GdaxTicker) {
 	var ticker = Ticker{}
-	ticker.Rate = gdaxTicker.Rate
-	ticker.Symbol = gdaxTicker.Symbol
+	ticker.Rate, _ = strconv.ParseFloat(gdaxTicker.Rate, 64)
 
-	targetCurrency, referenceCurrency := gdaxTicker.getCurriences()
-	ticker.TargetCurrency = targetCurrency
-	ticker.ReferenceCurrency = referenceCurrency
+	ticker.Pair = gdaxTicker.getCurriences()
 	ticker.TimpeStamp = time.Now()
 	b.Lock()
-	b.tickers[ticker.Symbol] = ticker
+	b.tickers[ticker.Pair.Symbol()] = ticker
 	b.Unlock()
 }

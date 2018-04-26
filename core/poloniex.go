@@ -20,16 +20,16 @@ type PoloniexTicker struct {
 	Last   string `json:"last"`
 }
 
-func (b *PoloniexTicker) getCurriences() (currencies.Currency, currencies.Currency) {
+func (b *PoloniexTicker) getCurriences() currencies.CurrencyPair {
 
 	if len(b.Symbol) > 0 {
 		var symbol = b.Symbol
 		var currencyCodes = strings.Split(symbol, "_")
 		if len(currencyCodes) > 1 {
-			return currencies.NewCurrencyWithCode(currencyCodes[1]), currencies.NewCurrencyWithCode(currencyCodes[0])
+			return currencies.CurrencyPair{currencies.NewCurrencyWithCode(currencyCodes[1]), currencies.NewCurrencyWithCode(currencyCodes[0])}
 		}
 	}
-	return currencies.NotAplicable, currencies.NotAplicable
+	return currencies.CurrencyPair{currencies.NotAplicable, currencies.NotAplicable}
 }
 
 type PoloniexManager struct {
@@ -83,15 +83,12 @@ func (b *PoloniexManager) StartListen(exchangeConfiguration ExchangeConfiguratio
 					if err == nil && poloniexTicker.IsFilled() && b.symbolsToParse[poloniexTicker.Symbol] {
 
 						var ticker Ticker
-						ticker.Rate = poloniexTicker.Last
-						ticker.Symbol = poloniexTicker.Symbol
+						ticker.Rate, _ = strconv.ParseFloat(poloniexTicker.Last, 64)
 						ticker.TimpeStamp = time.Now()
-						targetCurrency, referenceCurrency := poloniexTicker.getCurriences()
-						ticker.TargetCurrency = targetCurrency
-						ticker.ReferenceCurrency = referenceCurrency
+						ticker.Pair = poloniexTicker.getCurriences()
 						//fmt.Println(targetCurrency.CurrencyCode(), referenceCurrency.CurrencyCode())
 						b.Lock()
-						b.tickers[ticker.Symbol] = ticker
+						b.tickers[ticker.Pair.Symbol()] = ticker
 						b.Unlock()
 					}
 				}

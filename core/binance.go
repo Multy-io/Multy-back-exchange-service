@@ -8,6 +8,7 @@ import (
 	"github.com/Appscrunch/Multy-back-exchange-service/api"
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 	//"fmt"
+	"strconv"
 )
 
 type BinanceTicker struct {
@@ -17,7 +18,7 @@ type BinanceTicker struct {
 	StatisticCloseTime float64 `json:"C"` // field is not needed but it's a workaround because unmarshal is case insensitive and without this filed json can't be parsed
 }
 
-func (b *BinanceTicker) getCurriences() (currencies.Currency, currencies.Currency) {
+func (b *BinanceTicker) getCurriences() currencies.CurrencyPair {
 
 	if len(b.Symbol) > 0 {
 		var symbol = b.Symbol
@@ -31,12 +32,12 @@ func (b *BinanceTicker) getCurriences() (currencies.Currency, currencies.Currenc
 				targetCurrencyString := strings.TrimSuffix(symbol, referenceCurrency.CurrencyCode())
 				//fmt.Println(targetCurrencyString)
 				var targetCurrency = currencies.NewCurrencyWithCode(targetCurrencyString)
-				return targetCurrency, referenceCurrency
+				return currencies.CurrencyPair{targetCurrency, referenceCurrency}
 			}
 		}
 
 	}
-	return currencies.NotAplicable, currencies.NotAplicable
+	return currencies.CurrencyPair{currencies.NotAplicable, currencies.NotAplicable}
 }
 
 type BinanceManager struct {
@@ -75,11 +76,8 @@ func (b *BinanceManager) StartListen(exchangeConfiguration ExchangeConfiguration
 				for _, binanceTicker := range binanceTickers {
 					if b.symbolsToParse[binanceTicker.Symbol] {
 						var ticker = Ticker{}
-						targetCurrency, referenceCurrency := binanceTicker.getCurriences()
-						ticker.Symbol = binanceTicker.Symbol
-						ticker.Rate = binanceTicker.Rate
-						ticker.TargetCurrency = targetCurrency
-						ticker.ReferenceCurrency = referenceCurrency
+						ticker.Rate, _ = strconv.ParseFloat(binanceTicker.Rate, 64)
+						ticker.Pair = binanceTicker.getCurriences()
 						tickers = append(tickers, ticker)
 						//fmt.Println(binanceTicker.Symbol ,targetCurrency.CurrencyName(), referenceCurrency.CurrencyName())
 					}

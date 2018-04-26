@@ -30,7 +30,7 @@ func (bitfinexTicker BitfinexTicker) IsFilled() bool {
 	return (len(bitfinexTicker.Symbol) > 0 && len(bitfinexTicker.Rate) > 0)
 }
 
-func (b *BitfinexTicker) getCurriences() (currencies.Currency, currencies.Currency) {
+func (b *BitfinexTicker) getCurriences() currencies.CurrencyPair {
 	if len(b.Symbol) > 0 {
 		var symbol = b.Symbol
 		var damagedSymbol = TrimLeftChars(symbol, 2)
@@ -55,12 +55,12 @@ func (b *BitfinexTicker) getCurriences() (currencies.Currency, currencies.Curren
 				targetCurrencyString := TrimLeftChars(targetCurrencyStringWithT, 1)
 				//fmt.Println("targetCurrencyString", targetCurrencyString)
 				var targetCurrency = currencies.NewCurrencyWithCode(targetCurrencyString)
-				return targetCurrency, referenceCurrency
+				return currencies.CurrencyPair{ targetCurrency, referenceCurrency}
 			}
 		}
 
 	}
-	return currencies.NotAplicable, currencies.NotAplicable
+	return currencies.CurrencyPair{currencies.NotAplicable, currencies.NotAplicable}
 }
 
 func (b *BitfinexManager) StartListen(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
@@ -116,12 +116,9 @@ func (b *BitfinexManager) startSendingDataBack(exchangeConfiguration ExchangeCon
 			for _, value := range tempTickers {
 				if value.TimpeStamp.After(time.Now().Add(-maxTickerAge * time.Second)) {
 					var ticker = Ticker{}
-					ticker.Rate = value.Rate
-					ticker.Symbol = value.Symbol
+					ticker.Rate, _ = strconv.ParseFloat(value.Rate, 64)
 
-					targetCurrency, referenceCurrency := value.getCurriences()
-					ticker.TargetCurrency = targetCurrency
-					ticker.ReferenceCurrency = referenceCurrency
+					ticker.Pair = value.getCurriences()
 					tickers = append(tickers, ticker)
 				}
 			}

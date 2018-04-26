@@ -7,6 +7,7 @@ import (
 
 	"github.com/Appscrunch/Multy-back-exchange-service/api"
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
+	"strconv"
 )
 
 type HitBtcManager struct {
@@ -21,7 +22,7 @@ type HitBtcTicker struct {
 	} `json:"params"`
 }
 
-func (b *HitBtcTicker) getCurriences() (currencies.Currency, currencies.Currency) {
+func (b *HitBtcTicker) getCurriences() currencies.CurrencyPair {
 
 	if len(b.Params.Symbol) > 0 {
 		var symbol = b.Params.Symbol
@@ -39,12 +40,12 @@ func (b *HitBtcTicker) getCurriences() (currencies.Currency, currencies.Currency
 				targetCurrencyString := strings.TrimSuffix(symbol, referenceCurrencyCode)
 				//fmt.Println(targetCurrencyString)
 				var targetCurrency = currencies.NewCurrencyWithCode(targetCurrencyString)
-				return targetCurrency, referenceCurrency
+				return currencies.CurrencyPair{ targetCurrency, referenceCurrency}
 			}
 		}
 
 	}
-	return currencies.NotAplicable, currencies.NotAplicable
+	return currencies.CurrencyPair{currencies.NotAplicable, currencies.NotAplicable}
 }
 
 func (hitBtcTicker HitBtcTicker) IsFilled() bool {
@@ -119,14 +120,11 @@ func (b *HitBtcManager) startSendingDataBack(exchangeConfiguration ExchangeConfi
 
 func (b *HitBtcManager) add(hitBtcTicker HitBtcTicker) {
 	var ticker = Ticker{}
-	ticker.Rate = hitBtcTicker.Params.Rate
-	ticker.Symbol = hitBtcTicker.Params.Symbol
+	ticker.Rate, _ = strconv.ParseFloat(hitBtcTicker.Params.Rate, 64)
 	//fmt.Println(hitBtcTicker)
-	targetCurrency, referenceCurrency := hitBtcTicker.getCurriences()
-	ticker.TargetCurrency = targetCurrency
-	ticker.ReferenceCurrency = referenceCurrency
+	ticker.Pair = hitBtcTicker.getCurriences()
 	ticker.TimpeStamp = time.Now()
 	b.Lock()
-	b.tickers[ticker.Symbol] = ticker
+	b.tickers[ticker.Pair.Symbol()] = ticker
 	b.Unlock()
 }
