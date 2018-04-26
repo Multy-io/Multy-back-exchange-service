@@ -74,7 +74,17 @@ func (p *BittrexApi) publicRequest(urlString string, pair currencies.CurrencyPai
 
 
 func (p *BittrexApi) GetTicker(pair currencies.CurrencyPair, responseCh chan <- RestApiReposponse, errorCh chan <- error)  {
-	urlStrging := "https://bittrex.com/api/v1.1/public/getticker?market=" + pair.ReferenceCurrency.CurrencyCode() +"-" + pair.TargetCurrency.CurrencyCode()
+
+	referenceCurrencyCode := pair.ReferenceCurrency.CurrencyCode()
+	targetCurrencyCode := pair.TargetCurrency.CurrencyCode()
+
+	if  referenceCurrencyCode == "BCH" {
+		referenceCurrencyCode = "BCC"
+	} else if targetCurrencyCode == "BCH" {
+		targetCurrencyCode = "BCC"
+	}
+
+	urlStrging := "https://bittrex.com/api/v1.1/public/getticker?market=" + referenceCurrencyCode +"-" + targetCurrencyCode
 	//fmt.Println(urlStrging)
 	p.publicRequest(urlStrging, pair, responseCh, errorCh)
 

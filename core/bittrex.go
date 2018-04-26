@@ -59,15 +59,16 @@ func (b *BittrexManager) StartListen(exchangeConfiguration ExchangeConfiguration
 
 				var bittrexTicker BittrexTicker
 				json.Unmarshal(response.Message, &bittrexTicker)
-				bittrexTicker.Pair = response.Pair
-				var ticker Ticker
-				ticker.Rate = bittrexTicker.Result.Last
-				ticker.TimpeStamp = time.Now()
-				ticker.Pair = bittrexTicker.Pair
-				b.Lock()
-				b.tickers[ticker.Pair.Symbol()] = ticker
-				b.Unlock()
-
+				if bittrexTicker.Success {
+					bittrexTicker.Pair = response.Pair
+					var ticker Ticker
+					ticker.Rate = bittrexTicker.Result.Last
+					ticker.TimpeStamp = time.Now()
+					ticker.Pair = bittrexTicker.Pair
+					b.Lock()
+					b.tickers[ticker.Pair.Symbol()] = ticker
+					b.Unlock()
+				}
 			}
 
 		}
