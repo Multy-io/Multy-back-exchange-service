@@ -123,18 +123,18 @@ type ExchangeConfiguration struct {
 func (b *Manager) launchExchange(exchangeConfiguration ExchangeConfiguration, ch chan Result) {
 
 	switch exchangeConfiguration.Exchange {
-	//case Binance:
-	//	go b.binanceManager.StartListen(exchangeConfiguration, ch)
-	//case Bitfinex:
-	//	go b.bitfinexManager.StartListen(exchangeConfiguration, ch)
-	//case Gdax:
-	//	go b.gdaxManager.StartListen(exchangeConfiguration, ch)
-	//case HitBtc:
-	//	go b.hitBtcManager.StartListen(exchangeConfiguration, ch)
-	//case Okex:
-	//	go b.okexManager.StartListen(exchangeConfiguration, ch)
-	//case Poloniex:
-	//	go b.poloniexManager.StartListen(exchangeConfiguration, ch)
+	case Binance:
+		go b.binanceManager.StartListen(exchangeConfiguration, ch)
+	case Bitfinex:
+		go b.bitfinexManager.StartListen(exchangeConfiguration, ch)
+	case Gdax:
+		go b.gdaxManager.StartListen(exchangeConfiguration, ch)
+	case HitBtc:
+		go b.hitBtcManager.StartListen(exchangeConfiguration, ch)
+	case Okex:
+		go b.okexManager.StartListen(exchangeConfiguration, ch)
+	case Poloniex:
+		go b.poloniexManager.StartListen(exchangeConfiguration, ch)
 	case Bittrex:
 		go b.bittrexManager.StartListen(exchangeConfiguration, ch)
 	default:
