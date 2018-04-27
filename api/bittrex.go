@@ -13,6 +13,12 @@ import (
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 )
 
+type RestApi struct {
+	//connection *websocket.Conn
+
+	httpClient *http.Client
+}
+
 type RestApiReposponse struct {
 	Message []byte
 	Pair currencies.CurrencyPair
@@ -20,19 +26,21 @@ type RestApiReposponse struct {
 
 
 type BittrexApi struct {
-	//connection *websocket.Conn
-
-	httpClient *http.Client
+	*RestApi
 }
 
 
-func NewBittrexApi() *BittrexApi {
-	var api = BittrexApi{}
+func NewRestApi() *RestApi {
+	var api = RestApi{}
 	api.httpClient = &http.Client{Timeout: time.Second * 10}
 	return &api
 }
 
-func (p *BittrexApi) publicRequest(urlString string, pair currencies.CurrencyPair, responseCh chan <- RestApiReposponse, errorCh chan <- error) {
+func NewBittrexApi() *BittrexApi {
+	return &BittrexApi{NewRestApi()}
+}
+
+func (p *RestApi) publicRequest(urlString string, pair currencies.CurrencyPair, responseCh chan <- RestApiReposponse, errorCh chan <- error) {
 
 	<-throttle
 
