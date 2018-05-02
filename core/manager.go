@@ -30,6 +30,7 @@ type Manager struct {
 	gdaxManager     *GdaxManager
 	okexManager     *OkexManager
 	bittrexManager     *BittrexManager
+	huobiManager     *HuobiManager
 
 	server *stream.Server
 
@@ -47,6 +48,7 @@ func NewManager() *Manager {
 	manger.server = &stream.Server{}
 	manger.agregator = NewAgregator()
 	manger.bittrexManager = &BittrexManager{}
+	manger.huobiManager = &HuobiManager{}
 
 	return &manger
 }
@@ -125,22 +127,22 @@ type ExchangeConfiguration struct {
 func (b *Manager) launchExchange(exchangeConfiguration ExchangeConfiguration, ch chan Result) {
 
 	switch exchangeConfiguration.Exchange {
-	//case Binance:
-	//	go b.binanceManager.StartListen(exchangeConfiguration, ch)
-	//case Bitfinex:
-	//	go b.bitfinexManager.StartListen(exchangeConfiguration, ch)
-	//case Gdax:
-	//	go b.gdaxManager.StartListen(exchangeConfiguration, ch)
-	//case HitBtc:
-	//	go b.hitBtcManager.StartListen(exchangeConfiguration, ch)
-	//case Okex:
-	//	go b.okexManager.StartListen(exchangeConfiguration, ch)
-	//case Poloniex:
-	//	go b.poloniexManager.StartListen(exchangeConfiguration, ch)
-	//case Bittrex:
-	//	go b.bittrexManager.StartListen(exchangeConfiguration, ch)
-	case Huobi:
+	case Binance:
+		go b.binanceManager.StartListen(exchangeConfiguration, ch)
+	case Bitfinex:
+		go b.bitfinexManager.StartListen(exchangeConfiguration, ch)
+	case Gdax:
+		go b.gdaxManager.StartListen(exchangeConfiguration, ch)
+	case HitBtc:
+		go b.hitBtcManager.StartListen(exchangeConfiguration, ch)
+	case Okex:
+		go b.okexManager.StartListen(exchangeConfiguration, ch)
+	case Poloniex:
+		go b.poloniexManager.StartListen(exchangeConfiguration, ch)
+	case Bittrex:
 		go b.bittrexManager.StartListen(exchangeConfiguration, ch)
+	case Huobi:
+		go b.huobiManager.StartListen(exchangeConfiguration, ch)
 	default:
 		log.Errorf("launchExchange:default %v", exchangeConfiguration.Exchange.String())
 	}

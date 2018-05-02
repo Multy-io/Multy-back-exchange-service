@@ -7,8 +7,9 @@ import (
 //"encoding/json"
 
 //"fmt"
-"fmt"
+//"fmt"
 "github.com/Appscrunch/Multy-back-exchange-service/currencies"
+ "strings"
 )
 
 
@@ -35,8 +36,8 @@ func (p *HuobiApi) GetTicker(pair currencies.CurrencyPair, responseCh chan <- Re
 	//}
 
 //http://api.huobipro.com/market/detail/merged?symbol=btcusdt
-	urlStrging := "http://api.huobipro.com/market/detail/merged?symbol=" + targetCurrencyCode + referenceCurrencyCode
-	fmt.Println(urlStrging)
+	urlStrging := "http://api.huobipro.com/market/detail/merged?symbol=" + strings.ToLower(targetCurrencyCode) + strings.ToLower(referenceCurrencyCode)
+	//fmt.Println(urlStrging)
 	p.publicRequest(urlStrging, pair, responseCh, errorCh)
 
 
