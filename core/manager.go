@@ -31,6 +31,7 @@ type Manager struct {
 	okexManager     *OkexManager
 	bittrexManager     *BittrexManager
 	huobiManager     *HuobiManager
+	upbitManager     *UpbitManager
 
 	server *stream.Server
 
@@ -49,6 +50,7 @@ func NewManager() *Manager {
 	manger.agregator = NewAgregator()
 	manger.bittrexManager = &BittrexManager{}
 	manger.huobiManager = &HuobiManager{}
+	manger.upbitManager = &UpbitManager{}
 
 	return &manger
 }
@@ -87,7 +89,7 @@ type DBConfiguration struct {
 type Exchange int
 
 func NewExchange(exchangeString string) Exchange {
-	exchanges := map[string]Exchange{"BINANCE": Binance, "BITFINEX": Bitfinex, "GDAX": Gdax, "HITBTC": HitBtc, "OKEX": Okex, "POLONIEX": Poloniex, "BITTREX": Bittrex, "HUOBI": Huobi}
+	exchanges := map[string]Exchange{"BINANCE": Binance, "BITFINEX": Bitfinex, "GDAX": Gdax, "HITBTC": HitBtc, "OKEX": Okex, "POLONIEX": Poloniex, "BITTREX": Bittrex, "HUOBI": Huobi, "UPBIT": Upbit}
 	exchange := exchanges[strings.ToUpper(exchangeString)]
 	return exchange
 }
@@ -101,7 +103,8 @@ func (exchange Exchange) String() string {
 		"OKEX",
 		"POLONIEX",
 		"BITTREX",
-		"HUOBI"}
+		"HUOBI",
+		"UPBIT"}
 	return exchanges[exchange]
 }
 
@@ -114,6 +117,7 @@ const (
 	Poloniex Exchange = 5
 	Bittrex  Exchange = 6
 	Huobi 	 Exchange = 7
+	Upbit 	 Exchange = 8
 )
 
 type ExchangeConfiguration struct {
@@ -127,22 +131,24 @@ type ExchangeConfiguration struct {
 func (b *Manager) launchExchange(exchangeConfiguration ExchangeConfiguration, ch chan Result) {
 
 	switch exchangeConfiguration.Exchange {
-	case Binance:
-		go b.binanceManager.StartListen(exchangeConfiguration, ch)
-	case Bitfinex:
-		go b.bitfinexManager.StartListen(exchangeConfiguration, ch)
-	case Gdax:
-		go b.gdaxManager.StartListen(exchangeConfiguration, ch)
-	case HitBtc:
-		go b.hitBtcManager.StartListen(exchangeConfiguration, ch)
-	case Okex:
-		go b.okexManager.StartListen(exchangeConfiguration, ch)
-	case Poloniex:
-		go b.poloniexManager.StartListen(exchangeConfiguration, ch)
-	case Bittrex:
-		go b.bittrexManager.StartListen(exchangeConfiguration, ch)
-	case Huobi:
-		go b.huobiManager.StartListen(exchangeConfiguration, ch)
+	//case Binance:
+	//	go b.binanceManager.StartListen(exchangeConfiguration, ch)
+	//case Bitfinex:
+	//	go b.bitfinexManager.StartListen(exchangeConfiguration, ch)
+	//case Gdax:
+	//	go b.gdaxManager.StartListen(exchangeConfiguration, ch)
+	//case HitBtc:
+	//	go b.hitBtcManager.StartListen(exchangeConfiguration, ch)
+	//case Okex:
+	//	go b.okexManager.StartListen(exchangeConfiguration, ch)
+	//case Poloniex:
+	//	go b.poloniexManager.StartListen(exchangeConfiguration, ch)
+	//case Bittrex:
+	//	go b.bittrexManager.StartListen(exchangeConfiguration, ch)
+	//case Huobi:
+	//	go b.huobiManager.StartListen(exchangeConfiguration, ch)
+	case Upbit:
+		go b.upbitManager.StartListen(exchangeConfiguration, ch)
 	default:
 		log.Errorf("launchExchange:default %v", exchangeConfiguration.Exchange.String())
 	}
