@@ -28,10 +28,19 @@ type BithumbTicker struct {
 	Data map[string]*BithumbCoinResult `json:"data"`
 }
 
+type KRWTicker struct {
+	KRWUSD struct {
+		Val float64 `json:"val"`
+	} `json:"KRW_USD"`
+}
+
+
 
 type BithumbManager struct {
 	BasicManager
 	bithumbApi    *api.BithumbApi
+	fiatApi    *api.FiatApi
+	currentKrwRate float64
 }
 
 
@@ -39,17 +48,20 @@ func (b *BithumbManager) StartListen(exchangeConfiguration ExchangeConfiguration
 
 	b.tickers = make(map[string]Ticker)
 	b.bithumbApi = api.NewBithumbApi()
+	b.fiatApi = api.NewFiatApi()
 	//b.symbolsToParse = b.composeSybolsToParse(exchangeConfiguration)
 	//b.setchannelids()
 
-	pairs := exchangeConfiguration.Pairs
+
+	krwPair := currencies.CurrencyPair{currencies.SouthKoreanWon, currencies.Tether}
 
 	//ch := make(chan api.Reposponse)
 
 	responseCh := make(chan api.RestApiReposponse)
 	errorCh := make(chan error)
 
-	b.listen(pairs, responseCh, errorCh)
+	b.listenFiat(krwPair, responseCh, errorCh, 60)
+	b.listen(currencies.CurrencyPair{}, responseCh, errorCh, 5)
 	b.startSendingDataBack(exchangeConfiguration, resultChan)
 
 	for {
@@ -60,33 +72,36 @@ func (b *BithumbManager) StartListen(exchangeConfiguration ExchangeConfiguration
 			//fmt.Printf("%s %@ %@ \n", response.Message, response.Pair.TargetCurrency.CurrencyCode(), response.Pair.ReferenceCurrency.CurrencyCode())
 			if response.Message != nil {
 
-				var bithumbTicker BithumbTicker
-				json.Unmarshal(response.Message, &bithumbTicker)
+				if response.Pair.TargetCurrency == currencies.SouthKoreanWon {
+					var krwTicker KRWTicker
+					json.Unmarshal(response.Message, &krwTicker)
+					b.currentKrwRate = krwTicker.KRWUSD.Val
+				} else if b.currentKrwRate > 0 {
+					var bithumbTicker BithumbTicker
+					json.Unmarshal(response.Message, &bithumbTicker)
 
+					for k, v :=range  bithumbTicker.Data {
 
+						if  v.ClosingPrice != "" {
+							//fmt.Println(k,v)
+							var ticker Ticker
+							ticker.Rate, _ = strconv.ParseFloat(v.ClosingPrice, 64)
+							ticker.Rate = ticker.Rate * b.currentKrwRate
+							ticker.TimpeStamp = time.Now()
+							targetCurrency := currencies.NewCurrencyWithCode(k)
+							referenceCurrency := currencies.Tether
+							ticker.Pair = currencies.CurrencyPair{TargetCurrency:targetCurrency, ReferenceCurrency:referenceCurrency}
+							//fmt.Println(ticker.Pair.Symbol())
+							b.Lock()
+							b.tickers[ticker.Pair.Symbol()] = ticker
+							b.Unlock()
+						}
 
-				for k, v :=range  bithumbTicker.Data {
-
-					if  v.ClosingPrice != "" {
-						//fmt.Println(k,v)
-						var ticker Ticker
-						ticker.Rate, _ = strconv.ParseFloat(v.ClosingPrice, 64)
-						ticker.Rate = ticker.Rate * 0.0009125181247
-						ticker.TimpeStamp = time.Now()
-						targetCurrency := currencies.NewCurrencyWithCode(k)
-						referenceCurrency := currencies.Tether
-						ticker.Pair = currencies.CurrencyPair{TargetCurrency:targetCurrency, ReferenceCurrency:referenceCurrency}
-						//fmt.Println(ticker.Pair.Symbol())
-						b.Lock()
-						b.tickers[ticker.Pair.Symbol()] = ticker
-						b.Unlock()
 					}
 
+
 				}
-
-
 			}
-
 		}
 
 
@@ -94,13 +109,22 @@ func (b *BithumbManager) StartListen(exchangeConfiguration ExchangeConfiguration
 
 }
 
-func (b *BithumbManager) listen(pairs []currencies.CurrencyPair, responseCh chan api.RestApiReposponse, errorCh chan error) {
+func (b *BithumbManager) listen(pair currencies.CurrencyPair, responseCh chan api.RestApiReposponse, errorCh chan error, refreshInterval time.Duration) {
 	go func() {
-		for range time.Tick(5 * time.Second) {
-			go b.bithumbApi.GetTicker(currencies.CurrencyPair{}, responseCh, errorCh)
+		for range time.Tick(refreshInterval * time.Second) {
+			go b.bithumbApi.GetTicker(pair, responseCh, errorCh)
 		}
 	}()
 }
+
+func (b *BithumbManager) listenFiat(pair currencies.CurrencyPair, responseCh chan api.RestApiReposponse, errorCh chan error, refreshInterval time.Duration) {
+	go func() {
+		for range time.Tick(refreshInterval * time.Second) {
+			go b.fiatApi.GetTicker(pair, responseCh, errorCh)
+		}
+	}()
+}
+
 
 func (b *BithumbManager) startSendingDataBack(exchangeConfiguration ExchangeConfiguration, resultChan chan Result) {
 	go func() {
