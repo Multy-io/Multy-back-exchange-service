@@ -25,6 +25,8 @@ var DefaultReferenceCurrencies = []Currency{Tether, Bitcoin}
 type Currency int
 
 const (
+
+	NotAplicable           Currency = -99
 	Bitcoin                Currency = 0
 	Testnet                Currency = 1
 	Litecoin               Currency = 2
@@ -212,10 +214,10 @@ const (
 	Waves                  Currency = 37313
 	EOS                    Currency = 37314
 	Tether                 Currency = 37315
-	NotAplicable           Currency = -99
 )
 
 var CurrencyNames = map[Currency]string{
+	NotAplicable:           "NotAplicable",
 	Bitcoin:               "Bitcoin",
 	Testnet:               "Testnet",
 	Litecoin:              "Litecoin",
@@ -403,10 +405,10 @@ var CurrencyNames = map[Currency]string{
 	Waves:                  "Waves",
 	EOS:                    "EOS",
 	Tether:                 "Tether",
-	NotAplicable:           "NotAplicable",
 }
 
 var CurrencyCodes = map[Currency]string{
+	NotAplicable: "N.A.",
 	Bitcoin:      "BTC",
 	Litecoin:     "LTC",
 	Dash:         "DASH",
@@ -419,7 +421,6 @@ var CurrencyCodes = map[Currency]string{
 	EtherClassic: "ETC",
 	EOS:          "EOS",
 	Tether:       "USDT",
-	NotAplicable: "N.A.",
 }
 
 func (currency Currency) CurrencyName() string {
@@ -449,7 +450,9 @@ func NewCurrencyWithCode(currencyCodeString string) Currency {
 		currencyCodeString = "USDT"
 	}
 
-	currency := currencies[strings.ToUpper(currencyCodeString)]
-
-	return currency
+	if currency, ok := currencies[strings.ToUpper(currencyCodeString)]; ok {
+	 return currency
+	} else {
+		return NotAplicable
+	}
 }

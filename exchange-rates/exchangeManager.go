@@ -242,7 +242,6 @@ func (b *ExchangeManager) add(tikers server.Tickers) {
 					b.exchanges[exchangeTicker.Exchange] = v
 				}
 			}
-
 			b.exchanges[exchangeTicker.Exchange].Tickers[ticker.symbol()] = ticker
 		}
 
@@ -299,6 +298,7 @@ func (b *ExchangeManager) fillDb() {
 					dbTicker.Rate = ticker.Rate
 					dbTicker.isCalculated = ticker.isCalculated
 					dbExchange.Tickers = append(dbExchange.Tickers, dbTicker)
+					//fmt.Println(dbTicker.TargetCurrency.CurrencyCode())
 				}
 				dbExchanges = append(dbExchanges, &dbExchange)
 			}

@@ -31,7 +31,7 @@ func main() {
 //, "GOLOS", "BTS", "STEEM", "WAVES", "LTC", "BCH", "ETC", "DASH", "EOS"
 	configuration.TargetCurrencies = []string{"BTC", "ETH", "GOLOS", "BTS", "STEEM", "WAVES", "LTC", "BCH", "ETC", "DASH", "EOS"}
 	configuration.ReferenceCurrencies = []string{"USDT", "BTC"}
-	configuration.Exchanges = []string{"Binance", "Bitfinex", "Gdax", "HitBtc", "Okex", "Poloniex", "Bittrex", "HUOBI", "UPBIT", "KRAKEN"}
+	configuration.Exchanges = []string{"Binance", "Bitfinex", "Gdax", "HitBtc", "Okex", "Poloniex", "Bittrex", "HUOBI", "UPBIT", "KRAKEN", "BITHUMB"}
 	configuration.RefreshInterval = 1
 
 	dbConfig := core.DBConfiguration{}
