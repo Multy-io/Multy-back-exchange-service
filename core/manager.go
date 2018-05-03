@@ -32,6 +32,7 @@ type Manager struct {
 	bittrexManager     *BittrexManager
 	huobiManager     *HuobiManager
 	upbitManager     *UpbitManager
+	krakenManager     *KrakenManager
 
 	server *stream.Server
 
@@ -51,6 +52,7 @@ func NewManager() *Manager {
 	manger.bittrexManager = &BittrexManager{}
 	manger.huobiManager = &HuobiManager{}
 	manger.upbitManager = &UpbitManager{}
+	manger.krakenManager = &KrakenManager{}
 
 	return &manger
 }
@@ -89,7 +91,7 @@ type DBConfiguration struct {
 type Exchange int
 
 func NewExchange(exchangeString string) Exchange {
-	exchanges := map[string]Exchange{"BINANCE": Binance, "BITFINEX": Bitfinex, "GDAX": Gdax, "HITBTC": HitBtc, "OKEX": Okex, "POLONIEX": Poloniex, "BITTREX": Bittrex, "HUOBI": Huobi, "UPBIT": Upbit}
+	exchanges := map[string]Exchange{"BINANCE": Binance, "BITFINEX": Bitfinex, "GDAX": Gdax, "HITBTC": HitBtc, "OKEX": Okex, "POLONIEX": Poloniex, "BITTREX": Bittrex, "HUOBI": Huobi, "UPBIT": Upbit, "KRAKEN": Kraken}
 	exchange := exchanges[strings.ToUpper(exchangeString)]
 	return exchange
 }
@@ -104,7 +106,8 @@ func (exchange Exchange) String() string {
 		"POLONIEX",
 		"BITTREX",
 		"HUOBI",
-		"UPBIT"}
+		"UPBIT",
+		"KRAKEN"}
 	return exchanges[exchange]
 }
 
@@ -118,6 +121,7 @@ const (
 	Bittrex  Exchange = 6
 	Huobi 	 Exchange = 7
 	Upbit 	 Exchange = 8
+	Kraken 	 Exchange = 9
 )
 
 type ExchangeConfiguration struct {
@@ -149,6 +153,8 @@ func (b *Manager) launchExchange(exchangeConfiguration ExchangeConfiguration, ch
 		go b.huobiManager.StartListen(exchangeConfiguration, ch)
 	case Upbit:
 		go b.upbitManager.StartListen(exchangeConfiguration, ch)
+	case Kraken:
+		go b.krakenManager.StartListen(exchangeConfiguration, ch)
 	default:
 		log.Errorf("launchExchange:default %v", exchangeConfiguration.Exchange.String())
 	}
