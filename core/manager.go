@@ -6,6 +6,7 @@ import (
 	"time"
 
 	stream "github.com/Appscrunch/Multy-back-exchange-service/stream/server"
+	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 )
 
 const maxTickerAge = 5
@@ -28,6 +29,11 @@ type Manager struct {
 	bitfinexManager *BitfinexManager
 	gdaxManager     *GdaxManager
 	okexManager     *OkexManager
+	bittrexManager     *BittrexManager
+	huobiManager     *HuobiManager
+	upbitManager     *UpbitManager
+	krakenManager     *KrakenManager
+	bithumbManager     *BithumbManager
 
 	server *stream.Server
 
@@ -44,6 +50,11 @@ func NewManager() *Manager {
 	manger.okexManager = &OkexManager{}
 	manger.server = &stream.Server{}
 	manger.agregator = NewAgregator()
+	manger.bittrexManager = &BittrexManager{}
+	manger.huobiManager = &HuobiManager{}
+	manger.upbitManager = &UpbitManager{}
+	manger.krakenManager = &KrakenManager{}
+	manger.bithumbManager = &BithumbManager{}
 
 	return &manger
 }
@@ -56,6 +67,23 @@ type ManagerConfiguration struct {
 	DBConfiguration     DBConfiguration `json:"dbconfiguration"`
 }
 
+func (b *ManagerConfiguration) Pairs() []currencies.CurrencyPair {
+	var pairs = []currencies.CurrencyPair{}
+	for _, targetCurrency := range b.TargetCurrencies {
+		for _, referenceCurrency := range b.ReferenceCurrencies {
+
+			if referenceCurrency == "USD" {
+				referenceCurrency = "USDT"
+			} else if referenceCurrency == targetCurrency {
+				continue
+			}
+			pair := currencies.CurrencyPair{currencies.NewCurrencyWithCode(targetCurrency), currencies.NewCurrencyWithCode(referenceCurrency)}
+			pairs = append(pairs, pair)
+		}
+	}
+	return pairs
+}
+
 type DBConfiguration struct {
 	User     string `json:"user"`
 	Password string `json:"password"`
@@ -65,7 +93,7 @@ type DBConfiguration struct {
 type Exchange int
 
 func NewExchange(exchangeString string) Exchange {
-	exchanges := map[string]Exchange{"BINANCE": Binance, "BITFINEX": Bitfinex, "GDAX": Gdax, "HITBTC": HitBtc, "OKEX": Okex, "POLONIEX": Poloniex}
+	exchanges := map[string]Exchange{"BINANCE": Binance, "BITFINEX": Bitfinex, "GDAX": Gdax, "HITBTC": HitBtc, "OKEX": Okex, "POLONIEX": Poloniex, "BITTREX": Bittrex, "HUOBI": Huobi, "UPBIT": Upbit, "KRAKEN": Kraken, "BITHUMB": Bithumb}
 	exchange := exchanges[strings.ToUpper(exchangeString)]
 	return exchange
 }
@@ -77,7 +105,12 @@ func (exchange Exchange) String() string {
 		"GDAX",
 		"HITBTC",
 		"OKEX",
-		"POLONIEX"}
+		"POLONIEX",
+		"BITTREX",
+		"HUOBI",
+		"UPBIT",
+		"KRAKEN",
+		"BITHUMB"}
 	return exchanges[exchange]
 }
 
@@ -88,6 +121,11 @@ const (
 	HitBtc   Exchange = 3
 	Okex     Exchange = 4
 	Poloniex Exchange = 5
+	Bittrex  Exchange = 6
+	Huobi 	 Exchange = 7
+	Upbit 	 Exchange = 8
+	Kraken 	 Exchange = 9
+	Bithumb Exchange = 10
 )
 
 type ExchangeConfiguration struct {
@@ -95,6 +133,7 @@ type ExchangeConfiguration struct {
 	TargetCurrencies    []string
 	ReferenceCurrencies []string
 	RefreshInterval     int
+	Pairs []currencies.CurrencyPair
 }
 
 func (b *Manager) launchExchange(exchangeConfiguration ExchangeConfiguration, ch chan Result) {
@@ -112,9 +151,18 @@ func (b *Manager) launchExchange(exchangeConfiguration ExchangeConfiguration, ch
 		go b.okexManager.StartListen(exchangeConfiguration, ch)
 	case Poloniex:
 		go b.poloniexManager.StartListen(exchangeConfiguration, ch)
+	case Bittrex:
+		go b.bittrexManager.StartListen(exchangeConfiguration, ch)
+	case Huobi:
+		go b.huobiManager.StartListen(exchangeConfiguration, ch)
+	case Upbit:
+		go b.upbitManager.StartListen(exchangeConfiguration, ch)
+	case Kraken:
+		go b.krakenManager.StartListen(exchangeConfiguration, ch)
+	case Bithumb:
+		go b.bithumbManager.StartListen(exchangeConfiguration, ch)
 	default:
 		log.Errorf("launchExchange:default %v", exchangeConfiguration.Exchange.String())
-
 	}
 }
 
@@ -127,6 +175,7 @@ func (b *Manager) StartListen(configuration ManagerConfiguration) {
 		exchangeConfiguration.Exchange = NewExchange(exchangeString)
 		exchangeConfiguration.TargetCurrencies = configuration.TargetCurrencies
 		exchangeConfiguration.ReferenceCurrencies = configuration.ReferenceCurrencies
+		exchangeConfiguration.Pairs = configuration.Pairs()
 		b.launchExchange(exchangeConfiguration, ch)
 	}
 
@@ -178,9 +227,7 @@ func (b *Manager) convertToTickerCollection(tickerCollection TickerCollection) s
 
 func (b *Manager) convertToStreamTicker(ticker Ticker) stream.StreamTicker {
 	var streamTicker = stream.StreamTicker{}
-	streamTicker.Symbol = ticker.Symbol
 	streamTicker.Rate = ticker.Rate
-	streamTicker.ReferenceCurrency = ticker.ReferenceCurrency
-	streamTicker.TargetCurrency = ticker.TargetCurrency
+	streamTicker.Pair = ticker.Pair
 	return streamTicker
 }

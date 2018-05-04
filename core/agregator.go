@@ -16,10 +16,8 @@ type TickerCollection struct {
 }
 
 type Ticker struct {
-	TargetCurrency    currencies.Currency
-	ReferenceCurrency currencies.Currency
-	Symbol            string
-	Rate              string
+	Pair currencies.CurrencyPair
+	Rate              float64
 	TimpeStamp        time.Time
 }
 

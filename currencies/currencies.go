@@ -4,11 +4,29 @@ import (
 	"strings"
 )
 
+type CurrencyPair struct {
+	TargetCurrency   Currency
+	ReferenceCurrency Currency
+}
+
+func (b *CurrencyPair) Symbol() string {
+	return b.TargetCurrency.CurrencyCode() + "-" + b.ReferenceCurrency.CurrencyCode()
+}
+
+func (b *CurrencyPair) IsEqualTo(pair CurrencyPair) bool {
+	//fmt.Println(b.TargetCurrency.CurrencyCode(), b.ReferenceCurrency.CurrencyCode(), pair.TargetCurrency.CurrencyCode(), pair.ReferenceCurrency.CurrencyCode())
+	//fmt.Println(b.TargetCurrency == pair.TargetCurrency && b.ReferenceCurrency == pair.ReferenceCurrency)
+	return b.TargetCurrency == pair.TargetCurrency && b.ReferenceCurrency == pair.ReferenceCurrency
+}
+
+
 var DefaultReferenceCurrencies = []Currency{Tether, Bitcoin}
 
 type Currency int
 
 const (
+
+	NotAplicable           Currency = -99
 	Bitcoin                Currency = 0
 	Testnet                Currency = 1
 	Litecoin               Currency = 2
@@ -196,10 +214,11 @@ const (
 	Waves                  Currency = 37313
 	EOS                    Currency = 37314
 	Tether                 Currency = 37315
-	NotAplicable           Currency = -99
+	SouthKoreanWon         Currency = 57316
 )
 
 var CurrencyNames = map[Currency]string{
+	NotAplicable:           "NotAplicable",
 	Bitcoin:               "Bitcoin",
 	Testnet:               "Testnet",
 	Litecoin:              "Litecoin",
@@ -387,10 +406,11 @@ var CurrencyNames = map[Currency]string{
 	Waves:                  "Waves",
 	EOS:                    "EOS",
 	Tether:                 "Tether",
-	NotAplicable:           "NotAplicable",
+	SouthKoreanWon: 		"SouthKoreanWon",
 }
 
 var CurrencyCodes = map[Currency]string{
+	NotAplicable: "N.A.",
 	Bitcoin:      "BTC",
 	Litecoin:     "LTC",
 	Dash:         "DASH",
@@ -403,7 +423,7 @@ var CurrencyCodes = map[Currency]string{
 	EtherClassic: "ETC",
 	EOS:          "EOS",
 	Tether:       "USDT",
-	NotAplicable: "N.A.",
+	SouthKoreanWon: "KRW",
 }
 
 func (currency Currency) CurrencyName() string {
@@ -433,7 +453,9 @@ func NewCurrencyWithCode(currencyCodeString string) Currency {
 		currencyCodeString = "USDT"
 	}
 
-	currency := currencies[strings.ToUpper(currencyCodeString)]
-
-	return currency
+	if currency, ok := currencies[strings.ToUpper(currencyCodeString)]; ok {
+	 return currency
+	} else {
+		return NotAplicable
+	}
 }

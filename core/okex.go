@@ -7,6 +7,7 @@ import (
 
 	"github.com/Appscrunch/Multy-back-exchange-service/api"
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
+	"strconv"
 )
 
 type OkexManager struct {
@@ -32,16 +33,16 @@ type OkexTicker struct {
 	} `json:"data"`
 }
 
-func (b *OkexTicker) getCurriences() (currencies.Currency, currencies.Currency) {
+func (b *OkexTicker) getCurriences() currencies.CurrencyPair {
 
 	if len(b.Symbol) > 0 {
 		var symbol = b.Symbol
 		var currencyCode = strings.TrimPrefix(strings.TrimSuffix(symbol, "_ticker_this_week"), "ok_sub_futureusd_")
 		if len(currencyCode) > 2 {
-			return currencies.NewCurrencyWithCode(currencyCode), currencies.Tether
+			return currencies.CurrencyPair{currencies.NewCurrencyWithCode(currencyCode), currencies.Tether}
 		}
 	}
-	return currencies.NotAplicable, currencies.NotAplicable
+	return currencies.CurrencyPair{currencies.NotAplicable, currencies.NotAplicable}
 }
 
 func (ticker OkexTicker) IsFilled() bool {
@@ -115,15 +116,12 @@ func (b *OkexManager) addMessage(message []byte) {
 	for _, okexTicker := range okexTickers {
 		if okexTicker.IsFilled() {
 			var ticker = Ticker{}
-			ticker.Symbol = okexTicker.Symbol
-			ticker.Rate = okexTicker.Data.Last
+			ticker.Rate, _ = strconv.ParseFloat(okexTicker.Data.Last, 64)
 
-			targetCurrency, referenceCurrency := okexTicker.getCurriences()
-			ticker.TargetCurrency = targetCurrency
-			ticker.ReferenceCurrency = referenceCurrency
+			ticker.Pair = okexTicker.getCurriences()
 			ticker.TimpeStamp = time.Now()
 			b.Lock()
-			b.tickers[ticker.Symbol] = ticker
+			b.tickers[ticker.Pair.Symbol()] = ticker
 			b.Unlock()
 		}
 	}
