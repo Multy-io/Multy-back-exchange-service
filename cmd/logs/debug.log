@@ -881,3 +881,65 @@
 2018-04-24/17:25:36.064 [[34mDEBUG[0m] api: connectWs:Okex ws connected 
 2018-04-24/17:25:36.228 [[34mDEBUG[0m] api: connectWs:Poloniex ws connected 
 2018-04-24/17:25:36.835 [[34mDEBUG[0m] api: connectWs:Binance ws connected 
+2018-05-07/15:53:42.964 [[34mDEBUG[0m] core: StartListen:start binance manager listen 
+2018-05-07/15:53:42.963 [[32mINFO[0m] exchange-rates: starting client 
+2018-05-07/15:53:42.964 [[32mINFO[0m] api: connectWs:connecting to wss://ws-feed.gdax.com 
+2018-05-07/15:53:42.964 [[32mINFO[0m] api: connecting to wss://api.hitbtc.com/api/2/ws 
+2018-05-07/15:53:42.965 [[32mINFO[0m] api: connectWs:connecting to wss://real.okex.com:10440 
+2018-05-07/15:53:42.965 [[32mINFO[0m] exchange-rates: Db connected 
+2018-05-07/15:53:42.966 [[32mINFO[0m] exchange-rates: connectToServer:Connecting to GRPC server 
+2018-05-07/15:53:42.967 [[31mERROR[0m] exchange-rates: GrpcClient:listenTickers:b.connectToServer rpc error: code = Unavailable desc = all SubConns are in TransientFailure, latest connection error: connection error: desc = "transport: Error while dialing dial tcp 127.0.0.1:10000: connect: connection refused" 
+2018-05-07/15:53:43.355 [[34mDEBUG[0m] api: connectWs:HitBtc ws connected 
+2018-05-07/15:53:43.420 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.422 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.423 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.425 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.426 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.427 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.428 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.429 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.430 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.431 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.432 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.433 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.433 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.434 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.434 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.440 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.441 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.441 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.442 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.443 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.443 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.473 [[34mDEBUG[0m] api: connectWs:Bitfinex ws connected 
+2018-05-07/15:53:43.713 [[34mDEBUG[0m] api: connectWs:Gdax ws connected 
+2018-05-07/15:53:43.840 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.841 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.841 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.842 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.843 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.843 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.844 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.945 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.946 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.947 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.948 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.949 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.950 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.951 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.953 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.953 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.954 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.955 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.956 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.956 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.957 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.968 [[32mINFO[0m] exchange-rates: connectToServer:Connecting to GRPC server 
+2018-05-07/15:53:43.968 [[32mINFO[0m] api: connectWs:connecting to wss://stream.binance.com:9443/ws/%21ticker@arr 
+2018-05-07/15:53:43.969 [[31mERROR[0m] exchange-rates: GrpcClient:listenTickers:b.connectToServer 
+2018-05-07/15:53:44.042 [[32mINFO[0m] api: connectWs:onnecting to wss://api2.poloniex.com/realm1 
+2018-05-07/15:53:44.281 [[34mDEBUG[0m] api: connectWs:Okex ws connected 
+2018-05-07/15:53:44.804 [[34mDEBUG[0m] api: connectWs:Poloniex ws connected 
+2018-05-07/15:53:45.029 [[34mDEBUG[0m] api: connectWs:Binance ws connected 
+2018-05-07/15:53:52.970 [[31mERROR[0m] exchange-rates: calculateAllTickers: exchange ticket is nil BTC USDT KRAKEN  
+2018-05-07/15:53:57.966 [[31mERROR[0m] exchange-rates: calculateAllTickers: exchange ticket is nil BTC USDT KRAKEN  

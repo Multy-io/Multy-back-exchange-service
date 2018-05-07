@@ -35,3 +35,6 @@ todo:
 		--color \
 		-nRo -E ' TODO:.*|SkipNow|nolint:.*' .
 .PHONY: todo
+
+dist:
+	cd cmd/ && GOOS=linux GOARCH=amd64 go build $(LD_OPTS)  -o $(NAME) .
