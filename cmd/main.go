@@ -34,11 +34,11 @@ func main() {
 //	configuration.TargetCurrencies = []string{"LTC","DASH"}
 	configuration.TargetCurrencies = []string{"BTC", "ETH", "GOLOS", "BTS", "STEEM", "WAVES", "LTC", "BCH", "ETC", "DASH", "EOS"}
 		configuration.ReferenceCurrencies = []string{"USDT", "BTC"}
-	configuration.Exchanges = []string{"Gdax", "UPBIT", "KRAKEN", "BITHUMB"}
+	configuration.Exchanges = []string{"BINANCE", "BITFINEX"}
 	configuration.RefreshInterval = 1
 
 
-	configuration.HistoryApiKey = "A502B3C1-9C40-446F-9831-CA12EC039AB8"
+	configuration.HistoryApiKey = ""//"A502B3C1-9C40-446F-9831-CA12EC039AB8"
 	historyStartDate, _ := time.Parse(
 		time.RFC3339,
 		"2016-11-01T22:08:41+00:00")

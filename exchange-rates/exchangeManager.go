@@ -10,6 +10,7 @@ import (
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 	"github.com/Appscrunch/Multy-back-exchange-service/stream/server"
 	"fmt"
+	"strconv"
 )
 
 type Exchange struct {
@@ -218,8 +219,10 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 							rate = crossTicker.Rate / exchangeTicker.Rate
 						}
 
-						//fmt.Println(rate)
+						fmt.Println(exchange.name, exchangeTicker.symbol())
 						ticker := Ticker{}
+
+						ticker.TimpeStamp = exchangeTicker.TimpeStamp
 						ticker.Rate = rate
 						ticker.Pair.TargetCurrency = pair.TargetCurrency
 						ticker.Pair.ReferenceCurrency = pair.ReferenceCurrency
@@ -250,7 +253,7 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 
 func (b *ExchangeManager) add(tikers server.Tickers) {
 	b.Lock()
-/*
+
 	for _, exchangeTicker := range tikers.ExchangeTickers {
 		if _, ok := b.exchanges[exchangeTicker.Exchange]; !ok {
 			var ex = Exchange{}
@@ -275,33 +278,33 @@ func (b *ExchangeManager) add(tikers server.Tickers) {
 		}
 
 	}
-*/
+
 	b.Unlock()
 }
 
 func (b *ExchangeManager) addHistoryData(historyData core.HistoryResponse) {
 	b.Lock()
 
-		if _, ok := b.exchanges[historyData.Exchange.String()]; !ok {
-			var ex = Exchange{}
-			ex.name = historyData.Exchange.String()
-			b.exchanges[historyData.Exchange.String()] = ex
-		}
-
-		for _, value := range historyData.OhlcvData {
-			var ticker = Ticker{}
-			ticker.TimpeStamp = value.Time_open
-			ticker.Pair = historyData.Pair
-			ticker.Rate, _ = value.Price_open.Float64()
-
-			if v, ok := b.exchanges[historyData.Exchange.String()]; ok {
-				if v.Tickers == nil {
-					v.Tickers =  map[string]Ticker{}
-					b.exchanges[historyData.Exchange.String()] = v
-				}
-			}
-			b.exchanges[historyData.Exchange.String()].Tickers[ticker.symbol()] = ticker
-		}
+		//if _, ok := b.exchanges[historyData.Exchange.String()]; !ok {
+		//	var ex = Exchange{}
+		//	ex.name = historyData.Exchange.String()
+		//	b.exchanges[historyData.Exchange.String()] = ex
+		//}
+		//
+		//for _, value := range historyData.OhlcvData {
+		//	var ticker = Ticker{}
+		//	ticker.TimpeStamp = value.Time_open
+		//	ticker.Pair = historyData.Pair
+		//	ticker.Rate, _ = value.Price_open.Float64()
+		//
+		//	if v, ok := b.exchanges[historyData.Exchange.String()]; ok {
+		//		if v.Tickers == nil {
+		//			v.Tickers =  map[string]Ticker{}
+		//			b.exchanges[historyData.Exchange.String()] = v
+		//		}
+		//	}
+		//	b.exchanges[historyData.Exchange.String()].Tickers[ticker.symbol()] = ticker
+		//}
 
 
 	b.Unlock()
@@ -328,7 +331,7 @@ func (b *ExchangeManager) GetRates(timeStamp time.Time, exchangeName string, tar
 
 func (b *ExchangeManager) fillDb() {
 
-	for range time.Tick(5 * time.Second) {
+	for range time.Tick(10 * time.Second) {
 
 		dbExchanges := []*DbExchange{}
 
@@ -363,8 +366,10 @@ func (b *ExchangeManager) fillDb() {
 			}
 
 			//fmt.Println(dbExchanges)
+
 		}
 		b.dbManger.FillDb(dbExchanges)
+		b.exchanges = map[string]Exchange{}
 
 		//v := b.GetRates(time.Now().Add(-4 * time.Minute), "BINANCE", "BTS", []string{"BTC", "USDT"})
 		//

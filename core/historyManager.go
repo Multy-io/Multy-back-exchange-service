@@ -48,8 +48,8 @@ func (b *HistoryManager) collectHistoryForExchange(exchange Exchange, configurat
 
 	go func() {
 		for _, paiar := range configuration.Pairs {
-			time.Sleep(1 * time.Second)
-			go b.collectHistoryFor(exchange, paiar, configuration.HistoryStartDate, configuration.HistoryEndDate, responseCh)
+			//time.Sleep(0.5 * time.Second)
+			 b.collectHistoryFor(exchange, paiar, configuration.HistoryStartDate, configuration.HistoryEndDate, responseCh)
 		}
 	}()
 }
@@ -69,7 +69,7 @@ func (b *HistoryManager) collectHistoryFor(exchange Exchange, pair currencies.Cu
 	symbolId := exchange.CoinApiString()+"_SPOT_"+pair.TargetCurrency.CurrencyCode()+"_"+referenceCurrencyCode
 
 
-	Ohlcv_historic_data_with_time_end_and_limit, _ := b.sdk.Ohlcv_historic_data_with_time_end_and_limit(symbolId, "6HRS", startDate, endDate, 1)
+	Ohlcv_historic_data_with_time_end_and_limit, _ := b.sdk.Ohlcv_historic_data_with_time_end_and_limit(symbolId, "6HRS", startDate, endDate, 10)
 	//fmt.Println("Ohlcv_historic_data_with_time_end_and_limit:")
 	//fmt.Println("number:", len(Ohlcv_historic_data_with_time_end_and_limit))
 	//Ohlcv_historic_data_with_time_end_and_limit_item, _ := json.MarshalIndent(&Ohlcv_historic_data_with_time_end_and_limit, "", "  ")
