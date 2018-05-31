@@ -1,7 +1,7 @@
 package exchangeRates
 
 import (
-	"strconv"
+	//"strconv"
 	"time"
 
 	"sync"
@@ -9,6 +9,7 @@ import (
 	"github.com/Appscrunch/Multy-back-exchange-service/core"
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 	"github.com/Appscrunch/Multy-back-exchange-service/stream/server"
+	"fmt"
 )
 
 type Exchange struct {
@@ -66,6 +67,8 @@ type ExchangeManager struct {
 	referenceCurrencies []currencies.Currency
 	configuration       core.ManagerConfiguration
 	sync.Mutex
+	historyManager *core.HistoryManager
+
 }
 
 func NewExchangeManager(configuration core.ManagerConfiguration) *ExchangeManager {
@@ -82,13 +85,35 @@ func NewExchangeManager(configuration core.ManagerConfiguration) *ExchangeManage
 
 	manger.dbManger = NewDbManager(dbConfig)
 
+
+	manger.historyManager = &core.HistoryManager{}
+
+
 	return &manger
 }
 
 func (b *ExchangeManager) StartGetingData() {
 
+	responseCh := make(chan core.HistoryResponse)
+
 	go b.grpcClient.listenTickers(b.tickersCh)
 	go b.fillDb()
+
+	var exchanges []core.Exchange
+	for _, exchangeString := range b.configuration.Exchanges {
+		ex := core.NewExchange(exchangeString)
+		exchanges = append(exchanges, ex)
+	}
+
+
+
+	historyConfiguration := core.HistoryConfiguration{}
+	historyConfiguration.Exchanges = exchanges
+	historyConfiguration.HistoryStartDate = b.configuration.HistoryStartDate
+	historyConfiguration.HistoryEndDate = b.configuration.HistoryEndDate
+	historyConfiguration.Pairs = b.configuration.Pairs()
+	historyConfiguration.ApiKey = b.configuration.HistoryApiKey
+	go b.historyManager.StartCollectHistory(historyConfiguration, responseCh)
 
 	//ch := make(chan []*Exchange)
 	//go b.Subscribe(ch, 5, []string{"DASH", "ETC", "EOS", "WAVES", "STEEM", "BTS", "ETH"}, "USDT")
@@ -108,7 +133,11 @@ func (b *ExchangeManager) StartGetingData() {
 		//		}
 		//	}
 
-
+		case response := <-responseCh:
+			fmt.Printf("got history %@,  %@ %@ %s \n", response.Exchange.String(), response.Pair.TargetCurrency.CurrencyCode(), response.Pair.ReferenceCurrency.CurrencyCode(), response.OhlcvData)
+			if response.OhlcvData != nil {
+				b.addHistoryData(response)
+			}
 		}
 	}
 }
@@ -221,7 +250,7 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 
 func (b *ExchangeManager) add(tikers server.Tickers) {
 	b.Lock()
-
+/*
 	for _, exchangeTicker := range tikers.ExchangeTickers {
 		if _, ok := b.exchanges[exchangeTicker.Exchange]; !ok {
 			var ex = Exchange{}
@@ -246,8 +275,38 @@ func (b *ExchangeManager) add(tikers server.Tickers) {
 		}
 
 	}
+*/
 	b.Unlock()
 }
+
+func (b *ExchangeManager) addHistoryData(historyData core.HistoryResponse) {
+	b.Lock()
+
+		if _, ok := b.exchanges[historyData.Exchange.String()]; !ok {
+			var ex = Exchange{}
+			ex.name = historyData.Exchange.String()
+			b.exchanges[historyData.Exchange.String()] = ex
+		}
+
+		for _, value := range historyData.OhlcvData {
+			var ticker = Ticker{}
+			ticker.TimpeStamp = value.Time_open
+			ticker.Pair = historyData.Pair
+			ticker.Rate, _ = value.Price_open.Float64()
+
+			if v, ok := b.exchanges[historyData.Exchange.String()]; ok {
+				if v.Tickers == nil {
+					v.Tickers =  map[string]Ticker{}
+					b.exchanges[historyData.Exchange.String()] = v
+				}
+			}
+			b.exchanges[historyData.Exchange.String()].Tickers[ticker.symbol()] = ticker
+		}
+
+
+	b.Unlock()
+}
+
 
 func (b *ExchangeManager) GetRates(timeStamp time.Time, exchangeName string, targetCode string, referecies []string) []*Ticker {
 

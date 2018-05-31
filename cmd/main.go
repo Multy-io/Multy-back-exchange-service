@@ -6,6 +6,7 @@ import (
 	"github.com/Appscrunch/Multy-back-exchange-service/core"
 	"github.com/Appscrunch/Multy-back-exchange-service/exchange-rates"
 	_ "github.com/KristinaEtc/slflog"
+	"time"
 )
 
 var manager = core.NewManager()
@@ -33,8 +34,17 @@ func main() {
 //	configuration.TargetCurrencies = []string{"LTC","DASH"}
 	configuration.TargetCurrencies = []string{"BTC", "ETH", "GOLOS", "BTS", "STEEM", "WAVES", "LTC", "BCH", "ETC", "DASH", "EOS"}
 		configuration.ReferenceCurrencies = []string{"USDT", "BTC"}
-	configuration.Exchanges = []string{"Binance", "Bitfinex", "Gdax", "HitBtc", "Okex", "Poloniex", "Bittrex", "HUOBI", "UPBIT", "KRAKEN", "BITHUMB"}
+	configuration.Exchanges = []string{"Gdax", "UPBIT", "KRAKEN", "BITHUMB"}
 	configuration.RefreshInterval = 1
+
+
+	configuration.HistoryApiKey = "A502B3C1-9C40-446F-9831-CA12EC039AB8"
+	historyStartDate, _ := time.Parse(
+		time.RFC3339,
+		"2016-11-01T22:08:41+00:00")
+	configuration.HistoryStartDate = historyStartDate
+	configuration.HistoryEndDate = time.Now().UTC().Add(-3600)
+
 
 	dbConfig := core.DBConfiguration{}
 	dbConfig.User = "postgres"
