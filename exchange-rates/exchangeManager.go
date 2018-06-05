@@ -10,6 +10,7 @@ import (
 	"github.com/Appscrunch/Multy-back-exchange-service/currencies"
 	"github.com/Appscrunch/Multy-back-exchange-service/stream/server"
 	"fmt"
+	"strconv"
 )
 
 type Exchange struct {
@@ -253,30 +254,30 @@ func (b *ExchangeManager) calculateAllTickers(targetCodes []string, referenceCod
 func (b *ExchangeManager) add(tikers server.Tickers) {
 	b.Lock()
 
-	//for _, exchangeTicker := range tikers.ExchangeTickers {
-	//	if _, ok := b.exchanges[exchangeTicker.Exchange]; !ok {
-	//		var ex = Exchange{}
-	//		ex.name = exchangeTicker.Exchange
-	//		b.exchanges[exchangeTicker.Exchange] = ex
-	//	}
-	//
-	//	for _, value := range exchangeTicker.Tickers {
-	//		var ticker = Ticker{}
-	//		ticker.TimpeStamp = time.Now()
-	//		ticker.Pair.TargetCurrency = currencies.NewCurrencyWithCode(value.Target)
-	//		ticker.Pair.ReferenceCurrency = currencies.NewCurrencyWithCode(value.Referrence)
-	//		ticker.Rate, _ = strconv.ParseFloat(value.Rate, 64)
-	//
-	//		if v, ok := b.exchanges[exchangeTicker.Exchange]; ok {
-	//			if v.Tickers == nil {
-	//				v.Tickers =  map[string]Ticker{}
-	//				b.exchanges[exchangeTicker.Exchange] = v
-	//			}
-	//		}
-	//		b.exchanges[exchangeTicker.Exchange].Tickers[ticker.symbol()] = ticker
-	//	}
-	//
-	//}
+	for _, exchangeTicker := range tikers.ExchangeTickers {
+		if _, ok := b.exchanges[exchangeTicker.Exchange]; !ok {
+			var ex = Exchange{}
+			ex.name = exchangeTicker.Exchange
+			b.exchanges[exchangeTicker.Exchange] = ex
+		}
+
+		for _, value := range exchangeTicker.Tickers {
+			var ticker = Ticker{}
+			ticker.TimpeStamp = time.Now()
+			ticker.Pair.TargetCurrency = currencies.NewCurrencyWithCode(value.Target)
+			ticker.Pair.ReferenceCurrency = currencies.NewCurrencyWithCode(value.Referrence)
+			ticker.Rate, _ = strconv.ParseFloat(value.Rate, 64)
+
+			if v, ok := b.exchanges[exchangeTicker.Exchange]; ok {
+				if v.Tickers == nil {
+					v.Tickers =  map[string]Ticker{}
+					b.exchanges[exchangeTicker.Exchange] = v
+				}
+			}
+			b.exchanges[exchangeTicker.Exchange].Tickers[ticker.symbol()] = ticker
+		}
+
+	}
 
 	b.Unlock()
 }
@@ -302,7 +303,7 @@ func (b *ExchangeManager) addHistoryData(historyData core.HistoryResponse) {
 					b.exchanges[historyData.Exchange.String()] = v
 				}
 			}
-			fmt.Println(ticker.symbol()+value.Time_open.String())
+			//fmt.Println(ticker.symbol()+value.Time_open.String())
 			b.exchanges[historyData.Exchange.String()].Tickers[ticker.symbol()+value.Time_open.String()] = ticker
 		}
 
@@ -360,7 +361,7 @@ func (b *ExchangeManager) fillDb() {
 					dbTicker.Rate = ticker.Rate
 					dbTicker.isCalculated = ticker.isCalculated
 					dbExchange.Tickers = append(dbExchange.Tickers, dbTicker)
-					fmt.Println(dbTicker.TargetCurrency.CurrencyCode(), dbTicker.Rate)
+					//fmt.Println(dbTicker.TargetCurrency.CurrencyCode(), dbTicker.Rate)
 				}
 				dbExchanges = append(dbExchanges, &dbExchange)
 			}
