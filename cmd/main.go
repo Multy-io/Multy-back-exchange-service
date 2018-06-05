@@ -38,7 +38,7 @@ func main() {
 	configuration.RefreshInterval = 1
 
 
-	configuration.HistoryApiKey = ""//"A502B3C1-9C40-446F-9831-CA12EC039AB8"
+	configuration.HistoryApiKey = "A502B3C1-9C40-446F-9831-CA12EC039AB8"
 	historyStartDate, _ := time.Parse(
 		time.RFC3339,
 		"2016-11-01T22:08:41+00:00")
