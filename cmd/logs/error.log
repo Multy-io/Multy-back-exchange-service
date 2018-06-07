@@ -572,3 +572,49 @@
 2018-04-24/17:25:35.921 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
 2018-04-24/17:25:35.922 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
 2018-04-24/17:25:35.923 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:42.967 [[31mERROR[0m] exchange-rates: GrpcClient:listenTickers:b.connectToServer rpc error: code = Unavailable desc = all SubConns are in TransientFailure, latest connection error: connection error: desc = "transport: Error while dialing dial tcp 127.0.0.1:10000: connect: connection refused" 
+2018-05-07/15:53:43.420 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.422 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.423 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.425 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.426 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.427 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.428 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.429 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.430 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.431 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.432 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.433 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.433 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.434 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.434 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.440 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.441 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.441 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.442 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.443 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.443 [[31mERROR[0m] core: StartListen:HitBtcManager:error parsing hitBtc ticker 
+2018-05-07/15:53:43.840 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.841 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.841 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.842 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.843 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.843 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.844 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.945 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.946 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.947 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.948 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.949 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.950 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.951 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.953 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.953 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.954 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.955 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.956 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.956 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.957 [[31mERROR[0m] core: StartListen:error parsing hitBtc ticker: 
+2018-05-07/15:53:43.969 [[31mERROR[0m] exchange-rates: GrpcClient:listenTickers:b.connectToServer 
+2018-05-07/15:53:52.970 [[31mERROR[0m] exchange-rates: calculateAllTickers: exchange ticket is nil BTC USDT KRAKEN  
+2018-05-07/15:53:57.966 [[31mERROR[0m] exchange-rates: calculateAllTickers: exchange ticket is nil BTC USDT KRAKEN  

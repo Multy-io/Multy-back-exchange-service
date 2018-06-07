@@ -30,6 +30,11 @@ func (b *BinanceTicker) getCurriences() currencies.CurrencyPair {
 
 				//fmt.Println("2",symbol, referenceCurrency.CurrencyCode())
 				targetCurrencyString := strings.TrimSuffix(symbol, referenceCurrency.CurrencyCode())
+
+				if targetCurrencyString == "BCC" {
+					targetCurrencyString = "BCH"
+				}
+
 				//fmt.Println(targetCurrencyString)
 				var targetCurrency = currencies.NewCurrencyWithCode(targetCurrencyString)
 				return currencies.CurrencyPair{targetCurrency, referenceCurrency}
@@ -67,14 +72,16 @@ func (b *BinanceManager) StartListen(exchangeConfiguration ExchangeConfiguration
 				log.Errorf("StartListen: binance error:%v", *response.Err)
 				resultChan <- Result{exchangeConfiguration.Exchange.String(), nil, response.Err}
 			} else if *response.Message != nil {
-				//fmt.Printf("%s", message)
+				//fmt.Printf("%s \n", *response.Message)
 				var binanceTickers []BinanceTicker
 				json.Unmarshal(*response.Message, &binanceTickers)
 
 				var tickers = []Ticker{}
 
 				for _, binanceTicker := range binanceTickers {
+					//fmt.Println(binanceTicker.Symbol)
 					if b.symbolsToParse[binanceTicker.Symbol] {
+						//fmt.Println(binanceTicker.Symbol)
 						var ticker = Ticker{}
 						ticker.Rate, _ = strconv.ParseFloat(binanceTicker.Rate, 64)
 						ticker.Pair = binanceTicker.getCurriences()
@@ -105,6 +112,10 @@ func (b *BinanceManager) composeSybolsToParse(exchangeConfiguration ExchangeConf
 			} else if referenceCurrency == targetCurrency {
 				//fmt.Println(referenceCurrency, targetCurrency)
 				continue
+			}
+
+			if  targetCurrency == "BCH" {
+				targetCurrency = "BCC"
 			}
 
 			symbol := targetCurrency + referenceCurrency

@@ -34,7 +34,6 @@ type Manager struct {
 	upbitManager     *UpbitManager
 	krakenManager     *KrakenManager
 	bithumbManager     *BithumbManager
-
 	server *stream.Server
 
 	agregator *Agregator
@@ -55,7 +54,6 @@ func NewManager() *Manager {
 	manger.upbitManager = &UpbitManager{}
 	manger.krakenManager = &KrakenManager{}
 	manger.bithumbManager = &BithumbManager{}
-
 	return &manger
 }
 
@@ -65,6 +63,9 @@ type ManagerConfiguration struct {
 	Exchanges           []string        `json:"exchanges"`
 	RefreshInterval     time.Duration   `json:"refreshInterval"`
 	DBConfiguration     DBConfiguration `json:"dbconfiguration"`
+	HistoryStartDate    time.Time
+	HistoryEndDate		time.Time
+	HistoryApiKey 		string
 }
 
 func (b *ManagerConfiguration) Pairs() []currencies.CurrencyPair {
@@ -112,6 +113,18 @@ func (exchange Exchange) String() string {
 		"KRAKEN",
 		"BITHUMB"}
 	return exchanges[exchange]
+}
+
+
+func (exchange Exchange) CoinApiString() string {
+	switch exchange {
+	case Huobi:
+		return "HUOBIPRO"
+	case Gdax:
+		return "COINBASE"
+	default:
+		return exchange.String()
+	}
 }
 
 const (
@@ -170,9 +183,13 @@ func (b *Manager) StartListen(configuration ManagerConfiguration) {
 
 	ch := make(chan Result)
 
+	var exchanges []Exchange
+
 	for _, exchangeString := range configuration.Exchanges {
 		exchangeConfiguration := ExchangeConfiguration{}
-		exchangeConfiguration.Exchange = NewExchange(exchangeString)
+		ex := NewExchange(exchangeString)
+		exchangeConfiguration.Exchange = ex
+		exchanges = append(exchanges, ex)
 		exchangeConfiguration.TargetCurrencies = configuration.TargetCurrencies
 		exchangeConfiguration.ReferenceCurrencies = configuration.ReferenceCurrencies
 		exchangeConfiguration.Pairs = configuration.Pairs()
@@ -193,6 +210,8 @@ func (b *Manager) StartListen(configuration ManagerConfiguration) {
 		}
 		*allTickers = streamTickerCollections
 	}
+
+
 
 	for {
 		select {
@@ -230,4 +249,9 @@ func (b *Manager) convertToStreamTicker(ticker Ticker) stream.StreamTicker {
 	streamTicker.Rate = ticker.Rate
 	streamTicker.Pair = ticker.Pair
 	return streamTicker
+}
+
+
+func (b *Manager) CollectHisoryData(configuration ManagerConfiguration) {
+
 }

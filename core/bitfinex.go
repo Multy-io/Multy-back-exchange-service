@@ -53,6 +53,12 @@ func (b *BitfinexTicker) getCurriences() currencies.CurrencyPair {
 				//fmt.Println("2",symbol, referenceCurrency.CurrencyCode())
 				targetCurrencyStringWithT := strings.TrimSuffix(symbol, referenceCurrencyCode)
 				targetCurrencyString := TrimLeftChars(targetCurrencyStringWithT, 1)
+
+				if targetCurrencyString == "DSH" {
+					targetCurrencyString = "DASH"
+				}
+
+
 				//fmt.Println("targetCurrencyString", targetCurrencyString)
 				var targetCurrency = currencies.NewCurrencyWithCode(targetCurrencyString)
 				return currencies.CurrencyPair{ targetCurrency, referenceCurrency}

@@ -48,6 +48,7 @@ func (b *BitfinexApi) connectWs(apiCurrenciesConfiguration ApiCurrenciesConfigur
 		b.symbolesForSubscirbe = b.composeSymbolsForSubscirbe(apiCurrenciesConfiguration)
 		for _, symbol := range b.symbolesForSubscirbe {
 			subscribtion := `{"event":"subscribe","channel":"ticker","symbol": "` + symbol + `"}`
+			//fmt.Println(subscribtion)
 			connection.WriteMessage(websocket.TextMessage, []byte(subscribtion))
 		}
 		return connection
@@ -84,6 +85,10 @@ func (b *BitfinexApi) composeSymbolsForSubscirbe(apiCurrenciesConfiguration ApiC
 
 			if targetCurrency == referenceCurrency {
 				continue
+			}
+
+			if targetCurrency == "DASH" {
+				targetCurrency = "DSH"
 			}
 
 			if referenceCurrency == "USDT" {
