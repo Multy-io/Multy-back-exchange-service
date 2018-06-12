@@ -1,4 +1,4 @@
-create table exchanges
+create table if not exists exchanges
 (
 	id serial not null
 		constraint exchanges_pkey
@@ -8,11 +8,11 @@ create table exchanges
 )
 ;
 
-create unique index exchanges_title_uindex
+create unique index if not exists exchanges_title_uindex
 	on exchanges (title)
 ;
 
-create table currencies
+create table if not exists currencies
 (
 	id serial not null
 		constraint currencies_pkey
@@ -24,13 +24,12 @@ create table currencies
 )
 ;
 
-create unique index currencies_code_uindex
+create unique index if not exists currencies_code_uindex
 	on currencies (code)
 ;
 
 
-
-create table rates
+create table if not exists rates
 (
 	exchange_id integer not null,
 	target_id integer not null,
@@ -41,7 +40,7 @@ create table rates
 );
 
 
-create table exchanges_pairs
+create table if not exists exchanges_pairs
 (
 	exchange_id integer not null,
 	target_id integer not null,
@@ -52,8 +51,8 @@ create table exchanges_pairs
 		unique (exchange_id, reference_id, target_id, is_calculated)
 );
 
-
-create table sa_rates
+-- SA Source Abstraction - Raw data
+create table if not exists sa_rates
 (
 	exchange_title varchar not null,
 	target_title varchar not null,
@@ -117,17 +116,19 @@ WHERE sr.exchange_title = ex.title and sr.target_code = tcr.code and sr.referenc
 $$
 ;
 
-create or replace function getrates(p_time_stamp timestamp with time zone, p_exchange_title character varying, p_target_code character varying, p_referencies_codes character varying[]) returns TABLE(o_exchnage_title character varying, o_target_code character varying, o_reference_code character varying, o_time_stamp timestamp without time zone, o_rate real)
+-- Get exchange info at given point in time for given exchange from one currency to set of others
+create or replace function getrates(p_time_stamp timestamp with time zone, p_exchange_title character varying, p_target_code character varying, p_referencies_codes character varying[])
+	returns TABLE(o_exchnage_title character varying, o_target_code character varying, o_reference_code character varying, o_time_stamp timestamp without time zone, o_rate real)
 	language plpgsql
 as $$
 BEGIN
 
       RETURN QUERY SELECT  DISTINCT on (reference_code) exchange_title as o_exchnage_title, target_code as o_target_code, reference_code as o_reference_code, time_stamp as o_time_stamp, rate as o_rate
 FROM rates_view
-WHERE time_stamp <= p_time_stamp
-and exchange_title = p_exchange_title
-and target_code = p_target_code
-and reference_code = ANY(p_referencies_codes)
+WHERE time_stamp <= p_time_stamp -- add some kind of a window (a day?) limiting number of rows matching by time.
+	and exchange_title = p_exchange_title
+	and target_code = p_target_code
+	and reference_code = ANY(p_referencies_codes)
 ORDER by reference_code, time_stamp DESC;
     END;
 $$

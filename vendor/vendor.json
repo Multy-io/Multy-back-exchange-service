@@ -33,36 +33,6 @@
 			"revisionTime": "2017-12-11T19:21:08Z"
 		},
 		{
-			"checksumSHA1": "WX1+2gktHcBmE9MGwFSGs7oqexU=",
-			"path": "github.com/golang/protobuf/proto",
-			"revision": "e09c5db296004fbe3f74490e84dcd62c3c5ddb1b",
-			"revisionTime": "2018-03-28T16:31:53Z"
-		},
-		{
-			"checksumSHA1": "VfkiItDBFFkZluaAMAzJipDXNBY=",
-			"path": "github.com/golang/protobuf/ptypes",
-			"revision": "e09c5db296004fbe3f74490e84dcd62c3c5ddb1b",
-			"revisionTime": "2018-03-28T16:31:53Z"
-		},
-		{
-			"checksumSHA1": "yusEaGMuL7OWZSXKJzPEwVC0WqI=",
-			"path": "github.com/golang/protobuf/ptypes/any",
-			"revision": "e09c5db296004fbe3f74490e84dcd62c3c5ddb1b",
-			"revisionTime": "2018-03-28T16:31:53Z"
-		},
-		{
-			"checksumSHA1": "hUjAj0dheFVDl84BAnSWj9qy2iY=",
-			"path": "github.com/golang/protobuf/ptypes/duration",
-			"revision": "e09c5db296004fbe3f74490e84dcd62c3c5ddb1b",
-			"revisionTime": "2018-03-28T16:31:53Z"
-		},
-		{
-			"checksumSHA1": "O2ItP5rmfrgxPufhjJXbFlXuyL8=",
-			"path": "github.com/golang/protobuf/ptypes/timestamp",
-			"revision": "e09c5db296004fbe3f74490e84dcd62c3c5ddb1b",
-			"revisionTime": "2018-03-28T16:31:53Z"
-		},
-		{
 			"checksumSHA1": "+1LsRRZKa06yTFg/Tu5NCsyHxOA=",
 			"path": "github.com/gorilla/websocket",
 			"revision": "eb925808374e5ca90c83401a40d711dc08c0c0f6",
