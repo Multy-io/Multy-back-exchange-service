@@ -32,7 +32,7 @@ type DbTicker struct {
 	ReferenceCurrency currencies.Currency
 	Rate              float64
 	TimpeStamp        time.Time
-	isCalculated 		bool
+	isCalculated      bool
 }
 
 type DbManager struct {
@@ -54,16 +54,13 @@ func NewDbManager(configuration DBConfiguration) *DbManager {
 }
 
 func (b *DbManager) connectDb(configuration DBConfiguration) *sql.DB {
-	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
-		configuration.User, configuration.Password, configuration.Name)
-	db, err := sql.Open("postgres", dbinfo)
+	db, err := sql.Open("postgres", "sslmode=disable")
 	if err != nil {
 		log.Errorf("connectDb:DbManager:sql.Open %v", err.Error())
 	} else {
 		log.Infof("Db connected")
 	}
 	return db
-	//defer db.Close()
 }
 
 func (b *DbManager) FillDb(withExchanges []*DbExchange) {

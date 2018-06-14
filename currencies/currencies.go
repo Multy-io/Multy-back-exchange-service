@@ -14,8 +14,6 @@ func (b *CurrencyPair) Symbol() string {
 }
 
 func (b *CurrencyPair) IsEqualTo(pair CurrencyPair) bool {
-	//fmt.Println(b.TargetCurrency.CurrencyCode(), b.ReferenceCurrency.CurrencyCode(), pair.TargetCurrency.CurrencyCode(), pair.ReferenceCurrency.CurrencyCode())
-	//fmt.Println(b.TargetCurrency == pair.TargetCurrency && b.ReferenceCurrency == pair.ReferenceCurrency)
 	return b.TargetCurrency == pair.TargetCurrency && b.ReferenceCurrency == pair.ReferenceCurrency
 }
 

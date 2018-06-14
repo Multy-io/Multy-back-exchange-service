@@ -1,0 +1,30 @@
+# Release image - service image is default
+version: '3'
+services:
+    exchange-service:
+        image: multy-back-exchange-info:latest
+        
+        restart: always
+        ports:
+          - "${EXCHANGE_INFO_SERVICE_HOST_PORT}:80"
+        # links:
+        #   - postgres:multy-back-exchange-info-db
+        environment:
+            PGHOST: postgres
+            PGPORT: 5432
+            PGDATABASE: ${EXCHANGE_INFO_SERVICE_POSTGRES_DB}
+            PGUSER: "${EXCHANGE_INFO_SERVICE_POSTGRES_USER}"
+            PGPASSWORD: "${EXCHANGE_INFO_SERVICE_POSTGRES_PASSWORD}"
+
+    postgres:
+        image: postgres:10
+        restart: always
+        environment:
+            POSTGRES_DB: ${EXCHANGE_INFO_SERVICE_POSTGRES_DB}
+            POSTGRES_USER: ${EXCHANGE_INFO_SERVICE_POSTGRES_USER}
+            POSTGRES_PASSWORD: ${EXCHANGE_INFO_SERVICE_POSTGRES_PASSWORD}
+        volumes:
+            # persitent storage of the DB
+            - ${EXCHANGE_INFO_SERVICE_POSTGRES_HOST_DATA_DIR}:/var/lib/postgresql/data
+            # DB schema, executed every time container starts up
+            - ./sql/setupDB.sql:/docker-entrypoint-initdb.d/10_init.sql:ro

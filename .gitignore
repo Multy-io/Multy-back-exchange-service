@@ -6,6 +6,9 @@
 .idea/
 exchanger
 
+# Logs of the binary
+cmd/logs/*
+
 # Test binary, build with `go test -c`
 *.test
 
